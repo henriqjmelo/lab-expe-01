@@ -8,8 +8,8 @@
 
 ## 👥 Integrantes do Grupo
 
-* **[Henrique Jardim Melo]**
-* **[Gabriel Afonso]** 
+* **Henrique Jardim Melo**
+* **Gabriel Afonso** 
 
 ---
 
