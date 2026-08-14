@@ -9,8 +9,7 @@
 ## 👥 Integrantes do Grupo
 
 * **[Henrique Jardim Melo]**
-* **[Gabriel Afonso]** - GitHub: `@[usuario_b]`
-* **[Camila Melo]** - GitHub: `@[usuario_c]`
+* **[Gabriel Afonso]** 
 
 ---
 
