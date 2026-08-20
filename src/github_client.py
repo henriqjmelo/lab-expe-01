@@ -15,6 +15,8 @@ def run_query(query: str, variables: dict | None = None) -> dict:
     payload = response.json()
 
     if "errors" in payload:
-        raise RuntimeError(payload["errors"])
+        if not payload.get("data"):
+            raise RuntimeError(payload["errors"])
+        print(f"Aviso: resposta GraphQL com erros parciais: {payload['errors']}")
 
     return payload["data"]
