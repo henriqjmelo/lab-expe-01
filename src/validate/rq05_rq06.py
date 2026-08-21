@@ -38,32 +38,26 @@ def validate_primary_language(rows: list[dict]) -> None:
 
 
 def validate_issues(rows: list[dict]) -> None:
-    closed = [int(row["closedIssues"]) for row in rows if row["closedIssues"] not in ("", None)]
-    total = [int(row["totalIssues"]) for row in rows if row["totalIssues"] not in ("", None)]
-    null_closed = len(rows) - len(closed)
-    null_total = len(rows) - len(total)
-    ratios = []
-    zero_total = 0
-    invalid_order = 0
-
-    for row in rows:
-        if row["closedIssues"] in ("", None) or row["totalIssues"] in ("", None):
-            continue
-        closed_value = int(row["closedIssues"])
-        total_value = int(row["totalIssues"])
-        if closed_value > total_value:
-            invalid_order += 1
-        if total_value == 0:
-            zero_total += 1
-        else:
-            ratios.append(closed_value / total_value)
+    pairs = [
+        (int(row["closedIssues"]), int(row["totalIssues"]))
+        for row in rows
+        if row["closedIssues"] not in ("", None) and row["totalIssues"] not in ("", None)
+    ]
+    null_closed = sum(1 for row in rows if row["closedIssues"] in ("", None))
+    null_total = sum(1 for row in rows if row["totalIssues"] in ("", None))
+    invalid_order = sum(1 for closed_value, total_value in pairs if closed_value > total_value)
+    zero_total = sum(1 for _, total_value in pairs if total_value == 0)
+    ratios = [closed_value / total_value for closed_value, total_value in pairs if total_value > 0]
 
     print("--- RQ06 (issues fechadas/total) ---")
     print(f"nulos closedIssues: {null_closed}/{len(rows)}")
     print(f"nulos totalIssues: {null_total}/{len(rows)}")
     print(f"closedIssues > totalIssues: {invalid_order}")
     print(f"totalIssues igual a zero: {zero_total}")
-    print(f"razao mediana: {statistics.median(ratios):.4f}")
+    if ratios:
+        print(f"razao mediana: {statistics.median(ratios):.4f}")
+    else:
+        print("razao mediana: sem dados (todos os repositórios têm totalIssues igual a zero)")
 
     _report_count_metric(rows, "closedIssues", "RQ06 issues fechadas")
     _report_count_metric(rows, "totalIssues", "RQ06 issues totais")
