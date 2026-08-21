@@ -22,7 +22,7 @@ query($searchQuery: String!, $first: Int!) {
         primaryLanguage {
           name
         }
-        issues(states: CLOSED) {
+        closedIssues: issues(states: CLOSED) {
           totalCount
         }
         totalIssues: issues {
