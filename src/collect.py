@@ -1,12 +1,7 @@
 """
-Coletor unificado (issue #6) — combina os campos das RQs já disponíveis
-numa única query GraphQL e pagina via cursor até atingir o número de
-repositórios desejado.
-
-RQ01 (idade) e RQ02 (PRs aceitas) ainda NÃO estão incluídos — dependem
-da issue #3, ainda em aberto. Assim que ela for concluída, adicionar
-`createdAt` e `pullRequests(states: MERGED) { totalCount }` ao node
-abaixo.
+Coletor unificado (issue #6) — combina os campos de todas as RQs (01 a
+06) numa única query GraphQL e pagina via cursor até atingir o número
+de repositórios desejado.
 """
 
 import time
@@ -27,8 +22,10 @@ query($searchQuery: String!, $first: Int!, $after: String) {
         nameWithOwner
         stargazerCount
 
-        # TODO(#3): createdAt (RQ01)
-        # TODO(#3): pullRequests(states: MERGED) { totalCount } (RQ02)
+        createdAt
+        pullRequests(states: MERGED) {
+          totalCount
+        }
 
         releases {
           totalCount
