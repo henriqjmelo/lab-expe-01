@@ -17,6 +17,7 @@
 
 * Repositório: `https://github.com/henriqjmelo/lab-expe-01`
 * GitHub Projects (v2): `https://github.com/users/henriqjmelo/projects/1`
+* Relatório: [RELATORIO.md](RELATORIO.md)
 
 ---
 
@@ -32,8 +33,8 @@ A extração e validação das métricas foi dividida entre os integrantes da du
 
 | Questão de Pesquisa | Métrica | Responsável |
 | :--- | :--- | :--- |
-| **RQ 01** — Sistemas populares são maduros/antigos? | Idade do repositório (calculado a partir de `createdAt`) | Henrique Jardim Melo |
-| **RQ 02** — Sistemas populares recebem muita contribuição externa? | Total de Pull Requests aceitos (`MERGED`) | Henrique Jardim Melo |
+| **RQ 01** — Sistemas populares são maduros/antigos? | Idade do repositório (calculado a partir de `createdAt`) | Gabriel Afonso |
+| **RQ 02** — Sistemas populares recebem muita contribuição externa? | Total de Pull Requests aceitos (`MERGED`) | Gabriel Afonso |
 | **RQ 03** — Sistemas populares lançam releases com frequência? | Total de releases publicadas (`releases`) | Gabriel Afonso |
 | **RQ 04** — Sistemas populares são atualizados com frequência? | Tempo até a última atualização (`pushedAt`) | Gabriel Afonso |
 | **RQ 05** — Sistemas populares são escritos nas linguagens mais populares? | Linguagem primária (`primaryLanguage`) | Henrique Jardim Melo |
