@@ -1,0 +1,14 @@
+number,title,status
+6,[Integração] Unificar queries GraphQL e executar requisição automática para 100 repositórios,Done
+5,"[RQs] Implementar query GraphQL para RQ05 (Linguagens), RQ06 (Issues Fechadas) e Bônus RQ07",Done
+3,[RQs] Implementar query GraphQL para RQ01 (Idade) e RQ02 (PRs Aceitas),Done
+1,"[Setup] Configurar GitHub Projects v2, colunas do Kanban e política de WIP",Done
+2,[Dev] Criar estrutura inicial do script de consulta à API GraphQL do GitHub,Done
+4,[RQs] Implementar query GraphQL para RQ03 (Releases) e RQ04 (Última Atualização),Done
+7,[Dev] Implementar paginação na query GraphQL (100 → 1000 repositórios),Done
+8,[Dev] Exportar dados coletados dos 1000 repositórios para .csv,Done
+12,[RQ05+RQ06+RQ07] Validar consistência dos dados (outliers/nulos) em 1000 repos + hipótese informal,Backlog
+9,[Dev] Script de snapshot do GitHub Projects → .csv,Backlog
+10,[RQ01+RQ02] Validar consistência dos dados (outliers/nulos) em 1000 repos + hipótese informal,Backlog
+11,[RQ03+RQ04] Validar consistência dos dados (outliers/nulos) em 1000 repos + hipótese informal,Done
+13,[Relatório] Primeira versão — introdução + hipóteses informais,Backlog
