@@ -10,6 +10,13 @@ from datetime import datetime, timezone
 
 DATA_PATH = "data/repositorios.csv"
 
+# A API do GitHub nao retorna mais que 1000 em releases.totalCount. Repositorios
+# que batem nesse valor tiveram a contagem truncada — o total real e maior.
+# Verificado consultando repository(...) direto, fora da busca: next.js,
+# electron e home-assistant/core retornam exatamente 1000, enquanto
+# facebook/react retorna 132 (valor real, abaixo do teto).
+RELEASES_API_CAP = 1000
+
 
 def load_rows(path: str = DATA_PATH) -> list[dict]:
     with open(path, newline="", encoding="utf-8") as f:
@@ -25,11 +32,17 @@ def validate_releases(rows: list[dict]) -> None:
     upper_bound = q3 + 1.5 * iqr
     outliers = [v for v in values if v > upper_bound]
 
+    capped = sum(1 for v in values if v >= RELEASES_API_CAP)
+
     print("--- RQ03 (releases) ---")
     print(f"nulos: {nulls}/{len(rows)}")
     print(f"min={min(values)} max={max(values)} mediana={statistics.median(values)}")
     print(f"outliers (> {upper_bound:.1f}, limite IQR): {len(outliers)} repositorios")
     print(f"repositorios sem nenhuma release: {sum(1 for v in values if v == 0)}")
+    print(
+        f"repositorios no teto de {RELEASES_API_CAP} releases da API: {capped} "
+        "(valor truncado, o total real e maior)"
+    )
 
 
 def validate_pushed_at(rows: list[dict]) -> None:
