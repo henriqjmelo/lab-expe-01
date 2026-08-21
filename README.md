@@ -6,27 +6,27 @@
 
 ---
 
-## 👥 Integrantes do Grupo
+## Integrantes do Grupo
 
-* **Henrique Jardim Melo**
-* **Gabriel Afonso** 
-
----
-
-## 📌 Links Importantes
-
-* **Repositório:** `https://github.com/henriqjmelo/lab-expe-01`
-* **GitHub Projects (v2):** `https://github.com/users/henriqjmelo/projects/1`
+* Henrique Jardim Melo
+* Gabriel Afonso
 
 ---
 
-## 🎯 Objetivo do Laboratório
+## Links Importantes
 
-Este laboratório visa analisar as características dos 1.000 repositórios mais populares do GitHub por meio de mineração de dados utilizando a API GraphQL oficial, além de instituir e documentar a metodologia de gestão do projeto via quadro Kanban durante o semestre.
+* Repositório: `https://github.com/henriqjmelo/lab-expe-01`
+* GitHub Projects (v2): `https://github.com/users/henriqjmelo/projects/1`
 
 ---
 
-## 📊 Questões de Pesquisa (RQs) e Divisão de Trabalho
+## Objetivo do Laboratório
+
+Analisar as características dos repositórios mais populares do GitHub (por número de estrelas) usando a API GraphQL oficial, e documentar o processo de gestão do projeto via quadro Kanban ao longo do semestre.
+
+---
+
+## Questões de Pesquisa (RQs) e Divisão de Trabalho
 
 A extração e validação das métricas foi dividida entre os integrantes da dupla da seguinte forma:
 
@@ -40,41 +40,47 @@ A extração e validação das métricas foi dividida entre os integrantes da du
 | **RQ 06** — Sistemas populares possuem um alto percentual de issues fechadas? | Razão entre issues fechadas (`closed`) e total de issues | Henrique Jardim Melo |
 | **Bônus (RQ 07)** — Cruzamento das RQs 02, 03 e 04 agrupados por linguagem | Média/Mediana por linguagem | Henrique Jardim Melo |
 
-### 📚 Fonte de Referência para Linguagens (RQ 05)
-Para definir as "linguagens mais populares", o grupo utiliza como fonte oficial de referência o **[GitHub Octoverse](https://octoverse.github.com/)** / **[TIOBE Index](https://www.tiobe.com/tiobe-index/)**. Essa mesma fonte será mantida ao longo de todo o estudo.
+### Fonte de Referência para Linguagens (RQ 05)
+Para definir as "linguagens mais populares", o grupo usa como referência o [GitHub Octoverse](https://octoverse.github.com/) e o [TIOBE Index](https://www.tiobe.com/tiobe-index/). A mesma fonte é mantida ao longo de todo o estudo.
 
 ---
 
-## 🛠️ Configuração do Processo (GitHub Projects v2)
+## Configuração do Processo (GitHub Projects v2)
 
 ### 1. Estrutura do Board
-O fluxo de trabalho do grupo segue o padrão Kanban estruturado nas seguintes colunas:
-$$\text{Backlog} \longrightarrow \text{To Do} \longrightarrow \text{Doing} \longrightarrow \text{In Review} \longrightarrow \text{Done}$$
+O board segue o fluxo: Backlog → To Do → Doing → In Review → Done.
 
 ### 2. Política de Limite de WIP (Work in Progress)
-* **Limite configurado na coluna `Doing`:** **2 tarefas simultâneas**.
-* **Justificativa do Limite:** Sendo uma dupla focando em entregas individuais por Sprint, definir o limite em 2 cartões (um por integrante) força o foco na conclusão e revisão (*Review*) das tarefas ativas antes que novas sejam iniciadas. Isso previne gargalos de desenvolvimento, impede o acúmulo de tarefas incompletas e minimiza o tempo de ciclo (*cycle time*).
+Limite configurado na coluna `Doing`: 2 tarefas simultâneas (uma por integrante). Com uma dupla fazendo entregas individuais por sprint, esse limite força terminar e revisar o que já está em andamento antes de começar outra coisa, em vez de acumular tarefas abertas ao mesmo tempo.
 
 ### 3. Regras de Desenvolvimento
-1. **Rastreabilidade de Tasks:** Nenhuma tarefa é mantida como *Draft Issue*. Todas são convertidas em Issues reais do repositório e vinculadas ao Project.
-2. **Atribuição:** Todas as Issues possuem um responsável direto (*Assignee*).
-3. **Vínculo Commit ↔ Issue:** Todos os commits do projeto contêm a referência ao número da Issue correspondente na mensagem (ex.: `#12 implementa consulta GraphQL`), garantindo histórico auditável e vinculação automática no board.
+1. Nenhuma tarefa fica como *draft issue* solta — todas viram Issues reais do repositório, vinculadas ao Project.
+2. Toda Issue tem um responsável (*assignee*) definido.
+3. Todo commit referencia o número da Issue correspondente na mensagem (ex.: `#12 implementa consulta GraphQL`), pra manter o vínculo automático entre commit e board.
 
 ---
 
-## 🚀 Como Executar o Script
+## Como Executar o Script
 
 ### Estrutura do Projeto
 ```
 lab-expe-01/
-├── .env.example      # modelo do arquivo de variáveis de ambiente
+├── .env.example          # modelo do arquivo de variáveis de ambiente
 ├── .gitignore
 ├── requirements.txt
-├── main.py            # script de teste de conexão
-├── data/               # saída dos .csv (ignorado pelo git)
+├── main.py                # teste de conexão
+├── RELATORIO.md
+├── data/
+│   ├── repositorios.csv   # dataset coletado (versionado)
+│   └── snapshot_*.csv     # snapshots do board, um por sprint
 └── src/
-    ├── config.py       # carrega o token do .env
-    └── github_client.py # cliente HTTP genérico para a API GraphQL
+    ├── config.py           # carrega o token do .env
+    ├── github_client.py    # cliente HTTP genérico para a API GraphQL
+    ├── collect.py           # coletor unificado (todas as RQs, paginado)
+    ├── export_csv.py
+    ├── snapshot.py          # snapshot do Project v2 → CSV
+    ├── rq/                   # implementação + amostra de cada RQ
+    └── validate/             # validação de nulos/outliers no dataset completo
 ```
 
 ### Passo a passo
