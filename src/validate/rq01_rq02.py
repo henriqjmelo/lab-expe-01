@@ -25,16 +25,32 @@ def validate_created_at(rows: list[dict]) -> None:
     values = [r["createdAt"] for r in rows if r["createdAt"] not in ("", None)]
     nulls = len(rows) - len(values)
     parsed = [datetime.fromisoformat(value.replace("Z", "+00:00")) for value in values]
-    timestamps = [date.timestamp() for date in parsed]
-    upper_bound, _, outliers = _iqr_outliers(timestamps)
     now = datetime.now(timezone.utc)
 
-    print("--- RQ01 (createdAt) ---")
+    # a metrica de RQ01 e a idade, entao os outliers sao analisados sobre ela e
+    # nos dois limites: repositorios muito mais antigos ou muito mais novos que
+    # o restante. Olhar so o limite superior de createdAt esconderia justamente
+    # os projetos mais antigos, que sao o caso interessante aqui.
+    ages = sorted((now - date).days / 365.25 for date in parsed)
+    quartiles = statistics.quantiles(ages, n=4)
+    q1, q3 = quartiles[0], quartiles[2]
+    iqr = q3 - q1
+    lower_bound, upper_bound = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+    old_outliers = [age for age in ages if age > upper_bound]
+    new_outliers = [age for age in ages if age < lower_bound]
+
+    print("--- RQ01 (createdAt / idade) ---")
     print(f"nulos: {nulls}/{len(rows)}")
-    print(f"data mais antiga: {min(parsed).isoformat()}")
-    print(f"data mais recente: {max(parsed).isoformat()}")
+    print(f"data mais antiga: {min(parsed).date()} | mais recente: {max(parsed).date()}")
     print(f"datas no futuro: {sum(1 for date in parsed if date > now)}")
-    print(f"outliers (> timestamp {upper_bound:.0f}, limite IQR): {len(outliers)} repositorios")
+    print(
+        f"idade em anos: min={ages[0]:.1f} max={ages[-1]:.1f} "
+        f"mediana={statistics.median(ages):.1f}"
+    )
+    print(
+        f"outliers de idade (fora de {lower_bound:.1f}-{upper_bound:.1f} anos, limite IQR): "
+        f"{len(old_outliers)} mais antigos, {len(new_outliers)} mais recentes"
+    )
 
 
 def validate_pull_requests(rows: list[dict]) -> None:
