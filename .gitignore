@@ -9,6 +9,7 @@ __pycache__/
 venv/
 *.egg-info/
 
-# Data outputs
+# Data outputs (mantém só o dataset final coletado; exports de teste ficam fora)
 data/*.csv
 !data/.gitkeep
+!data/repositorios.csv
