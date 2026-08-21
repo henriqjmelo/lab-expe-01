@@ -77,7 +77,10 @@ def collect_repositories(total: int = 100, delay: float = 2.0) -> list[dict]:
         page_size = min(PAGE_SIZE, total - len(repos))
         search = _fetch_page(search_query, page_size, cursor)
 
-        repos.extend(search["nodes"])
+        # a Search API do GitHub pode retornar nós nulos para repositórios
+        # que ficaram inacessíveis/foram movidos entre a indexação e a
+        # resolução da busca — descarta esses nós em vez de propagar None
+        repos.extend(node for node in search["nodes"] if node is not None)
 
         if not search["pageInfo"]["hasNextPage"]:
             break

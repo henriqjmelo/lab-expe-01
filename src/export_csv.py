@@ -16,7 +16,10 @@ def _flatten_value(value):
             return value["totalCount"]
         if "name" in value:
             return value["name"]
-        return value
+        raise ValueError(
+            f"Campo aninhado com formato desconhecido: {value!r} — "
+            "atualize _flatten_value para lidar com esse formato."
+        )
     if value is None:
         return ""
     return value
