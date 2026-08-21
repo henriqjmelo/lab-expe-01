@@ -41,4 +41,6 @@ As consultas do GitHub usam exclusivamente `requests` e GraphQL manual. Nao fora
 
 ## 4. Limites da analise
 
+A coleta reuniu 990 repositorios em vez dos 1000 previstos pelo enunciado. A diferenca vem do proprio ranking mudando durante os minutos que a paginacao leva pra terminar: como a busca e ordenada por estrelas em tempo real, repositorios podem entrar ou sair das primeiras posicoes entre uma pagina e outra. O numero se repetiu (990) em duas coletas separadas, o que sugere um limite proprio da API pra essa consulta, nao uma falha aleatoria.
+
 O ranking e dinamico e pode mudar durante a coleta. Campos nulos, especialmente `primaryLanguage`, podem refletir repositorios sem linguagem dominante definida pelo GitHub. Outliers nao sao erros automaticamente: projetos muito grandes podem legitimamente concentrar contribuicoes ou issues. Por fim, a razao de issues fechadas nao mede tempo de resolucao nem qualidade da manutencao.
