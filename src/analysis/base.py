@@ -119,9 +119,13 @@ def salvar(fig, nome: str) -> str:
     return caminho
 
 
-def histograma(valores, titulo, xlabel, nome, bins=30, log_y=False) -> str:
+def histograma(valores, titulo, xlabel, nome, bins=30, log_y=False, log_x=False) -> str:
     fig, ax = _nova_figura()
     ax.hist(valores, bins=bins, color="#4878a8", edgecolor="white")
+    if log_x:
+        # precisa acompanhar intervalos espacados em log, senao as barras
+        # ficam com largura desigual num eixo linear e o grafico engana
+        ax.set_xscale("log")
     if log_y:
         ax.set_yscale("log")
         ax.set_ylabel("Repositorios (escala log)")
