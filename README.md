@@ -10,6 +10,7 @@
 
 * Henrique Jardim Melo
 * Gabriel Afonso
+* Terceiro integrante a definir
 
 ---
 
@@ -29,17 +30,17 @@ Analisar as características dos repositórios mais populares do GitHub (por nú
 
 ## Questões de Pesquisa (RQs) e Divisão de Trabalho
 
-A extração e validação das métricas foi dividida entre os integrantes da dupla da seguinte forma:
+As RQs são divididas em três partes, uma por integrante. A tabela mostra a divisão da análise e visualização (Lab01S03). A divisão da extração e da validação, nas sprints anteriores, está registrada no board e no histórico de commits.
 
 | Questão de Pesquisa | Métrica | Responsável |
 | :--- | :--- | :--- |
 | **RQ 01** — Sistemas populares são maduros/antigos? | Idade do repositório (calculado a partir de `createdAt`) | Gabriel Afonso |
 | **RQ 02** — Sistemas populares recebem muita contribuição externa? | Total de Pull Requests aceitos (`MERGED`) | Gabriel Afonso |
-| **RQ 03** — Sistemas populares lançam releases com frequência? | Total de releases publicadas (`releases`) | Gabriel Afonso |
-| **RQ 04** — Sistemas populares são atualizados com frequência? | Tempo até a última atualização (`pushedAt`) | Gabriel Afonso |
-| **RQ 05** — Sistemas populares são escritos nas linguagens mais populares? | Linguagem primária (`primaryLanguage`) | Henrique Jardim Melo |
-| **RQ 06** — Sistemas populares possuem um alto percentual de issues fechadas? | Razão entre issues fechadas (`closed`) e total de issues | Henrique Jardim Melo |
-| **Bônus (RQ 07)** — Cruzamento das RQs 02, 03 e 04 agrupados por linguagem | Média/Mediana por linguagem | Henrique Jardim Melo |
+| **RQ 03** — Sistemas populares lançam releases com frequência? | Total de releases publicadas (`releases`) | Henrique Jardim Melo |
+| **RQ 04** — Sistemas populares são atualizados com frequência? | Tempo até a última atualização (`pushedAt`) | Henrique Jardim Melo |
+| **RQ 05** — Sistemas populares são escritos nas linguagens mais populares? | Linguagem primária (`primaryLanguage`) | A definir |
+| **RQ 06** — Sistemas populares possuem um alto percentual de issues fechadas? | Razão entre issues fechadas (`closed`) e total de issues | A definir |
+| **Bônus (RQ 07)** — Cruzamento das RQs 02, 03 e 04 agrupados por linguagem | Média/Mediana por linguagem | A definir |
 
 ### Fonte de Referência para Linguagens (RQ 05)
 Para definir as "linguagens mais populares", o grupo usa como referência o [GitHub Octoverse](https://octoverse.github.com/) e o [TIOBE Index](https://www.tiobe.com/tiobe-index/). A mesma fonte é mantida ao longo de todo o estudo.
@@ -74,6 +75,7 @@ lab-expe-01/
 ├── data/
 │   ├── repositorios.csv   # dataset coletado (versionado)
 │   └── snapshot_*.csv     # snapshots do board, um por sprint
+├── graficos/              # PNG gerados na análise (versionados)
 └── src/
     ├── config.py           # carrega o token do .env
     ├── github_client.py    # cliente HTTP genérico para a API GraphQL
@@ -81,7 +83,9 @@ lab-expe-01/
     ├── export_csv.py
     ├── snapshot.py          # snapshot do Project v2 → CSV
     ├── rq/                   # implementação + amostra de cada RQ
-    └── validate/             # validação de nulos/outliers no dataset completo
+    ├── validate/             # validação de nulos/outliers no dataset completo
+    └── analysis/             # estatísticas e gráficos das RQs
+        └── base.py            # carregamento tipado, métricas derivadas e helpers de gráfico
 ```
 
 ### Passo a passo
@@ -117,3 +121,30 @@ lab-expe-01/
    python main.py
    ```
    Se tudo estiver certo, o script imprime seu login do GitHub e o rate limit disponível.
+
+### Coleta de dados
+
+```bash
+python -m src.collect 1000     # coleta os repositórios e grava data/repositorios.csv
+python -m src.snapshot         # exporta o board para data/snapshot_AAAA-MM-DD.csv
+```
+
+A coleta completa leva alguns minutos, porque pagina em blocos e respeita o limite de requisições da API.
+
+### Validação e análise
+
+Os scripts abaixo leem `data/repositorios.csv` e não fazem requisições à API.
+
+```bash
+python -m src.validate.rq01_rq02   # nulos e outliers de idade e PRs aceitas
+python -m src.validate.rq03_rq04   # nulos e outliers de releases e atualização
+python -m src.validate.rq05_rq06   # nulos, linguagens e razão de issues
+
+python -m src.analysis.rq01_rq02   # estatísticas e gráficos de RQ01 e RQ02
+```
+
+Os gráficos são salvos em `graficos/`.
+
+### Sobre as dependências
+
+A coleta usa apenas `requests` e a query GraphQL é escrita à mão, como o enunciado exige. `matplotlib` e `numpy` entram só na etapa de análise e visualização, e não consultam a API do GitHub.
