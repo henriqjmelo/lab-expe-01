@@ -45,6 +45,8 @@ As RQs são divididas em três partes, uma por integrante. A tabela mostra a div
 ### Fonte de Referência para Linguagens (RQ 05)
 Para definir as "linguagens mais populares", o grupo usa como referência o [GitHub Octoverse](https://octoverse.github.com/) e o [TIOBE Index](https://www.tiobe.com/tiobe-index/). A mesma fonte é mantida ao longo de todo o estudo.
 
+Os dois rankings usados na comparação ficam fixos em `src/analysis/rq05_rq06.py`, com a data da consulta (Octoverse 2025 e TIOBE de agosto/2026), para que a análise continue reproduzível depois que os rankings mudarem.
+
 ---
 
 ## Configuração do Processo (GitHub Projects v2)
@@ -141,6 +143,7 @@ python -m src.validate.rq03_rq04   # nulos e outliers de releases e atualizaçã
 python -m src.validate.rq05_rq06   # nulos, linguagens e razão de issues
 
 python -m src.analysis.rq01_rq02   # estatísticas e gráficos de RQ01 e RQ02
+python -m src.analysis.rq05_rq06   # estatísticas e gráficos de RQ05 e RQ06
 ```
 
 Os gráficos são salvos em `graficos/`.
