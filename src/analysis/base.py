@@ -146,13 +146,30 @@ def barras(rotulos, valores, titulo, xlabel, nome) -> str:
     return salvar(fig, nome)
 
 
-def boxplot(grupos: dict, titulo, ylabel, nome, log_y=False) -> str:
-    """grupos: {rotulo: [valores]}. Usado na RQ07."""
-    fig, ax = _nova_figura()
+def boxplot(grupos: dict, titulo, ylabel, nome, xlabel="", symlog_y=False, figsize=(11, 6)) -> str:
+    """
+    grupos: {rotulo: [valores]}. Usado na RQ07.
+
+    A escala opcional e symlog, e nao log, porque as tres metricas da RQ07
+    contem zeros legitimos (repositorios sem release, sem PR aceita ou com
+    push no proprio dia da coleta). Em escala log esses valores sumiriam do
+    grafico. O symlog e linear entre -1 e 1 e logaritmico a partir dai, o
+    que preserva o zero e ainda comprime a cauda longa. O linscale encurta
+    essa faixa linear: no valor padrao ela ocuparia o espaco de uma decada
+    inteira e empurraria todas as caixas pra metade de cima do grafico.
+
+    Os outliers ficam ocultos (showfliers=False): com caudas que chegam a
+    dezenas de milhares, os pontos extremos esticariam o eixo a ponto de
+    achatar todas as caixas. O corpo da distribuicao, que e o que a
+    comparacao entre linguagens precisa mostrar, continua visivel.
+    """
+    fig, ax = _nova_figura(figsize=figsize)
     ax.boxplot(grupos.values(), tick_labels=list(grupos.keys()), showfliers=False)
-    if log_y:
-        ax.set_yscale("log")
+    if symlog_y:
+        ax.set_yscale("symlog", linthresh=1, linscale=0.25)
     ax.set_title(titulo)
     ax.set_ylabel(ylabel)
+    if xlabel:
+        ax.set_xlabel(xlabel)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     return salvar(fig, nome)

@@ -40,12 +40,15 @@ As RQs são divididas em três partes, uma por integrante. A tabela mostra a div
 | **RQ 04** — Sistemas populares são atualizados com frequência? | Tempo até a última atualização (`pushedAt`) | Henrique Jardim Melo |
 | **RQ 05** — Sistemas populares são escritos nas linguagens mais populares? | Linguagem primária (`primaryLanguage`) | A definir |
 | **RQ 06** — Sistemas populares possuem um alto percentual de issues fechadas? | Razão entre issues fechadas (`closed`) e total de issues | A definir |
-| **Bônus (RQ 07)** — Cruzamento das RQs 02, 03 e 04 agrupados por linguagem | Média/Mediana por linguagem | A definir |
+| **Bônus (RQ 07)** — Cruzamento das RQs 02, 03 e 04 agrupados por linguagem | Mediana por linguagem, com boxplot | A definir |
 
 ### Fonte de Referência para Linguagens (RQ 05)
 Para definir as "linguagens mais populares", o grupo usa como referência o [GitHub Octoverse](https://octoverse.github.com/) e o [TIOBE Index](https://www.tiobe.com/tiobe-index/). A mesma fonte é mantida ao longo de todo o estudo.
 
-Os dois rankings usados na comparação ficam fixos em `src/analysis/rq05_rq06.py`, com a data da consulta (Octoverse 2025 e TIOBE de agosto/2026), para que a análise continue reproduzível depois que os rankings mudarem.
+Os dois rankings usados na comparação ficam fixos em `src/analysis/rq05_rq06.py`, com a data da consulta (Octoverse 2025 e TIOBE de agosto/2026), para que a análise continue reproduzível depois que os rankings mudarem. A RQ07 importa essas mesmas listas em vez de redefini-las, para que "linguagem popular" signifique a mesma coisa nas duas RQs.
+
+### Corte mínimo de repositórios por linguagem (RQ07)
+A RQ07 só compara linguagens com pelo menos **10 repositórios** no dataset. Das 43 linguagens primárias distintas, 24 aparecem em menos de 5 repositórios e 12 aparecem em um único — nesses casos a mediana descreve dois ou três projetos específicos, não a linguagem. Com o corte sobram 13 linguagens, que cobrem 819 dos 905 repositórios com linguagem informada (90,5%).
 
 ---
 
@@ -144,6 +147,7 @@ python -m src.validate.rq05_rq06   # nulos, linguagens e razão de issues
 
 python -m src.analysis.rq01_rq02   # estatísticas e gráficos de RQ01 e RQ02
 python -m src.analysis.rq05_rq06   # estatísticas e gráficos de RQ05 e RQ06
+python -m src.analysis.rq07        # RQ07: RQ02, RQ03 e RQ04 por linguagem
 ```
 
 Os gráficos são salvos em `graficos/`.
