@@ -10,7 +10,7 @@
 
 * Henrique Jardim Melo
 * Gabriel Afonso
-* Guilherme costa
+* Guilherme Costa
 
 ---
 
@@ -38,9 +38,9 @@ As RQs são divididas em três partes, uma por integrante. A tabela mostra a div
 | **RQ 02** — Sistemas populares recebem muita contribuição externa? | Total de Pull Requests aceitos (`MERGED`) | Gabriel Afonso |
 | **RQ 03** — Sistemas populares lançam releases com frequência? | Total de releases publicadas (`releases`) | Henrique Jardim Melo |
 | **RQ 04** — Sistemas populares são atualizados com frequência? | Tempo até a última atualização (`pushedAt`) | Henrique Jardim Melo |
-| **RQ 05** — Sistemas populares são escritos nas linguagens mais populares? | Linguagem primária (`primaryLanguage`) | A definir |
-| **RQ 06** — Sistemas populares possuem um alto percentual de issues fechadas? | Razão entre issues fechadas (`closed`) e total de issues | A definir |
-| **Bônus (RQ 07)** — Cruzamento das RQs 02, 03 e 04 agrupados por linguagem | Mediana por linguagem, com boxplot | A definir |
+| **RQ 05** — Sistemas populares são escritos nas linguagens mais populares? | Linguagem primária (`primaryLanguage`) | Guilherme Costa |
+| **RQ 06** — Sistemas populares possuem um alto percentual de issues fechadas? | Razão entre issues fechadas (`closed`) e total de issues | Guilherme Costa |
+| **Bônus (RQ 07)** — Cruzamento das RQs 02, 03 e 04 agrupados por linguagem | Mediana por linguagem, com boxplot | Guilherme Costa |
 
 ### Fonte de Referência para Linguagens (RQ 05)
 Para definir as "linguagens mais populares", o grupo usa como referência o [GitHub Octoverse](https://octoverse.github.com/) e o [TIOBE Index](https://www.tiobe.com/tiobe-index/). A mesma fonte é mantida ao longo de todo o estudo.
@@ -58,7 +58,11 @@ A RQ07 só compara linguagens com pelo menos **10 repositórios** no dataset. Da
 O board segue o fluxo: Backlog → To Do → Doing → In Review → Done.
 
 ### 2. Política de Limite de WIP (Work in Progress)
-Limite configurado na coluna `Doing`: 2 tarefas simultâneas (uma por integrante). Com uma dupla fazendo entregas individuais por sprint, esse limite força terminar e revisar o que já está em andamento antes de começar outra coisa, em vez de acumular tarefas abertas ao mesmo tempo.
+Limite configurado na coluna `Doing`: 2 cartões simultâneos. O grupo tem três integrantes, então o limite fica de propósito abaixo do tamanho do time.
+
+A ideia é priorizar fluxo em vez de ocupação. Se cada integrante pudesse manter um cartão próprio em andamento, as três frentes avançariam em paralelo e nada seria concluído antes do fim da sprint. Com o teto em 2, quem termina uma tarefa e encontra o limite ocupado precisa ajudar a fechar ou revisar o que já está em andamento antes de puxar item novo, o que reduz o tempo de ciclo.
+
+As colunas `Backlog` e `In review` também têm limite, de 5 cartões cada, para sinalizar acúmulo nas pontas do fluxo.
 
 ### 3. Regras de Desenvolvimento
 1. Nenhuma tarefa fica como *draft issue* solta — todas viram Issues reais do repositório, vinculadas ao Project.
@@ -81,6 +85,8 @@ lab-expe-01/
 │   ├── repositorios.csv   # dataset coletado (versionado)
 │   └── snapshot_*.csv     # snapshots do board, um por sprint
 ├── graficos/              # PNG gerados na análise (versionados)
+├── prints/                # prints do board, anexados ao relatório
+├── artefatos/             # slides da apresentação
 └── src/
     ├── config.py           # carrega o token do .env
     ├── github_client.py    # cliente HTTP genérico para a API GraphQL
@@ -90,7 +96,11 @@ lab-expe-01/
     ├── rq/                   # implementação + amostra de cada RQ
     ├── validate/             # validação de nulos/outliers no dataset completo
     └── analysis/             # estatísticas e gráficos das RQs
-        └── base.py            # carregamento tipado, métricas derivadas e helpers de gráfico
+        ├── base.py            # carregamento tipado, métricas derivadas e helpers de gráfico
+        ├── rq01_rq02.py
+        ├── rq03_rq04.py
+        ├── rq05_rq06.py
+        └── rq07.py
 ```
 
 ### Passo a passo
@@ -146,6 +156,7 @@ python -m src.validate.rq03_rq04   # nulos e outliers de releases e atualizaçã
 python -m src.validate.rq05_rq06   # nulos, linguagens e razão de issues
 
 python -m src.analysis.rq01_rq02   # estatísticas e gráficos de RQ01 e RQ02
+python -m src.analysis.rq03_rq04   # estatísticas e gráficos de RQ03 e RQ04
 python -m src.analysis.rq05_rq06   # estatísticas e gráficos de RQ05 e RQ06
 python -m src.analysis.rq07        # RQ07: RQ02, RQ03 e RQ04 por linguagem
 ```
