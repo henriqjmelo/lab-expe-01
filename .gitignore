@@ -14,3 +14,6 @@ data/*.csv
 !data/.gitkeep
 !data/repositorios.csv
 !data/snapshot_*.csv
+
+# macOS
+.DS_Store

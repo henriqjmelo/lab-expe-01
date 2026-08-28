@@ -298,13 +298,26 @@ A resposta possivel, portanto, e negativa com ressalva: nao ha evidencia de que 
 
 ## 4. Configuracao do processo
 
+- **Repositorio:** https://github.com/henriqjmelo/lab-expe-01
+- **GitHub Projects (v2):** https://github.com/users/henriqjmelo/projects/1
+
 O trabalho foi organizado em issues independentes, com uma branch por entrega e commits iniciados pelo numero da issue. O fluxo adotado foi:
 
 `Backlog -> To Do -> Doing -> In Review -> Done`
 
-Cada issue deve ser vinculada ao GitHub Projects v2. Ao iniciar uma tarefa, seu card deve ser movido para `Doing`; apos a revisao e o merge, deve ser movido para `Done`. O projeto utilizado e o projeto de usuario numero 1 de `henriqjmelo`.
+Cada issue deve ser vinculada ao GitHub Projects v2. Ao iniciar uma tarefa, seu card deve ser movido para `Doing`; apos a revisao e o merge, deve ser movido para `Done`.
 
-As consultas do GitHub usam exclusivamente `requests` e GraphQL manual. Nao foram utilizadas bibliotecas de terceiros para a API do GitHub. O token e carregado por `GITHUB_TOKEN` a partir do ambiente ou de `.env`, que permanece fora do controle de versao.
+### Politica de limite de WIP
+
+O limite de trabalho em andamento na coluna `Doing` foi definido em **2 cartoes**, valor visivel nos prints anexados ao final desta secao.
+
+O grupo tem tres integrantes, entao o limite fica deliberadamente abaixo do tamanho do time. A escolha segue a ideia central do Kanban de priorizar fluxo em vez de ocupacao: se cada integrante pudesse manter um cartao proprio em andamento, as tres frentes avancariam em paralelo e nada seria concluido antes do fim da sprint. Com o teto em 2, quem termina uma tarefa e encontra o limite ocupado precisa ajudar a fechar ou revisar o que ja esta em andamento antes de puxar item novo, o que reduz o tempo de ciclo e evita acumular trabalho pela metade.
+
+O efeito pratico apareceu na organizacao das sprints: as entregas foram encadeadas por dependencia, com a base de analise liberando as analises por RQ, e cada analise liberando a secao correspondente do relatorio.
+
+As colunas `Backlog` e `In review` tambem receberam limite, de 5 cartoes cada, para sinalizar acumulo nas pontas do fluxo.
+
+As consultas do GitHub usam exclusivamente `requests` e GraphQL manual. Nao foram utilizadas bibliotecas de terceiros para a API do GitHub. `matplotlib` e `numpy` entram apenas na etapa de analise e visualizacao, e nao acessam a API. O token e carregado por `GITHUB_TOKEN` a partir do ambiente ou de `.env`, que permanece fora do controle de versao.
 
 ![Print do GitHub Projects](prints/Screenshot%202026-08-27%20at%2022.08.21.png)
 
