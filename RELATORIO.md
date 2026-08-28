@@ -91,6 +91,40 @@ A hipotese informal registrada na issue #10 dizia que repositorios mais antigos 
 
 O resultado acompanha a hipotese: a mediana de PRs aceitas cresce em todas as faixas conforme a idade aumenta, sem excecao. Cabem duas ressalvas. A primeira e que o crescimento nao e proporcional ao tempo: entre a faixa mais nova e a mais antiga a idade se multiplica bem mais do que as 3,8 vezes observadas na mediana de PRs, o que sugere que o tempo explica parte do fenomeno, mas nao ele todo. A segunda e que o cruzamento mostra associacao, nao causa. Fatores como o tipo de projeto, o tamanho da comunidade e a politica de contribuicao de cada repositorio nao foram controlados e podem estar por tras do mesmo padrao.
 
+### RQ03 — Sistemas populares lancam releases com frequencia?
+
+Metrica: total de releases publicadas.
+
+| Estatistica | Valor |
+| :--- | ---: |
+| Mediana | 38 releases |
+| Media | 127 releases |
+| Minimo | 0 releases |
+| Maximo observado | 1.000 releases |
+| Q1 | 0 releases |
+| Q3 | 147 releases |
+
+Dos 990 repositorios, 288 nao possuem nenhuma release e 23 aparecem exatamente no teto de 1.000 da API. Nesse segundo grupo, o valor real pode ser maior, pois `releases.totalCount` e truncado pela API nesse limite. O grafico `graficos/rq03_releases.png` mostra a distribuicao dos repositorios com pelo menos uma release, mantendo os dois grupos explicitamente informados no titulo e no texto.
+
+**Discussao.** A hipotese da issue #11 dizia que a frequencia de releases varia conforme o tipo de projeto e seu processo de versionamento. O resultado apoia essa leitura: embora a mediana seja 38, quase 29% do conjunto nao publica releases. Isso inclui listas curadas, material de referencia e outros repositorios que nao seguem um ciclo tradicional de versoes. A media de 127 tambem fica muito acima da mediana por causa de poucos projetos com muitas releases. O teto da API limita a leitura dos extremos e exige cautela ao comparar os maiores produtores de releases.
+
+### RQ04 — Sistemas populares sao atualizados com frequencia?
+
+Metrica: tempo, em dias, entre o `pushedAt` e a data de referencia da coleta, 21/08/2026.
+
+| Estatistica | Valor |
+| :--- | ---: |
+| Mediana | 1 dia |
+| Media | 112 dias |
+| Minimo | 0 dias |
+| Maximo | 2.452 dias |
+| Q1 | 0 dias |
+| Q3 | 47 dias |
+
+Quatrocentos e quarenta e seis repositorios tiveram push no proprio dia da coleta. O grafico `graficos/rq04_dias_sem_push.png` apresenta a distribuicao do tempo ate a ultima atualizacao.
+
+**Discussao.** A mediana de apenas 1 dia confirma a parte da hipotese que previa atualizacoes recentes: pelo menos metade dos repositorios foi atualizada ha no maximo um dia antes da referencia. A media de 112 dias e o terceiro quartil de 47 dias revelam uma cauda longa de repositorios populares que nao recebem mudancas ha meses ou anos. Portanto, a amostra e predominantemente ativa, mas nao homogenea; a frequencia de atualizacao varia conforme o projeto e seu ritmo de manutencao.
+
 ### RQ05 — Sistemas populares sao escritos nas linguagens mais populares?
 
 Metrica: linguagem primaria do repositorio, campo `primaryLanguage`.
