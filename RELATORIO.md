@@ -306,6 +306,12 @@ Cada issue deve ser vinculada ao GitHub Projects v2. Ao iniciar uma tarefa, seu 
 
 As consultas do GitHub usam exclusivamente `requests` e GraphQL manual. Nao foram utilizadas bibliotecas de terceiros para a API do GitHub. O token e carregado por `GITHUB_TOKEN` a partir do ambiente ou de `.env`, que permanece fora do controle de versao.
 
+![Print do GitHub Projects](prints/Screenshot%202026-08-27%20at%2022.08.21.png)
+
+![Print do GitHub Projects](prints/Screenshot%202026-08-27%20at%2022.08.28.png)
+
+![Print do GitHub Projects](prints/image.png)
+
 ## 5. Limites da analise
 
 A contagem de releases (RQ03) e truncada pela propria API do GitHub, que nao retorna valores acima de 1000 em `releases.totalCount`. No dataset, 23 dos 990 repositorios (2,3%) aparecem com exatamente 1000 releases, o que significa que o total real deles e maior — nao foi possivel saber quanto. A verificacao foi feita consultando `repository(...)` diretamente, fora da busca paginada: `vercel/next.js`, `electron/electron` e `home-assistant/core` retornam exatamente 1000, enquanto `facebook/react` retorna 132, um valor real abaixo do teto. A mediana de RQ03 nao e afetada, ja que a maior parte da distribuicao esta longe do limite, mas o valor maximo e a analise de extremos ficam subestimados. Esse truncamento tambem tende a enviesar a RQ07 na comparacao de releases por linguagem, porque os projetos que batem no teto se concentram no ecossistema JavaScript/TypeScript.

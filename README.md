@@ -10,7 +10,7 @@
 
 * Henrique Jardim Melo
 * Gabriel Afonso
-* Terceiro integrante a definir
+* Guilherme costa
 
 ---
 
