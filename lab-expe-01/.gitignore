@@ -1,0 +1,19 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Data outputs (mantém o dataset final e os snapshots de sprint; exports de teste ficam fora)
+data/*.csv
+!data/.gitkeep
+!data/repositorios.csv
+!data/snapshot_*.csv
+
+# macOS
+.DS_Store
