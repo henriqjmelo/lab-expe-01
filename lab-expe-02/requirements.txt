@@ -1,0 +1,18 @@
+# Lab02 - dependencias Python
+# Versoes fixadas: a secao 5 do DESENHO.md trata "efeito de medicao" como
+# ameaca a validade de construto, mitigada fixando versoes e comandos.
+# Testado com Python 3.12.
+#
+# A duplicacao (RQ3) usa jscpd, que e Node: instale com `npm install` nesta pasta.
+
+# Execucao das suites de aceitacao e cronometragem do trial (RQ1, RQ2)
+pytest==9.1.1
+
+# Metricas estaticas: complexidade ciclomatica, LOC e manutenibilidade (RQ3)
+radon==6.0.1
+
+# Analise estatistica e graficos (S03)
+pandas==3.0.5
+scipy==1.18.1
+matplotlib==3.11.1
+seaborn==0.13.2

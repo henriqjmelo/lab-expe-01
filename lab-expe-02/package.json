@@ -1,0 +1,10 @@
+{
+  "name": "lab-expe-02",
+  "version": "1.0.0",
+  "description": "Ferramental Node do Lab02 - deteccao de duplicacao com jscpd",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "jscpd": "5.2.0"
+  }
+}
