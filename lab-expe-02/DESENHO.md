@@ -99,9 +99,21 @@ Cada kata tem `test_kN.py` com testes de aceitação escritos e congelados antes
 
 Todas as 53 asserções foram conferidas contra uma implementação de referência (descartável, não commitada) antes de congelar as suítes: as 53 passam com a referência e falham de forma limpa (`NotImplementedError`, sem erro de import) contra o esqueleto vazio de `solucao.py`, que é o estado em que cada trial começa.
 
-## 5. Ameaças à validade
+## 5. Ameaças à validade e plano de mitigação
 
-_Pendente — issue #57._
+| Ameaça | Tipo de validade | Mitigação planejada | Risco residual |
+| :--- | :--- | :--- | :--- |
+| **Efeito de aprendizado entre katas**: a prática acumulada pode reduzir o tempo nos últimos trials independentemente da IA | Interna | Usar desenho crossover, contrabalancear a ordem, registrar a posição do trial e comparar cada participante consigo mesmo | O aprendizado não é removido completamente; a posição será reportada e interpretada como possível confundidor |
+| **Familiaridade prévia desigual com a ferramenta de IA**: participantes podem começar com diferentes níveis de domínio | Construto / interna | Registrar experiência prévia no questionário inicial, documentar a ferramenta e as regras de uso e incluir participante como bloco do desenho | A familiaridade pode continuar afetando a magnitude do efeito; não será possível equalizar totalmente a experiência sem treinamento adicional |
+| **Vazamento de solução entre trials**: uma solução ou estratégia vista antes pode ser reutilizada em outra condição | Interna | Executar as katas em ordem definida, manter diretórios e sessões separados, não compartilhar código entre trials e registrar qualquer incidente | Participantes podem reconhecer padrões ou transferir conhecimento informalmente, mesmo sem copiar arquivos |
+| **Memorização pelo modelo**: katas públicas e muito indexadas podem estar no treinamento do assistente | Construto / interna | Usar seis katas autorais do grupo, sem copiar LeetCode, HackerRank ou Codewars, e congelar as especificações antes dos trials | Não é possível garantir que conceitos genéricos ou padrões semelhantes não estejam no treinamento do modelo |
+| **Amostra pequena**: três participantes e 18 trials limitam o poder estatístico e a estabilidade das estimativas | Conclusão | Reportar medianas e IQR, preservar todos os dados individuais, usar teste de Wilcoxon pareado e evitar generalizações além da amostra | O estudo pode não detectar efeitos reais pequenos; resultados serão apresentados como evidência exploratória |
+| **Validade de conclusão estatística**: normalidade e independência podem não ser plausíveis com dados pareados e censurados | Conclusão | Usar Wilcoxon pareado para diferenças entre tratamentos, informar tamanho de efeito, apresentar dados individuais e marcar tempos censurados | O número reduzido de pares limita a precisão do p-valor; a censura em 2100 s pode produzir empates |
+| **Diferença de dificuldade entre katas**: algumas katas podem exigir mais raciocínio ou código | Interna | Cada participante resolve cada kata uma vez em cada tratamento; usar kata como bloco e manter as seis especificações congeladas | A interação entre dificuldade e tratamento pode permanecer, especialmente em uma amostra pequena |
+| **Efeito de medição**: ferramentas de complexidade, duplicação e testes podem produzir resultados sensíveis à configuração | Construto | Fixar versões e comandos das ferramentas, executar o mesmo pipeline para todos os trials e armazenar os valores brutos e logs | Ferramentas podem não capturar todos os aspectos de qualidade e seus resultados não equivalem à manutenibilidade real |
+| **Validade externa limitada**: os três participantes são da mesma turma e podem ter perfil semelhante | Externa | Descrever claramente os participantes e o contexto, publicar as katas e o protocolo para replicação e limitar as conclusões ao contexto estudado | Os resultados não devem ser generalizados para outras linguagens, níveis de experiência, ferramentas ou equipes sem replicação |
+
+As ameaças e seus tratamentos serão revisados antes do início dos trials. Qualquer violação do protocolo, uso acidental de IA na condição sem-IA, alteração de teste ou falha de ferramenta será registrada junto ao trial, em vez de removida silenciosamente do dataset.
 
 ## 6. Calibração do piloto
 
