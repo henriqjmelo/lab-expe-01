@@ -11,3 +11,9 @@ venv/
 
 # Environment variables
 .env
+
+# Node (jscpd, em lab-expe-02)
+node_modules/
+
+# Relatorios temporarios do jscpd
+jscpd-report.json
