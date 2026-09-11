@@ -52,4 +52,32 @@ _Pendente — issue #57._
 
 ## 6. Calibração do piloto
 
-_Pendente — issue #60. Precisa ser feito por uma pessoa do grupo, sem cronômetro de trial e sem assistente de IA, resolvendo cada kata pra confirmar que é viável dentro dos 35 minutos. Este piloto não entra no dataset final._
+Piloto feito pelo Gabriel, sem cronômetro de trial e sem assistente de IA — cada kata resolvido uma vez, pra confirmar viabilidade dentro do time-box de 35 minutos. Este piloto não entra no dataset final.
+
+| Kata | Tempo estimado | Dificuldade percebida |
+| :--- | :--- | :--- |
+| K1 — Turno de Atendimento | 10-15 min | Fácil |
+| K2 — Verificador de Senha Corporativa | 15-20 min | Fácil/Intermediário |
+| K3 — Consolidador de Notas Fiscais | 5-10 min | Muito fácil |
+| K4 — Detector de Rajada de Login | 20-25 min | Intermediário |
+| K5 — Compactador de Texto por Repetição | 20-30 min | Intermediário |
+| K6 — Divisor de Times por Afinidade | 5-15 min | Fácil |
+
+**Os 6 katas foram confirmados como resolvíveis dentro do time-box**, com folga em todos os casos — o mais lento (K5) ficou em até 30 min no pior cenário estimado.
+
+### Observação de balanceamento
+
+Há uma diferença de 2 a 4x entre o kata mais rápido (K3, 5-10 min) e os mais lentos (K4 e K5, 20-30 min). Nenhum estoura o time-box, mas a diferença é grande o suficiente pra valer a pena conferir que o contrabalanceamento entre participantes e tratamentos (issue #56) distribui essa variação de forma equilibrada entre as condições com/sem IA — evitando concentrar os katas mais difíceis do mesmo lado da comparação.
+
+### Anotações por kata
+
+- **K1**: casos de borda (`ValueError`) precisam ser tratados antes da distribuição; o operador módulo (`%`) resolve o round-robin diretamente.
+- **K2**: não é complexo, mas é trabalhoso — várias validações isoladas, com a ordem dos códigos de violação importando. Regex ajuda bastante na regra de repetição.
+- **K3**: agregação clássica em dicionário. Único cuidado é arredondar só no final e validar valor negativo antes de somar.
+- **K4**: o mais exigente em raciocínio algorítmico — agrupar eventos por usuário, ordenar por timestamp, aplicar janela deslizante.
+- **K5**: duas funções (encode/decode). Descompactar é a parte mais trabalhosa, por causa de contagens com mais de um dígito.
+- **K6**: `sorted()` do Python é estável — ordenar só por habilidade decrescente já mantém a ordem de empate automaticamente. Quem não souber disso pode perder tempo tentando montar uma chave de ordenação mais complexa.
+
+### Ajuste feito a partir deste processo
+
+O enunciado do K5 tinha um exemplo autocontraditório (uma linha incorreta seguida de uma nota tentando corrigi-la no próprio texto), encontrado durante a verificação da especificação e corrigido antes do piloto. Nenhum outro kata precisou de ajuste ou substituição.
