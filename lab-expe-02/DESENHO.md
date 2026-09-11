@@ -49,7 +49,26 @@ Também serão registrados como variáveis de controle o participante, a kata, a
 
 ## 3. Tratamentos, projeto experimental e quantidade de medições
 
-_Pendente — issue #56._
+O experimento usa um desenho **crossover within-subject**: cada um dos três participantes executa as seis katas nos dois tratamentos, com-IA e sem-IA. Assim, cada participante funciona como seu próprio controle, reduzindo o efeito de diferenças individuais de experiência, velocidade e estilo de programação.
+
+O desenho tem três fatores observados: participante, kata e tratamento. O tratamento é o fator de interesse; participante e kata são controlados pela repetição cruzada. Cada participante executa três katas com IA e três sem IA, totalizando seis trials por participante e **18 trials no experimento**, sendo nove por tratamento.
+
+O time-box de cada trial é de **35 minutos (2100 segundos)**. O relógio começa quando o participante inicia a implementação e termina na primeira execução dos testes de aceitação totalmente aprovados. Se o time-box for atingido antes disso, o trial não é descartado: o tempo é registrado como **2100 segundos, com indicador de censura**, e o percentual de testes aprovados observado naquele momento é preservado. A análise de tempo deverá tratar esses valores como censurados, e não como se fossem tempos exatos de conclusão.
+
+## 4. Contrabalanceamento e ordem de execução
+
+A ordem foi contrabalanceada para distribuir tratamento, kata e posição do trial. Guilherme e Gabriel começam alternando os tratamentos; Henrique usa a ordem invertida para reduzir a associação entre posição e tratamento. A tabela fixa a ordem planejada antes da coleta:
+
+| Ordem | Guilherme | Gabriel | Henrique |
+|:-:|:--|:--|:--|
+| 1 | K1 com IA | K1 sem IA | K6 com IA |
+| 2 | K2 sem IA | K2 com IA | K5 sem IA |
+| 3 | K3 com IA | K3 sem IA | K4 com IA |
+| 4 | K4 sem IA | K4 com IA | K3 sem IA |
+| 5 | K5 com IA | K5 sem IA | K2 com IA |
+| 6 | K6 sem IA | K6 com IA | K1 sem IA |
+
+O contrabalanceamento evita que todas as katas mais fáceis ou mais difíceis fiquem no mesmo tratamento e reduz o efeito de aprendizado associado à posição. A mesma kata aparece uma vez em cada tratamento para cada participante, permitindo calcular diferenças pareadas. A ordem planejada deverá ser refletida nas issues de trial da S02; qualquer desvio será registrado como protocolo e não ocultado na análise.
 
 ## 4. Objetos experimentais — katas
 
