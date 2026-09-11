@@ -22,7 +22,7 @@ def detectar_rajadas(eventos: list[tuple[str, int]], limite: int, janela_segundo
 ## Regras e casos de borda
 
 - A janela é contígua: um evento em `t` e outro em `t + janela_segundos` estão na mesma janela (a checagem é `fim - inicio <= janela_segundos`, não `<`).
-- A ordem dos usuários na lista de saída é a ordem em que cada um **primeiro** ultrapassou o limite, considerando os eventos desse usuário ordenados por timestamp.
+- A ordem dos usuários na lista de saída não importa para os testes.
 - Eventos de usuários diferentes não interagem entre si — a janela é sempre calculada dentro dos eventos do mesmo usuário.
 - Se dois eventos do mesmo usuário têm o mesmo timestamp, contam como dois eventos distintos.
 - Lista de eventos vazia retorna `[]`.
