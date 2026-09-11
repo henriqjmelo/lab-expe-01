@@ -7,11 +7,45 @@
 
 ## 1. Hipóteses (H0 / H1)
 
-_Pendente — issue #55._
+O experimento compara dois tratamentos: desenvolvimento **com-IA**, no qual o participante pode consultar o assistente de IA definido pelo grupo, e desenvolvimento **sem-IA**, no qual o participante não pode consultar esse assistente. As hipóteses são direcionais e serão avaliadas por comparações pareadas dentro de cada participante, com nível de significância planejado de $\alpha = 0,05$.
+
+### RQ1 — O uso de IA reduz o tempo de desenvolvimento?
+
+- **H0:** o uso de IA não reduz o time-to-green; a mediana pareada do tempo com-IA é igual ou maior que a mediana sem-IA.
+- **H1:** o uso de IA reduz o time-to-green; a mediana pareada do tempo com-IA é menor que a mediana sem-IA.
+
+### RQ2 — O uso de IA melhora a qualidade funcional da solução?
+
+- **H0:** o uso de IA não aumenta o percentual de testes de aceitação aprovados; a mediana pareada com-IA é igual ou menor que a mediana sem-IA.
+- **H1:** o uso de IA aumenta o percentual de testes de aceitação aprovados; a mediana pareada com-IA é maior que a mediana sem-IA.
+
+### RQ3 — O uso de IA altera a estrutura e a manutenibilidade do código?
+
+- **H0:** o uso de IA não reduz a complexidade ciclomatica média nem o percentual de linhas duplicadas; as medianas pareadas com-IA são iguais ou maiores que as sem-IA.
+- **H1:** o uso de IA reduz a complexidade ciclomatica média e o percentual de linhas duplicadas, sem interpretar LOC isoladamente como qualidade.
+
+As hipóteses são formuladas como diferenças de tratamento, e não como afirmações causais universais. O teste estatístico, o tamanho da amostra e as limitações do estudo serão registrados antes da análise final.
 
 ## 2. Variáveis dependentes e independente
 
-_Pendente — issue #55._
+### Variável independente
+
+O fator experimental é o **uso do assistente de IA**, com dois níveis:
+
+1. `com-IA`: o participante pode usar o assistente durante o trial;
+2. `sem-IA`: o participante resolve a kata sem consultar o assistente.
+
+### Variáveis dependentes
+
+| RQ | Variável | Operacionalização | Justificativa GQM |
+| :--- | :--- | :--- | :--- |
+| RQ1 | Time-to-green | Segundos entre o início do trial e a execução dos testes de aceitação com resultado aprovado; trial que estoura o limite recebe 2100 s e é marcado como censurado | Mede diretamente a eficiência de entrega e é mais informativo que contar linhas ou commits |
+| RQ2 | Percentual de testes aprovados | Testes de aceitação aprovados dividido pelo total de testes da kata | Permite comparar katas com números de testes diferentes e representa a qualidade funcional observável |
+| RQ3 | Complexidade ciclomatica média | Média da complexidade por função ou método da solução | Observa a dificuldade estrutural de manutenção; é preferível a LOC como indicador de complexidade |
+| RQ3 | Percentual de linhas duplicadas | Percentual de linhas identificadas como duplicadas pela ferramenta definida no protocolo | Captura repetição estrutural que pode dificultar manutenção e evolução |
+| Controle | LOC | Linhas de código da solução | Controla o tamanho da implementação, mas não será interpretada isoladamente como qualidade |
+
+Também serão registrados como variáveis de controle o participante, a kata, a ordem do trial, o tratamento, o tempo bruto, o status de censura e a quantidade total de testes. O dataset manterá os valores brutos por trial; nenhum trial será descartado por falha ou por exceder o time-box.
 
 ## 3. Tratamentos, projeto experimental e quantidade de medições
 
