@@ -39,12 +39,12 @@ Cada kata tem `test_kN.py` com testes de aceitação escritos e congelados antes
 | K1 | 9 |
 | K2 | 9 |
 | K3 | 8 |
-| K4 | 8 |
+| K4 | 9 |
 | K5 | 9 |
 | K6 | 9 |
-| **Total** | **52** |
+| **Total** | **53** |
 
-Todas as 52 asserções foram conferidas contra uma implementação de referência (descartável, não commitada) antes de congelar as suítes: as 52 passam com a referência e falham de forma limpa (`NotImplementedError`, sem erro de import) contra o esqueleto vazio de `solucao.py`, que é o estado em que cada trial começa.
+Todas as 53 asserções foram conferidas contra uma implementação de referência (descartável, não commitada) antes de congelar as suítes: as 53 passam com a referência e falham de forma limpa (`NotImplementedError`, sem erro de import) contra o esqueleto vazio de `solucao.py`, que é o estado em que cada trial começa.
 
 ## 5. Ameaças à validade
 

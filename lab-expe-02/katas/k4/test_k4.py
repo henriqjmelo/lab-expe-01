@@ -51,3 +51,15 @@ def test_multiplos_usuarios_apenas_um_com_rajada():
         ("bruno", 0), ("bruno", 50),
     ]
     assert detectar_rajadas(eventos, limite=2, janela_segundos=5) == ["ana"]
+
+
+def test_multiplos_usuarios_em_rajada_ao_mesmo_tempo():
+    # bruno aparece primeiro na entrada, mas ana ultrapassa o limite num
+    # timestamp absoluto mais cedo -- a ordem de saida nao importa (README),
+    # entao a comparacao e feita sem depender de qual vem primeiro na lista.
+    eventos = [
+        ("bruno", 100), ("bruno", 101), ("bruno", 102),
+        ("ana", 0), ("ana", 1), ("ana", 2),
+    ]
+    resultado = detectar_rajadas(eventos, limite=2, janela_segundos=5)
+    assert sorted(resultado) == ["ana", "bruno"]
