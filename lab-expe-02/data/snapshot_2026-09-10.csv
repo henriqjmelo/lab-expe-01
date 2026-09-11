@@ -1,0 +1,78 @@
+number,title,status
+6,[Integração] Unificar queries GraphQL e executar requisição automática para 100 repositórios,Done
+12,[RQ05+RQ06+RQ07] Validar consistência dos dados (outliers/nulos) em 1000 repos + hipótese informal,Done
+13,[Relatório] Primeira versão — introdução + hipóteses informais,Done
+10,[RQ01+RQ02] Validar consistência dos dados (outliers/nulos) em 1000 repos + hipótese informal,Done
+5,"[RQs] Implementar query GraphQL para RQ05 (Linguagens), RQ06 (Issues Fechadas) e Bônus RQ07",Done
+3,[RQs] Implementar query GraphQL para RQ01 (Idade) e RQ02 (PRs Aceitas),Done
+1,"[Setup] Configurar GitHub Projects v2, colunas do Kanban e política de WIP",Done
+2,[Dev] Criar estrutura inicial do script de consulta à API GraphQL do GitHub,Done
+4,[RQs] Implementar query GraphQL para RQ03 (Releases) e RQ04 (Última Atualização),Done
+7,[Dev] Implementar paginação na query GraphQL (100 → 1000 repositórios),Done
+8,[Dev] Exportar dados coletados dos 1000 repositórios para .csv,Done
+9,[Dev] Script de snapshot do GitHub Projects → .csv,Done
+11,[RQ03+RQ04] Validar consistência dos dados (outliers/nulos) em 1000 repos + hipótese informal,Done
+31,"[Base] Modulo de analise: carregamento, estatisticas e helper de graficos",Done
+32,[Analise] RQ01 (idade) e RQ02 (PRs aceitas): estatisticas e graficos,Done
+33,[Analise] RQ03 (releases) e RQ04 (atualizacao): estatisticas e graficos,Done
+34,[Analise] RQ05 (linguagens) e RQ06 (issues fechadas): estatisticas e graficos,Done
+35,"[Analise] RQ07 (bonus): cruzamento de RQ02, RQ03 e RQ04 por linguagem",Done
+36,[Relatorio] Resultados e discussao de RQ01 e RQ02,Done
+37,[Relatorio] Resultados e discussao de RQ03 e RQ04,Done
+38,"[Relatorio] Resultados e discussao de RQ05, RQ06 e RQ07",Done
+39,"[Entrega] Snapshot de fechamento da S03, print do board e link do Projects",Done
+43,"[Doc] Atualizar README para a S03: estrutura, divisao em trio e comandos de analise",Done
+50,"[Doc] Conferencia final: politica de WIP e links no relatorio, README da S03",Done
+52,[Doc] Corrige divisao de trabalho e dois dados nos slides,Done
+55,"[S01][Desenho] Hipoteses (H0/H1), variaveis dependentes e independente",Backlog
+56,"[S01][Desenho] Projeto experimental crossover, contrabalanceamento e nº de medicoes",Backlog
+57,[S01][Desenho] Ameacas a validade e plano de mitigacao,Backlog
+58,[S01][Katas] Especificar e escrever os 6 katas autorais,In review
+59,[S01][Katas] Suites de teste de aceitacao (pytest) dos 6 katas,In review
+60,[S01][Katas] Piloto de calibracao: validar dificuldade equivalente,Backlog
+61,[S01][Infra] Script de cronometragem e registro de trial,Backlog
+62,[S01][Infra] Script de metricas estaticas (radon + jscpd -> CSV),Backlog
+63,"[S01][Infra] Ambiente, requirements e README de execucao do Lab02",Backlog
+64,[S01][Processo] Configurar campos customizados no Projects e abrir os cartoes de trial,Backlog
+65,[S01][Entrega] Snapshot do board e print de fechamento da S01,Doing
+66,[S02][Trial] K1 - com IA - Guilherme,Backlog
+67,[S02][Trial] K2 - sem IA - Guilherme,Backlog
+68,[S02][Trial] K3 - com IA - Guilherme,Backlog
+69,[S02][Trial] K4 - sem IA - Guilherme,Backlog
+70,[S02][Trial] K5 - com IA - Guilherme,Backlog
+71,[S02][Trial] K6 - sem IA - Guilherme,Backlog
+72,[S02][Trial] K1 - sem IA - Gabriel,Backlog
+73,[S02][Trial] K2 - com IA - Gabriel,Backlog
+74,[S02][Trial] K3 - sem IA - Gabriel,Backlog
+75,[S02][Trial] K4 - com IA - Gabriel,Backlog
+76,[S02][Trial] K5 - sem IA - Gabriel,Backlog
+77,[S02][Trial] K6 - com IA - Gabriel,Backlog
+78,[S02][Trial] K6 - com IA - Henrique,Backlog
+79,[S02][Trial] K5 - sem IA - Henrique,Backlog
+80,[S02][Trial] K4 - com IA - Henrique,Backlog
+81,[S02][Trial] K3 - sem IA - Henrique,Backlog
+82,[S02][Trial] K2 - com IA - Henrique,Backlog
+83,[S02][Trial] K1 - sem IA - Henrique,Backlog
+84,[S02][Infra] Protocolo operacional do trial e checklist de padronizacao,Backlog
+85,[S02][Dados] Consolidar data/trials.csv com os 18 trials,Backlog
+86,[S02][Dados] Rodar metricas estaticas sobre o codigo final dos 18 trials,Backlog
+87,"[S02][Dados] Conferencia de integridade: censura, contagem de testes e tempos",Backlog
+88,[S02][Entrega] Snapshot do board e print de fechamento da S02,Backlog
+89,"[S03][Analise] Preparo dos dados: limpeza, censura e identificacao de outliers",Backlog
+90,[S03][RQ1] Wilcoxon pareado sobre time-to-green,Backlog
+91,[S03][RQ2] Wilcoxon sobre taxa de sucesso e nº de testes falhando,Backlog
+92,[S03][RQ3] Complexidade ciclomatica e indice de manutenibilidade por tratamento,Backlog
+93,[S03][RQ3] Duplicacao de codigo e LOC como metrica de controle,Backlog
+94,[S03][Dashboard] Graficos de tempo e taxa de sucesso,Backlog
+95,[S03][Dashboard] Graficos das metricas estaticas e painel consolidado,Backlog
+96,[S03][Analise] Revisao cruzada dos resultados estatisticos,Backlog
+97,[S03][Entrega] Snapshot do board e print de fechamento da S03,Backlog
+98,[Relatorio] Introducao e hipoteses,Backlog
+99,"[Relatorio] Metodologia reprodutivel: ambiente, katas, assistente e versao",Backlog
+100,[Relatorio] Resultados da RQ1 (tempo),Backlog
+101,[Relatorio] Resultados da RQ2 (defeitos),Backlog
+102,[Relatorio] Resultados da RQ3 (complexidade e duplicacao),Backlog
+103,[Relatorio] Discussao final e ameacas a validade revisitadas,Backlog
+104,[Relatorio] Revisao de consistencia estatistica e de linguagem do documento,Backlog
+105,[Relatorio] Slides da apresentacao,Backlog
+106,"[Relatorio][Entrega] Conferencia final: links do Projects, README e checklist do enunciado",Backlog
