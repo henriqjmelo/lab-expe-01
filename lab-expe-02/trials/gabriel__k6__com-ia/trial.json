@@ -1,0 +1,12 @@
+{
+  "integrante": "gabriel",
+  "kata": "k6",
+  "tratamento": "com-ia",
+  "ordem": 6,
+  "inicio": "2026-09-17T23:28:16-03:00",
+  "timebox_s": 2100,
+  "tempo_s": 59,
+  "testes_passando": 9,
+  "testes_total": 9,
+  "censurado": 0
+}
