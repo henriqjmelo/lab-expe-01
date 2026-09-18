@@ -176,13 +176,14 @@ por todos os três integrantes** — é a operacionalização da variável indep
 
 | Item | Valor |
 | :--- | :--- |
-| Assistente | `<preencher>` |
-| Versão / modelo | `<preencher>` |
-| Modo de acesso | `<preencher>` (ex.: chat web, extensão na IDE) |
-| Regras de uso no trial | `<preencher>` (o que pode ser perguntado/colado) |
+| Assistente | Claude (Anthropic) |
+| Versão / modelo | Claude Sonnet 5 (`claude-sonnet-5`) |
+| Modo de acesso | Claude Code (extensão na IDE) |
+| Regras de uso no trial | Uso livre dentro da IDE: pedir sugestões, implementações completas, correções e explicações de erro. O participante roda a suíte e decide o que aceitar — não precisa aceitar sugestão sem entender. Fora do trial `com-ia`, nenhuma IA pode ser consultada. |
 
-> **Pendente:** definir em grupo antes do primeiro trial da S02 e preencher a
-> tabela acima. Nos trials `sem-IA`, nenhum assistente pode ser consultado.
+> Definido a partir da decisão do Gabriel nesta issue. Como a regra vale para
+> os três integrantes (mesma ferramenta e versão em todos os trials `com-IA`),
+> confirmar com Henrique e Guilherme antes dos trials deles.
 
 ### Estrutura de pastas
 
