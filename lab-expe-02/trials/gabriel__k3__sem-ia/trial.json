@@ -1,0 +1,12 @@
+{
+  "integrante": "gabriel",
+  "kata": "k3",
+  "tratamento": "sem-ia",
+  "ordem": 3,
+  "inicio": "2026-09-17T23:09:40-03:00",
+  "timebox_s": 2100,
+  "tempo_s": 2100,
+  "testes_passando": 7,
+  "testes_total": 8,
+  "censurado": 1
+}
