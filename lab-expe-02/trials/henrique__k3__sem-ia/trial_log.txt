@@ -1,0 +1,3 @@
+run t=248.5s testes=6/8 dur=177.5s
+run t=475.7s testes=7/8 dur=319.5s
+run t=710.0s testes=8/8 dur=411.8s

@@ -1,0 +1,3 @@
+run t=17.6s testes=9/9 dur=10.6s
+run t=48.4s testes=9/9 dur=26.4s
+run t=88.0s testes=9/9 dur=37.0s
