@@ -25,11 +25,12 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import select
+import queue
 import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -152,18 +153,30 @@ def formatar_restante(segundos: float) -> str:
     return f"{segundos // 60:02d}:{segundos % 60:02d}"
 
 
-def ler_comando(timeout_s: float) -> str | None:
-    """Le um comando do stdin respeitando o tempo restante do time-box.
+def _leitor_stdin(fila: "queue.Queue[str]") -> None:
+    """Thread daemon que le linhas de stdin e as coloca na fila.
+
+    select.select() em stdin so funciona com sockets no Windows (falha com
+    OSError WinError 10093); ler numa thread separada e portavel entre
+    Windows, Mac e Linux.
+    """
+    for linha in sys.stdin:
+        fila.put(linha)
+    fila.put("")  # sinaliza EOF pro consumidor
+
+
+def ler_comando(fila: "queue.Queue[str]", timeout_s: float) -> str | None:
+    """Le um comando da fila respeitando o tempo restante do time-box.
 
     Devolve None quando o time-box estoura ou quando o stdin termina (caso em
     que o trial simplesmente corre ate o time-box).
     """
     if timeout_s <= 0:
         return None
-    pronto, _, _ = select.select([sys.stdin], [], [], timeout_s)
-    if not pronto:
+    try:
+        linha = fila.get(timeout=timeout_s)
+    except queue.Empty:
         return None
-    linha = sys.stdin.readline()
     if linha == "":  # EOF
         time.sleep(timeout_s)
         return None
@@ -209,6 +222,9 @@ def main() -> int:
     print(f"Time-box: {formatar_restante(args.timebox)}")
     print("Edite solucao.py nessa pasta. Comandos: [t|Enter] testar  [s] status  [x] encerrar\n")
 
+    fila_stdin: "queue.Queue[str]" = queue.Queue()
+    threading.Thread(target=_leitor_stdin, args=(fila_stdin,), daemon=True).start()
+
     relogio = time.monotonic()
     fim = relogio + args.timebox
     ultimo = Resultado(passando=0, total=0, duracao_s=0.0)
@@ -216,7 +232,7 @@ def main() -> int:
     censurado = 1
 
     while True:
-        comando = ler_comando(fim - time.monotonic())
+        comando = ler_comando(fila_stdin, fim - time.monotonic())
 
         if comando is None:
             # Time-box estourado: preserva o estado observado neste instante.
