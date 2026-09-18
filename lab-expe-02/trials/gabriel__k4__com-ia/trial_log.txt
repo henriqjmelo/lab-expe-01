@@ -1,0 +1,4 @@
+inicio=2026-09-17T23:25:03-03:00
+run t=2.5s testes=0/9 dur=0.3s
+desistencia t=86.6s testes=9/9
+correcao: 9/9 no momento do x = sucesso real. tempo_s e censurado corrigidos manualmente em trial.json para refletir o run verde as 86.6s (ver #75).
