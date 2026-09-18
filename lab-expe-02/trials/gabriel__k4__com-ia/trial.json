@@ -1,0 +1,13 @@
+{
+  "integrante": "gabriel",
+  "kata": "k4",
+  "tratamento": "com-ia",
+  "ordem": 4,
+  "inicio": "2026-09-17T23:25:03-03:00",
+  "timebox_s": 2100,
+  "tempo_s": 87,
+  "testes_passando": 9,
+  "testes_total": 9,
+  "censurado": 0,
+  "correcao_manual": "registro original tinha tempo_s=2100 e censurado=1 porque o participante apertou 'x' em vez de confirmar o run verde; trial_log.txt mostra 9/9 as 86.6s, resultado do proprio check final do x. Corrigido para refletir o resultado real (ver #75). Terceiro trial seguido com o mesmo erro operacional (ver tambem #76 e #73)."
+}
