@@ -58,10 +58,11 @@ class Resultado:
     passando: int
     total: int
     duracao_s: float
+    coletou: bool = True
 
     @property
     def verde(self) -> bool:
-        return self.total > 0 and self.passando == self.total
+        return self.coletou and self.total > 0 and self.passando == self.total
 
 
 def raiz_lab() -> Path:
@@ -101,13 +102,13 @@ def rodar_suite(diretorio: Path) -> Resultado:
         try:
             suite = ET.parse(relatorio).getroot()
         except (ET.ParseError, FileNotFoundError):
-            # Erro de coleta (import quebrado, arquivo sem testes): 0 de 0.
-            return Resultado(passando=0, total=0, duracao_s=duracao)
+            # Erro de coleta (import quebrado, arquivo sem testes): sem denominador.
+            return Resultado(passando=0, total=0, duracao_s=duracao, coletou=False)
 
         if suite.tag == "testsuites":
             nos = list(suite)
             if not nos:
-                return Resultado(passando=0, total=0, duracao_s=duracao)
+                return Resultado(passando=0, total=0, duracao_s=duracao, coletou=False)
             suite = nos[0]
 
         total = int(suite.get("tests", 0))
@@ -115,9 +116,29 @@ def rodar_suite(diretorio: Path) -> Resultado:
         erros = int(suite.get("errors", 0))
         pulados = int(suite.get("skipped", 0))
         passando = max(total - falhas - erros - pulados, 0)
-        return Resultado(passando=passando, total=total, duracao_s=duracao)
+        return Resultado(
+            passando=passando, total=total, duracao_s=duracao, coletou=total > 0
+        )
     finally:
         relatorio.unlink(missing_ok=True)
+
+
+def consolidar(anterior: Resultado, novo: Resultado, total_esperado: int) -> Resultado:
+    """Descarta execucao que nao coletou a suite inteira.
+
+    testes_total e propriedade da kata, nao da execucao: a suite foi congelada
+    na issue #59 e nao muda durante o trial. Quando pytest falha na coleta
+    (import quebrado, sintaxe invalida) ele devolve 0 de 0, ou 1 de 1 contando
+    o proprio erro - gravar isso troca o denominador da RQ2. Foi o que
+    aconteceu no trial #72, que ficou com testes_total=0 embora a suite da k1
+    tenha 9 testes. Nesses casos vale a ultima medicao que coletou a suite
+    inteira, e o participante ve o aviso no terminal.
+    """
+    if total_esperado and novo.total == total_esperado:
+        return novo
+    if not total_esperado and novo.coletou:
+        return novo
+    return anterior
 
 
 def preparar_trial(raiz: Path, integrante: str, kata: str, tratamento: str,
@@ -214,12 +235,19 @@ def main() -> int:
     trial = preparar_trial(raiz, integrante, kata, args.tratamento, args.refazer)
     saida = Path(args.saida) if args.saida else raiz / "data" / "trials_raw.csv"
 
+    # Denominador da RQ2, medido sobre o esqueleto intacto antes de o relogio
+    # comecar: nesse estado a suite coleta normalmente e todos os testes falham
+    # com NotImplementedError.
+    baseline = rodar_suite(trial)
+    total_esperado = baseline.total
+
     inicio_iso = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
-    eventos: list[str] = [f"inicio={inicio_iso}"]
+    eventos: list[str] = [f"inicio={inicio_iso}", f"suite={total_esperado} testes"]
 
     print(f"\nTrial: {integrante} | {kata} | {args.tratamento} | ordem {args.ordem}")
     print(f"Pasta: {trial}")
     print(f"Time-box: {formatar_restante(args.timebox)}")
+    print(f"Suite: {total_esperado} testes de aceitacao")
     print("Edite solucao.py nessa pasta. Comandos: [t|Enter] testar  [s] status  [x] encerrar\n")
 
     fila_stdin: "queue.Queue[str]" = queue.Queue()
@@ -227,7 +255,7 @@ def main() -> int:
 
     relogio = time.monotonic()
     fim = relogio + args.timebox
-    ultimo = Resultado(passando=0, total=0, duracao_s=0.0)
+    ultimo = Resultado(passando=0, total=total_esperado, duracao_s=0.0, coletou=False)
     tempo_s = args.timebox
     censurado = 1
 
@@ -238,7 +266,7 @@ def main() -> int:
             # Time-box estourado: preserva o estado observado neste instante.
             decorrido = time.monotonic() - relogio
             print(f"\n[{formatar_restante(decorrido)}] TIME-BOX. Rodando a suite uma ultima vez...")
-            ultimo = rodar_suite(trial)
+            ultimo = consolidar(ultimo, rodar_suite(trial), total_esperado)
             eventos.append(f"timebox testes={ultimo.passando}/{ultimo.total}")
             tempo_s = args.timebox
             censurado = 1
@@ -251,12 +279,22 @@ def main() -> int:
         if comando == "x":
             decorrido = time.monotonic() - relogio
             print(f"[{formatar_restante(decorrido)}] Encerrado pelo participante. Ultima verificacao...")
-            ultimo = rodar_suite(trial)
+            ultimo = consolidar(ultimo, rodar_suite(trial), total_esperado)
             eventos.append(
                 f"desistencia t={decorrido:.1f}s testes={ultimo.passando}/{ultimo.total}"
             )
-            tempo_s = args.timebox
-            censurado = 1
+            if ultimo.verde:
+                # A verificacao do proprio x passou em tudo: o trial chegou ao
+                # verde, e registrar como censurado em 2100 s jogaria fora o
+                # time-to-green real (RQ1). Foi o que aconteceu em #73, #75 e
+                # #76, corrigidos na mao depois.
+                tempo_s = int(round(decorrido))
+                censurado = 0
+                eventos.append(f"verde no check do x t={decorrido:.1f}s")
+                print(f"\nVERDE em {formatar_restante(decorrido)} ({tempo_s} s).")
+            else:
+                tempo_s = args.timebox
+                censurado = 1
             break
 
         if comando not in ("", "t"):
@@ -267,14 +305,28 @@ def main() -> int:
         # ficou verde foi disparada: e o momento em que a solucao ja estava
         # pronta. A duracao da propria execucao fica registrada no log.
         disparo = time.monotonic() - relogio
-        ultimo = rodar_suite(trial)
-        eventos.append(
-            f"run t={disparo:.1f}s testes={ultimo.passando}/{ultimo.total} "
-            f"dur={ultimo.duracao_s:.1f}s"
-        )
-        print(
-            f"[{formatar_restante(disparo)}] {ultimo.passando}/{ultimo.total} testes passando"
-        )
+        execucao = rodar_suite(trial)
+        ultimo = consolidar(ultimo, execucao, total_esperado)
+        if ultimo is not execucao:
+            # A execucao nao coletou a suite inteira: o resultado exibido seria
+            # inventado. O relogio continua correndo - isso e parte do trial.
+            eventos.append(
+                f"run t={disparo:.1f}s descartado: coletou {execucao.total} de "
+                f"{total_esperado} testes"
+            )
+            print(
+                f"[{formatar_restante(disparo)}] solucao.py nao pode ser importada "
+                f"(coletou {execucao.total} de {total_esperado} testes). "
+                f"Corrija o erro e rode de novo."
+            )
+        else:
+            eventos.append(
+                f"run t={disparo:.1f}s testes={ultimo.passando}/{ultimo.total} "
+                f"dur={ultimo.duracao_s:.1f}s"
+            )
+            print(
+                f"[{formatar_restante(disparo)}] {ultimo.passando}/{ultimo.total} testes passando"
+            )
 
         if ultimo.verde:
             tempo_s = int(round(disparo))
@@ -292,6 +344,19 @@ def main() -> int:
         "testes_total": ultimo.total,
         "censurado": censurado,
     }
+    if total_esperado == 0:
+        # Nenhuma execucao do trial conseguiu coletar a suite: sem denominador,
+        # a taxa de sucesso da RQ2 nao existe. Gravar assim mesmo mantem o
+        # registro bruto honesto, mas o valor precisa ser resolvido a mao.
+        aviso = (
+            f"ATENCAO: a suite da kata {kata} nao pode ser coletada nem com o "
+            f"esqueleto intacto - testes_total=0 e a RQ2 fica sem denominador. "
+            f"Confira trial_log.txt, corrija a linha em {saida} e registre a "
+            f"correcao em trial.json."
+        )
+        eventos.append("aviso: suite nunca coletada (testes_total=0)")
+        print(f"\n{aviso}")
+
     gravar_csv(saida, linha)
 
     (trial / "trial.json").write_text(

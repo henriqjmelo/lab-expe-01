@@ -119,12 +119,12 @@ O trial termina de uma destas formas, e **nenhuma descarta o registro**:
 | 2100 s sem verde | o timer fecha sozinho | `tempo_s=2100`, `censurado=1` |
 | Interrupção antes do time-box | `x` | `tempo_s=2100`, `censurado=1` |
 
-> **Atenção — não use `x` para fechar um trial que já está verde.** Hoje o `x` grava
-> `tempo_s=2100` e `censurado=1` mesmo quando a verificação final passa em todos os
-> testes, o que joga fora o time-to-green real. Foi o que aconteceu nos trials #73, #75
-> e #76, corrigidos depois na mão. Para fechar no verde, use `t` e deixe o timer parar
-> sozinho. Enquanto o `x` não for corrigido em `src/timer.py`, confira a linha gravada em
-> `data/trials_raw.csv` contra o `trial_log.txt` do trial antes de fechar o cartão.
+> O `x` já foi um problema: até a correção em `src/timer.py`, ele gravava `tempo_s=2100`
+> e `censurado=1` mesmo quando a verificação final passava em todos os testes, jogando
+> fora o time-to-green real. Foi o que aconteceu nos trials #73, #75 e #76, corrigidos
+> na mão depois. Hoje o `x` respeita o resultado da verificação final: se ela está verde,
+> grava o tempo real e `censurado=0`. Ainda assim, confira a linha gravada em
+> `data/trials_raw.csv` contra o `trial_log.txt` antes de fechar o cartão.
 
 ### 4.4 Depois do trial
 
