@@ -127,7 +127,7 @@ Trials registrados, do Gabriel. A coluna "Ordem real" é a posição em que o tr
 | K5 | sem IA | 5 | 3 | 217 | não | 9/9 | 100% |
 | K6 | com IA | 6 | 6 | 59 | não | 9/9 | 100% |
 
-![Tempo por trial](graficos/lab02_tempo_por_trial.png)
+![Tempo por trial](../graficos/lab02_tempo_por_trial.png)
 
 ### 3.1 RQ1: tempo
 
@@ -147,7 +147,7 @@ A mediana sem IA cai num trial censurado, então ela é um limite inferior: o va
 
 Sem IA, o K1 terminou sem nenhuma implementação (0/9) e o K3 terminou com 7 de 8 testes. O teste que faltou no K3 verifica se a mensagem de erro contém a palavra `valor` em minúscula, e a mensagem escrita começava com `Valor`. A validação em si estava correta.
 
-![Taxa de sucesso](graficos/lab02_taxa_sucesso.png)
+![Taxa de sucesso](../graficos/lab02_taxa_sucesso.png)
 
 ### 3.3 RQ3: estrutura do código
 
@@ -163,7 +163,7 @@ O K1 sem IA não entra, por não ter implementação. Ficam três trials com IA 
 
 Por trial: complexidade média 12,0 (K2), 5,0 (K3), 7,0 (K4), 8,5 (K5), 7,0 (K6); SLOC 18, 10, 17, 33, 8. A duplicação foi 0% em todos.
 
-![Métricas estáticas](graficos/lab02_metricas_estaticas.png)
+![Métricas estáticas](../graficos/lab02_metricas_estaticas.png)
 
 ---
 
@@ -224,7 +224,7 @@ Para fechar o experimento:
 
 ## Anexos
 
-* Dados: `data/trials_raw.csv`, `data/analise_parcial_trials.csv`, `data/analise_parcial_tratamentos.csv`
-* Código: `src/timer.py`, `src/consolida.py`, `src/metricas.py`, `src/analise_parcial.py`
-* Protocolo e desenho: `PROTOCOLO.md`, `DESENHO.md`
+* Dados (em `lab-expe-02/data/`): `trials_raw.csv`, `analise_parcial_trials.csv`, `analise_parcial_tratamentos.csv`
+* Código (em `lab-expe-02/src/`): `timer.py`, `consolida.py`, `metricas.py`, `analise_parcial.py`
+* Protocolo e desenho (em `lab-expe-02/`): `PROTOCOLO.md`, `DESENHO.md`
 * Board: https://github.com/users/henriqjmelo/projects/1
