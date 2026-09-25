@@ -161,6 +161,11 @@ Nenhum trial é removido do dataset por falha, desistência ou violação: o des
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 2026-09-17 | #73, #75, #76 | Gabriel | K2, K4, K5 | `x` gravou `tempo_s=2100` / `censurado=1` sobre um resultado verde; corrigido na mão a partir do `trial_log.txt` (`correcao_manual` no `trial.json`) | Tempos reais preservados; a correção manual precisa constar na metodologia do relatório |
 | 2026-09-17 | #72 | Gabriel | K1 | Verificação final do `x` devolveu `0/0`: `testes_total=0` no registro, apagando o denominador da RQ2 (`trial_log.txt` mostra `0/9` no run anterior) | Total restaurado para 9 (passando continua 0) com nota em `trial.json` e `trial_log.txt`; a consolidação deixou de bloquear a linha |
+| 2026-09-17 | #84 | Gabriel | K2, K4, K6 | Tratamento com-IA: o assistente (Claude Code) foi usado na mesma conversa em que escreveu katas, suítes e soluções de referência. Em K4 e K6 o assistente escreveu a solução direto no `solucao.py` e rodou o pytest antes do participante; em K2 só escreveu o arquivo | Ameaça de validade de construto e de vazamento; vai para as limitações do relatório |
+| 2026-09-17 | #84 | Gabriel | K1 a K6 | Execução fora da ordem planejada: K1, K3, K5 (sem-IA) e depois K2, K4, K6 (com-IA), em vez de alternar; os seis trials na mesma noite; antes de existir o PROTOCOLO | O contrabalanceamento de posição não se sustenta para o Gabriel; posição e tratamento ficam confundidos nos dados dele |
+| 2026-09-17 | #84 | Gabriel | K1 | Tentativa de registrar código já escrito fora do timer; recusada e refeita pelo `timer.py` | Só o trial refeito com o timer está no dataset |
+| 2026-09-17 | #84 | Gabriel | K2, K4, K6 | `n_prompts` não foi contado nos trials com-IA | Métrica exploratória da RQ1 indisponível para o Gabriel |
+| 2026-09-17 | #84 | Gabriel | K1 a K6 | Ambiente diferente do fixado no README: Python 3.13.0 (fixado 3.12.13) e Node 24.13.0 (fixado 26.0.0) | Registrado como ameaça; não há indício de efeito nas métricas, mas não foi testado |
 
 Casos que **devem** ser registrados: uso acidental de IA no `sem-ia`; alteração de teste;
 interrupção durante o trial; leitura prévia de solução de terceiro; execução fora da
