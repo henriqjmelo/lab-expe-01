@@ -1,0 +1,3 @@
+inicio=2026-09-25T18:40:09-03:00
+suite=8 testes
+run t=32.8s testes=8/8 dur=0.2s
