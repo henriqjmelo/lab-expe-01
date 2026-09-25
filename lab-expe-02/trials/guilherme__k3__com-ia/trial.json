@@ -3,12 +3,10 @@
   "kata": "k3",
   "tratamento": "com-ia",
   "ordem": 3,
-  "inicio": "2026-09-24T20:21:00-03:00",
+  "inicio": "2026-09-25T18:40:09-03:00",
   "timebox_s": 2100,
-  "tempo_s": 526,
+  "tempo_s": 33,
   "testes_passando": 8,
   "testes_total": 8,
-  "censurado": 0,
-  "issue": 68,
-  "n_prompts": 5
+  "censurado": 0
 }

@@ -1,21 +1,23 @@
 def compactar(texto: str) -> str:
-    if any(caractere < "a" or caractere > "z" for caractere in texto):
-        raise ValueError("texto")
-    if not texto:
-        return ""
+    if any(not ("a" <= caractere <= "z") for caractere in texto):
+        raise ValueError("texto deve conter apenas letras minusculas de a a z")
 
     partes: list[str] = []
-    inicio = 0
+    indice = 0
 
-    for indice in range(1, len(texto) + 1):
-        if indice == len(texto) or texto[indice] != texto[inicio]:
-            quantidade = indice - inicio
-            caractere = texto[inicio]
-            if quantidade >= 3:
-                partes.append(f"{caractere}{quantidade}")
-            else:
-                partes.append(caractere * quantidade)
-            inicio = indice
+    while indice < len(texto):
+        fim = indice + 1
+        while fim < len(texto) and texto[fim] == texto[indice]:
+            fim += 1
+
+        repeticoes = fim - indice
+        if repeticoes >= 3:
+            partes.append(f"{texto[indice]}{repeticoes}")
+        else:
+            # Sequencias de 1 ou 2 ficam literais, sem contagem.
+            partes.append(texto[indice] * repeticoes)
+
+        indice = fim
 
     return "".join(partes)
 
@@ -27,13 +29,13 @@ def descompactar(codigo: str) -> str:
     while indice < len(codigo):
         caractere = codigo[indice]
         indice += 1
-        inicio_numero = indice
+
+        # A contagem pode ter mais de um digito, entao consome todos.
+        digitos = ""
         while indice < len(codigo) and codigo[indice].isdigit():
+            digitos += codigo[indice]
             indice += 1
 
-        if inicio_numero < indice:
-            partes.append(caractere * int(codigo[inicio_numero:indice]))
-        else:
-            partes.append(caractere)
+        partes.append(caractere * int(digitos) if digitos else caractere)
 
     return "".join(partes)

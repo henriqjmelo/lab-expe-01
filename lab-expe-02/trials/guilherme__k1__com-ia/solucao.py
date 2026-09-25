@@ -1,22 +1,20 @@
 def distribuir_chamados(chamados: list[str], atendentes: list[str], capacidade: int) -> dict[str, list[str]]:
     if capacidade <= 0:
-        raise ValueError("capacidade deve ser positiva")
-    if not atendentes:
-        if chamados:
-            raise ValueError("capacidade insuficiente")
-        return {}
-    if capacidade * len(atendentes) < len(chamados):
+        raise ValueError("capacidade deve ser maior que zero")
+    if len(chamados) > capacidade * len(atendentes):
         raise ValueError("capacidade insuficiente")
 
-    resultado = {atendente: [] for atendente in atendentes}
-    indice = 0
-    restantes = len(chamados)
+    resultado: dict[str, list[str]] = {atendente: [] for atendente in atendentes}
+    if not chamados:
+        return resultado
 
-    while restantes:
-        atendente = atendentes[indice % len(atendentes)]
-        if len(resultado[atendente]) < capacidade:
-            resultado[atendente].append(chamados[len(chamados) - restantes])
-            restantes -= 1
-        indice += 1
+    posicao = 0
+    for chamado in chamados:
+        # Pula quem ja atingiu a capacidade; a validacao acima garante que
+        # sempre sobra lugar, entao o laco nao roda indefinidamente.
+        while len(resultado[atendentes[posicao % len(atendentes)]]) >= capacidade:
+            posicao += 1
+        resultado[atendentes[posicao % len(atendentes)]].append(chamado)
+        posicao += 1
 
     return resultado

@@ -3,11 +3,10 @@
   "kata": "k6",
   "tratamento": "sem-ia",
   "ordem": 6,
-  "inicio": "2026-09-24T22:08:00-03:00",
+  "inicio": "2026-09-25T19:07:00-03:00",
   "timebox_s": 2100,
-  "tempo_s": 1175,
+  "tempo_s": 541,
   "testes_passando": 9,
   "testes_total": 9,
-  "censurado": 0,
-  "issue": 71
+  "censurado": 0
 }
