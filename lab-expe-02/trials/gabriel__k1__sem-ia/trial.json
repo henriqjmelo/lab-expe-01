@@ -7,6 +7,7 @@
   "timebox_s": 2100,
   "tempo_s": 2100,
   "testes_passando": 0,
-  "testes_total": 0,
-  "censurado": 1
+  "testes_total": 9,
+  "censurado": 1,
+  "correcao_manual": "registro original tinha testes_total=0 porque a verificacao final do x devolveu 0/0. O trial_log.txt mostra 0/9 no run anterior e a suite congelada do K1 tem 9 testes. Total restaurado para 9, passando continua 0 (ver #72)."
 }
