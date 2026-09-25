@@ -175,3 +175,33 @@ ordem planejada; falha de ferramenta; correção manual de linha do `trials_raw.
 - Refazer um trial já executado (`--refazer` é só para teste da ferramenta).
 - Rodar as métricas estáticas da RQ3 (issue #86) — acontecem **depois** dos 18 trials,
   em pipeline único para todos.
+
+---
+
+## 8. Pareamento da análise inferencial (S03, issues #90, #91, #92, #93)
+
+**Proposta de Gabriel, pendente de aceite de Henrique e Guilherme.** Se ninguém
+discordar, esta é a regra usada por todos os scripts de teste da S03.
+
+O DESENHO.md fala em comparação pareada dentro de cada participante e afirma que a
+mesma kata aparece uma vez em cada tratamento para cada participante. Isso não
+bate com o próprio desenho: cada participante faz 6 trials, um por kata, cada um
+em um único tratamento (tabela de contrabalanceamento e `PLANO` em `consolida.py`).
+Não existe par "mesmo participante, mesma kata, com e sem IA".
+
+O par que o dataset permite é por kata: para cada kata, a mediana dos trials com-IA
+e a mediana dos trials sem-IA. São 6 pares (K1 a K6), cada kata com 3 trials (1 e 2,
+em ordem que varia). Consequências:
+
+- o teste é o Wilcoxon de postos sinalizados sobre 6 diferenças; o menor p possível
+  é 0,015625 (unilateral) e 0,03125 (bilateral). Dois empates ou uma diferença nula
+  já reduzem o poder de forma visível;
+- o participante deixa de ser bloco do teste e vira variável de controle, descrita
+  nas tabelas por trial;
+- o tempo censurado entra com 2100 s e o número de pares com censura é reportado
+  ao lado do p-valor;
+- o relatório deve dizer que a formulação "dentro de cada participante" do
+  DESENHO.md não foi executada, e por quê.
+
+Implementação: `src/inferencia.py`. Testada só com entradas sintéticas em
+`tests_analise/test_inferencia.py`; o script se recusa a testar quando faltam pares.
