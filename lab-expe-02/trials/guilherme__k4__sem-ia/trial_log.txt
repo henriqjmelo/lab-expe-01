@@ -1,0 +1,8 @@
+inicio=2026-09-25T18:58:24-03:00
+suite=9 testes
+run t=352.9s testes=0/9 dur=0.2s
+run t=360.9s testes=0/9 dur=0.1s
+run t=396.8s testes=0/9 dur=0.2s
+run t=400.5s testes=2/9 dur=0.1s
+run t=444.2s testes=2/9 dur=0.2s
+run t=453.4s testes=9/9 dur=0.1s
