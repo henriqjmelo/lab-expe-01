@@ -1,0 +1,3 @@
+tratamento,n,verdes,censurados,tempo_mediana_s,tempo_min_s,tempo_max_s,mediana_censurada,taxa_sucesso_mediana,taxa_sucesso_min,taxa_sucesso_max,n_rq3,complexidade_media_mediana,loc_mediana,sloc_mediana,mi_mediana,duplicacao_pct_mediana
+com-ia,3,3,0,70,59,87,0,1.0,1.0,1.0,3,7.0,20.0,17.0,58.274,0.0
+sem-ia,3,1,2,2100,217,2100,1,0.875,0.0,1.0,2,6.75,30.0,21.5,56.422,0.0

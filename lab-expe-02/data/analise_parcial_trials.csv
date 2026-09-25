@@ -1,0 +1,7 @@
+integrante,kata,tratamento,ordem,tempo_s,censurado,testes_passando,testes_total,total_corrigido,taxa_sucesso,sem_implementacao,complexidade_media,loc,sloc,mi,duplicacao_pct
+gabriel,k1,sem-ia,1,2100,1,0,9,1,0.0,1,,,,,
+gabriel,k2,com-ia,2,70,0,9,9,0,1.0,0,12.0,22,18,57.472,0.0
+gabriel,k3,sem-ia,3,2100,1,7,8,0,0.875,0,5.0,16,10,67.45,0.0
+gabriel,k4,com-ia,4,87,0,9,9,0,1.0,0,7.0,20,17,58.274,0.0
+gabriel,k5,sem-ia,5,217,0,9,9,0,1.0,0,8.5,44,33,45.394,0.0
+gabriel,k6,com-ia,6,59,0,9,9,0,1.0,0,7.0,11,8,66.357,0.0
