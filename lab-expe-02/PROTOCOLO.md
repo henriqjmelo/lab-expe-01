@@ -160,7 +160,7 @@ Nenhum trial é removido do dataset por falha, desistência ou violação: o des
 | Data | Issue | Integrante | Kata | Desvio | Efeito na análise |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 2026-09-17 | #73, #75, #76 | Gabriel | K2, K4, K5 | `x` gravou `tempo_s=2100` / `censurado=1` sobre um resultado verde; corrigido na mão a partir do `trial_log.txt` (`correcao_manual` no `trial.json`) | Tempos reais preservados; a correção manual precisa constar na metodologia do relatório |
-| 2026-09-17 | #72 | Gabriel | K1 | Verificação final do `x` devolveu `0/0`: `testes_total=0` no registro, apagando o denominador da RQ2 (`trial_log.txt` mostra `0/9` no run anterior) | Linha bloqueada pela consolidação até o total ser restaurado para 9 |
+| 2026-09-17 | #72 | Gabriel | K1 | Verificação final do `x` devolveu `0/0`: `testes_total=0` no registro, apagando o denominador da RQ2 (`trial_log.txt` mostra `0/9` no run anterior) | Total restaurado para 9 (passando continua 0) com nota em `trial.json` e `trial_log.txt`; a consolidação deixou de bloquear a linha |
 
 Casos que **devem** ser registrados: uso acidental de IA no `sem-ia`; alteração de teste;
 interrupção durante o trial; leitura prévia de solução de terceiro; execução fora da
