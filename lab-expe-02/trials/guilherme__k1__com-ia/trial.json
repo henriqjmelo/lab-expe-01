@@ -1,0 +1,14 @@
+{
+  "integrante": "guilherme",
+  "kata": "k1",
+  "tratamento": "com-ia",
+  "ordem": 1,
+  "inicio": "2026-09-24T19:05:00-03:00",
+  "timebox_s": 2100,
+  "tempo_s": 734,
+  "testes_passando": 9,
+  "testes_total": 9,
+  "censurado": 0,
+  "issue": 66,
+  "n_prompts": 4
+}

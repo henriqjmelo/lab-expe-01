@@ -1,0 +1,5 @@
+SIMULADO — registro demonstrativo; horários e durações são fictícios.
+inicio=2026-09-24T21:29:00-03:00
+run t=353.6s testes=6/9 dur=0.3s
+run t=842.0s testes=9/9 dur=0.3s
+fim=2026-09-24T21:43:02-03:00
