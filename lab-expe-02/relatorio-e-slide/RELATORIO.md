@@ -1,230 +1,217 @@
 # Assistentes de IA vs. codificação manual: um experimento controlado
 
-**Laboratório 02 · Laboratório de Experimentação de Software**
-Engenharia de Software, 6º período, noite · Professor: Danilo Maia
+**Laboratório 02 — Laboratório de Experimentação de Software**  
+**Curso:** Engenharia de Software, 6º período, noite  
+**Professor:** Danilo Maia
 
-**Integrantes**
+## Integrantes
 
-* Guilherme Augustto Costa Barros
-* Gabriel Afonso Infante Vieira
-* Henrique Jardim
+- Henrique Jardim Melo
+- Gabriel Afonso Infante Vieira
+- Guilherme Costa
 
-**Repositório:** https://github.com/henriqjmelo/lab-expe-01
-**GitHub Projects (v2):** https://github.com/users/henriqjmelo/projects/1
+**Repositório:** https://github.com/henriqjmelo/lab-expe-01  
+**GitHub Projects:** https://github.com/users/henriqjmelo/projects/1
 
----
-
-## Estado desta versão
-
-O experimento foi planejado para 18 trials (3 participantes, 6 katas cada). Nesta versão do relatório, **6 dos 18 trials estão registrados pelo cronômetro** em `data/trials_raw.csv`, todos do Gabriel. Os trials do Guilherme (issues #66 a #71) e do Henrique (#78 a #83) não têm registro do cronômetro e por isso **não entram na análise**.
-
-Com 6 trials, de um único participante, e com katas diferentes em cada tratamento, não existem pares válidos para o teste de Wilcoxon. Esta versão traz só estatística descritiva e não responde às três questões de pesquisa. As seções 3 e 4 mostram o que os dados registrados permitem observar, e a seção 5 lista o que limita essa leitura. Todos os números vêm do script `src/analise_parcial.py`, que pode ser executado de novo quando os demais trials forem registrados. Nenhum valor foi estimado ou preenchido por dedução.
+> **Correção desta versão.** Os seis trials do Henrique estavam registrados nas pastas individuais, em `trial.json` e `trial_log.txt`, mas não haviam sido copiados para `data/trials_raw.csv`. As seis linhas foram recuperadas diretamente desses registros, sem estimativa ou imputação. O CSV agora contém 18/18 trials planejados.
 
 ---
 
-## 1. Introdução e hipóteses
+## 1. Introdução
 
-Assistentes de IA generativa entraram no dia a dia de quem programa, mas a maior parte do que se diz sobre o efeito deles em produtividade e qualidade é relato pessoal. Este laboratório mede esse efeito num experimento controlado, com katas de programação resolvidas com e sem um assistente, sob tempo limitado.
+Assistentes de IA generativa são usados cada vez mais no desenvolvimento de software, mas relatos pessoais não permitem separar o efeito da ferramenta de fatores como habilidade, dificuldade da tarefa e ordem de execução. Este laboratório avalia, em condições controladas, se o uso de um assistente altera o tempo de resolução, a qualidade funcional e a estrutura do código produzido em seis katas autorais de Python.
 
-O tratamento é o uso do assistente: `com IA`, em que o participante pode consultá-lo, e `sem IA`, em que não pode. As questões e hipóteses (detalhadas em `DESENHO.md`) são:
+### Questões de pesquisa
 
-| Questão | H0 | H1 |
-| :--- | :--- | :--- |
-| RQ1: a IA reduz o tempo para resolver a tarefa? | A mediana do tempo até passar em todos os testes com IA é igual ou maior que sem IA. | A mediana com IA é menor. |
-| RQ2: a IA reduz os defeitos, ou seja, os testes que falham? | A mediana da taxa de testes aprovados com IA é igual ou menor que sem IA. | A mediana com IA é maior. |
-| RQ3: a IA altera a complexidade ciclomática ou a duplicação do código? | As medianas de complexidade média e de linhas duplicadas com IA são iguais ou maiores que sem IA. | As medianas com IA são menores. |
+- **RQ1:** o uso de assistente de IA reduz o tempo necessário para resolver uma tarefa de programação?
+- **RQ2:** o uso de assistente de IA reduz a quantidade de defeitos, operacionalizada pela taxa de testes de aceitação aprovados?
+- **RQ3:** o uso de assistente de IA altera a complexidade ciclomática, a duplicação ou o tamanho do código produzido?
 
-Nível de significância planejado: α = 0,05.
+### Hipóteses
+
+| Questão | Hipótese nula (H0) | Hipótese alternativa (H1) |
+|---|---|---|
+| RQ1 | O tempo com IA é igual ou maior que o tempo sem IA. | O tempo com IA é menor. |
+| RQ2 | A taxa de testes aprovados com IA é igual ou menor que sem IA. | A taxa com IA é maior. |
+| RQ3 | A complexidade e a duplicação com IA são iguais ou maiores que sem IA. | A complexidade e a duplicação com IA são menores. |
+
+O nível de significância planejado foi **α = 0,05**.
 
 ---
 
 ## 2. Metodologia
 
-### 2.1 Desenho
+### 2.1 Desenho experimental
 
-Desenho crossover com contrabalanceamento entre participantes. Cada participante resolve as seis katas uma vez, três com IA e três sem, o que dá 18 trials e 9 por tratamento. Cada trial tem limite de 35 minutos (2100 s). A ordem planejada de cada pessoa foi congelada antes da coleta:
+O plano especificou um desenho crossover com três participantes, seis katas por participante e três trials em cada tratamento. A ordem planejada foi contrabalanceada entre os integrantes. Cada trial tinha um **time-box de 35 minutos (2.100 s)**; trials que não chegassem ao verde seriam registrados como censurados em 2.100 s, sem descarte.
 
-| Ordem planejada | Guilherme | Gabriel | Henrique |
-| :-: | :-- | :-- | :-- |
-| 1 | K1 com IA | K1 sem IA | K6 com IA |
-| 2 | K2 sem IA | K2 com IA | K5 sem IA |
-| 3 | K3 com IA | K3 sem IA | K4 com IA |
-| 4 | K4 sem IA | K4 com IA | K3 sem IA |
-| 5 | K5 com IA | K5 sem IA | K2 com IA |
-| 6 | K6 sem IA | K6 com IA | K1 sem IA |
+A coleta completa contém 18 trials:
 
-Como cada pessoa faz cada kata uma única vez, o pareamento da análise final só pode ser feito por kata (seis pares, comparando os trials com IA e sem IA de cada kata entre participantes), e não por participante. O `DESENHO.md` descreve o pareamento como se cada participante repetisse a mesma kata nos dois tratamentos, o que não é possível com 18 trials. Esse ponto deve ser revisado antes da análise final.
+| Participante | Com IA | Sem IA | Total |
+|---|---:|---:|---:|
+| Gabriel | 3 | 3 | 6 |
+| Guilherme | 3 | 3 | 6 |
+| Henrique | 3 | 3 | 6 |
+| **Total** | **9** | **9** | **18** |
+
+Como cada participante realizou cada kata uma única vez, uma mesma pessoa não possui a mesma kata nos dois tratamentos. Assim, o teste inferencial foi feito **por kata**, formando seis pares entre os trials com IA e sem IA. O participante é descrito como variável de controle, mas não funciona como bloco within-subject no teste por kata. Essa diferença entre o desenho pretendido e os registros reais permanece como limitação metodológica.
 
 ### 2.2 Objetos experimentais
 
-Seis katas autorais em Python, escritas para este laboratório, sem cópia de LeetCode, HackerRank ou Codewars, para reduzir a chance de o assistente já conhecer a solução. Cada kata tem uma suíte de aceitação em pytest, congelada antes da coleta (53 testes no total). O piloto de calibração, feito sem IA e fora do dataset, confirmou que as seis cabem no limite de 35 minutos.
+Foram usadas seis katas autorais, com suítes de aceitação congeladas antes da coleta:
 
 | Kata | Tema | Testes |
-| :--- | :--- | :-: |
+|---|---|---:|
 | K1 | Turno de atendimento: distribuição round-robin com capacidade | 9 |
-| K2 | Verificador de senha corporativa: validação com sete regras | 9 |
-| K3 | Consolidador de notas fiscais: agregação com filtro e arredondamento | 8 |
-| K4 | Detector de rajada de login: janela deslizante sobre timestamps | 9 |
-| K5 | Compactador de texto por repetição: codificação e decodificação | 9 |
-| K6 | Divisor de times por afinidade: partição com algoritmo determinístico | 9 |
+| K2 | Verificador de senha corporativa | 9 |
+| K3 | Consolidador de notas fiscais | 8 |
+| K4 | Detector de rajada de login com janela deslizante | 9 |
+| K5 | Compactador de texto por repetição | 9 |
+| K6 | Divisor de times por afinidade | 9 |
+| **Total** |  | **53** |
 
-### 2.3 Assistente de IA
+As katas foram escritas para o laboratório e não copiadas de plataformas conhecidas. Um piloto anterior indicou que todas eram resolvíveis dentro do time-box, embora K4 e K5 fossem mais exigentes que K3.
 
-Claude Sonnet 5 (`claude-sonnet-5`), usado pelo Claude Code na IDE. A regra de uso nos trials com IA é livre: pedir sugestões, implementações completas, correções e explicações de erro. O participante executa a suíte e decide o que aceitar. Nos trials sem IA nenhum assistente pode ser consultado. O protocolo completo, com o que é permitido em cada tratamento, está em `PROTOCOLO.md`.
+### 2.3 Tratamentos
 
-### 2.4 Ambiente e instrumentação
+- **Com IA:** uso do Claude Sonnet 5 (`claude-sonnet-5`) por meio do Claude Code na IDE. Foram permitidos pedidos de implementação, correção e explicação; o participante executava a suíte e decidia o que aceitar.
+- **Sem IA:** implementação manual, com documentação oficial e busca por conceitos permitidas, mas sem consulta a assistentes ou autocompletes baseados em IA.
 
-| Item | Versão fixada no README | Versão usada nos trials do Gabriel |
-| :--- | :--- | :--- |
-| Python | 3.12.13 | **3.13.0** |
-| pytest | 9.1.1 | 9.1.1 |
-| radon | 6.0.1 | 6.0.1 |
-| jscpd | 5.2.0 | 5.2.0 |
-| Node.js | 26.0.0 | **24.13.0** |
-| pandas, scipy, matplotlib, seaborn | 3.0.5, 1.18.1, 3.11.1, 0.13.2 | iguais |
+### 2.4 Instrumentação e métricas
 
-As diferenças em Python e Node não afetam a execução dos testes nem as métricas medidas, mas ficam registradas porque o README fixa outras versões.
+O `src/timer.py` registrou o tempo até a primeira execução verde da suíte ou o limite de 2.100 s. A taxa de sucesso foi calculada como:
 
-O tempo e a contagem de testes são registrados pelo `src/timer.py`. Ele copia a kata para uma pasta isolada do trial, marca o início, roda a suíte quando o participante pede e grava uma linha em `data/trials_raw.csv`. O trial termina no primeiro run com todos os testes passando (`censurado = 0`) ou quando chega a 2100 s (`censurado = 1`). O `src/consolida.py` valida o desenho e o `src/metricas.py` mede complexidade e linhas de código com o radon e duplicação com o jscpd, sempre com os mesmos parâmetros (`--min-lines 5 --min-tokens 50`).
+\[
+\text{taxa de sucesso} = \frac{\text{testes aprovados ao final}}{\text{testes da suíte congelada}}
+\]
 
-### 2.5 Métricas
+Para a RQ3, o pipeline utilizou `radon cc` para complexidade ciclomática média, `radon raw` para LOC/SLOC, `radon mi` para manutenibilidade e `jscpd 5.2.0` para duplicação, com `--min-lines 5 --min-tokens 50`.
 
-* **RQ1:** tempo até passar em todos os testes (time-to-green), em segundos. Trial que chega ao limite entra como censurado em 2100 s, nunca é descartado. Agregação por mediana.
-* **RQ2:** taxa de sucesso, que é a fração de testes da suíte congelada que passam ao final do trial.
-* **RQ3:** complexidade ciclomática média por função (radon `cc`), percentual de linhas duplicadas (jscpd) e, como apoio, índice de manutenibilidade (radon `mi`). O número de linhas (LOC e SLOC) é reportado como variável de controle.
+Os dados brutos estão em `data/trials_raw.csv`; os resultados consolidados estão em `data/analise_parcial_trials.csv`, `data/analise_parcial_tratamentos.csv`, `data/metricas.csv`, `data/inferencia_pares.csv` e `data/inferencia_testes.csv`.
 
-### 2.6 Regras aplicadas nesta análise parcial
+### 2.5 Análise estatística
 
-* Só entram linhas gravadas pelo cronômetro em `data/trials_raw.csv`.
-* O denominador da taxa de sucesso é o tamanho da suíte congelada da kata. Uma verificação final que gravou 0/0 (falha de coleta) é lida como 0 de N.
-* Trial sem implementação (o `solucao.py` é idêntico ao esqueleto da kata) fica fora da RQ3, porque não há código para medir.
-* Não há teste inferencial. Com n = 3 por tratamento, katas diferentes em cada um e um único participante, a faixa (mínimo e máximo) substitui o IQR.
-
-### 2.7 Como reproduzir
-
-```bash
-pip install -r lab-expe-02/requirements.txt
-cd lab-expe-02 && npm install
-python src/timer.py --integrante <nome> --kata k1 --tratamento sem-ia --ordem 1
-python src/consolida.py --parcial
-python src/analise_parcial.py
-```
-
-Para o experimento completo, depois dos 18 trials: `python src/consolida.py`, `python src/metricas.py --todos` e a análise inferencial descrita na seção 2.1.
+Foram priorizadas medianas e IQR por causa do tamanho reduzido e da censura. Para a comparação por kata, foi usado o teste de Wilcoxon de postos sinalizados, unilateral na direção das hipóteses para RQ1/RQ2/RQ3. O teste não foi executado quando o número de diferenças não nulas não permitia atingir α = 0,05; nesses casos, foi informado o menor p-valor possível para a amostra observada.
 
 ---
 
 ## 3. Resultados
 
-Trials registrados, do Gabriel. A coluna "Ordem real" é a posição em que o trial foi de fato executado (a coluna "Planejada" é a do contrabalanceamento, gravada como argumento do cronômetro).
+### 3.1 Visão geral dos 18 trials
 
-| Kata | Tratamento | Planejada | Ordem real | Tempo (s) | Censurado | Testes | Taxa |
-| :-: | :-- | :-: | :-: | :-: | :-: | :-: | :-: |
-| K1 | sem IA | 1 | 1 | 2100 | sim | 0/9 | 0% |
-| K2 | com IA | 2 | 4 | 70 | não | 9/9 | 100% |
-| K3 | sem IA | 3 | 2 | 2100 | sim | 7/8 | 87,5% |
-| K4 | com IA | 4 | 5 | 87 | não | 9/9 | 100% |
-| K5 | sem IA | 5 | 3 | 217 | não | 9/9 | 100% |
-| K6 | com IA | 6 | 6 | 59 | não | 9/9 | 100% |
+| Tratamento | n | Verdes | Censurados | Mediana do tempo (s) | IQR do tempo (s) | Mediana da taxa | IQR da taxa |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Com IA | 9 | 9 | 0 | 87,0 | 59–96 | 100% | 100%–100% |
+| Sem IA | 9 | 7 | 2 | 710,0 | 453–1.060 | 100% | 100%–100% |
 
-![Tempo por trial](../graficos/lab02_tempo_por_trial.png)
+Na condição com IA, os tempos variaram de 26 a 241 segundos. Na condição sem IA, variaram de 217 a 2.100 segundos; os dois valores de 2.100 s são censurados e não representam necessariamente conclusão após exatamente 35 minutos.
 
-### 3.1 RQ1: tempo
+### 3.2 RQ1 — Tempo de resolução
 
-| Tratamento | n | Trials verdes | Censurados | Mediana do tempo | Faixa |
-| :--- | :-: | :-: | :-: | :-: | :-: |
-| com IA | 3 | 3 | 0 | 70 s | 59 a 87 s |
-| sem IA | 3 | 1 | 2 | 2100 s (censurada) | 217 a 2100 s |
+Para cada kata, foi calculada a mediana dos trials disponíveis em cada tratamento:
 
-A mediana sem IA cai num trial censurado, então ela é um limite inferior: o valor real é de pelo menos 35 minutos. Não é um tempo medido.
+| Kata | Com IA (s) | Sem IA (s) | Diferença com − sem (s) |
+|---|---:|---:|---:|
+| K1 | 241 | 1.580 | −1.339 |
+| K2 | 79 | 314 | −235 |
+| K3 | 33 | 1.405 | −1.372 |
+| K4 | 105 | 453 | −348 |
+| K5 | 26 | 568,5 | −542,5 |
+| K6 | 77,5 | 541 | −463,5 |
 
-### 3.2 RQ2: taxa de sucesso
+**Wilcoxon unilateral:** W = 0; p = **0,01562**; correlação rank-biserial = **−1,0**; seis diferenças não nulas; dois pares contêm trials censurados.
 
-| Tratamento | n | Mediana da taxa | Faixa |
-| :--- | :-: | :-: | :-: |
-| com IA | 3 | 100% | 100% |
-| sem IA | 3 | 87,5% | 0% a 100% |
+**Resposta à RQ1:** os dados apresentam evidência estatística, no pareamento por kata adotado, de menor tempo com IA. A mediana geral foi 87 s com IA contra 710 s sem IA. O resultado é forte dentro desta amostra, mas não deve ser generalizado sem considerar os desvios de protocolo descritos na Seção 4.
 
-Sem IA, o K1 terminou sem nenhuma implementação (0/9) e o K3 terminou com 7 de 8 testes. O teste que faltou no K3 verifica se a mensagem de erro contém a palavra `valor` em minúscula, e a mensagem escrita começava com `Valor`. A validação em si estava correta.
+### 3.3 RQ2 — Defeitos e taxa de sucesso
 
-![Taxa de sucesso](../graficos/lab02_taxa_sucesso.png)
+Todos os nove trials com IA terminaram com 100% dos testes aprovados. Nos nove trials sem IA, sete terminaram verdes; um terminou com 7/8 e outro com 0/9. Como a mediana dos dois grupos é 100%, a mediana não captura a diferença nas caudas.
 
-### 3.3 RQ3: estrutura do código
+| Tratamento | Trials verdes | Taxa mínima | Mediana | Taxa máxima |
+|---|---:|---:|---:|---:|
+| Com IA | 9/9 | 100% | 100% | 100% |
+| Sem IA | 7/9 | 0% | 100% | 100% |
 
-O K1 sem IA não entra, por não ter implementação. Ficam três trials com IA (K2, K4, K6) e dois sem IA (K3, K5).
+No pareamento por kata, apenas duas diferenças foram não nulas: K1 e K3 favoreceram IA; os outros quatro pares empataram. Com duas diferenças não nulas, o menor p unilateral possível é 0,25. Portanto, **não foi aplicado um teste inferencial com α = 0,05**.
 
-| Métrica (mediana) | com IA (n=3) | sem IA (n=2) |
-| :--- | :-: | :-: |
-| Complexidade ciclomática média | 7,0 | 6,75 |
-| SLOC | 17 | 21,5 |
-| LOC (controle) | 20 | 30 |
-| Linhas duplicadas | 0% | 0% |
-| Índice de manutenibilidade | 58,3 | 56,4 |
+**Resposta à RQ2:** descritivamente, a condição com IA teve menos falhas e nenhum trial incompleto; porém, os dados não permitem afirmar diferença estatisticamente significativa. A mediana permanece em 100% nos dois grupos por causa dos empates.
 
-Por trial: complexidade média 12,0 (K2), 5,0 (K3), 7,0 (K4), 8,5 (K5), 7,0 (K6); SLOC 18, 10, 17, 33, 8. A duplicação foi 0% em todos.
+### 3.4 RQ3 — Estrutura do código
 
-![Métricas estáticas](../graficos/lab02_metricas_estaticas.png)
+O trial K1 de Gabriel sem IA foi identificado como sem implementação e foi excluído apenas da análise estática, conforme o protocolo. Assim, a RQ3 usa nove soluções com IA e oito soluções sem IA.
 
----
+| Métrica | Com IA (n=9), mediana [IQR] | Sem IA (n=8), mediana [IQR] |
+|---|---:|---:|
+| Complexidade média | 7,0 [6,0–7,0] | 7,75 [5,75–10,5] |
+| LOC | 22 [20–23] | 33 [19,25–40,25] |
+| SLOC | 17 [15–18] | 24 [14,75–27] |
+| Índice de manutenibilidade | 63,038 [58,274–66,357] | 58,822 [50,920–66,236] |
+| Linhas duplicadas | 0% [0–0] | 0% [0–0] |
 
-## 4. Discussão
+No pareamento por kata, foram usados seis pares. Para a complexidade, W = 3,0; p = **0,07812**; rank-biserial = **−0,7143**. Para duplicação, todos os valores foram zero, portanto não houve diferenças não nulas. Para MI, o teste bilateral resultou em p = 0,3125; LOC e SLOC foram tratados como controles exploratórios, com p = 0,09375 e p = 0,0625, respectivamente.
 
-**O que os números mostram.** Nos três trials com IA, o assistente levou a solução completa a 9/9 testes em 59 a 87 segundos. Sem IA, um trial chegou a 9/9 em 217 s, outro parou em 7 de 8 e o terceiro foi encerrado sem implementação. Isso vai na direção de H1 para RQ1 e RQ2. Para RQ3 não há diferença visível: as medianas são próximas, a duplicação é zero nos dois grupos e com dois trials sem IA uma mediana quase não diz nada.
-
-**Por que isso não responde às questões.** A comparação acima não é uma comparação entre tratamentos, por quatro motivos que se somam:
-
-1. É um único participante, então não existe variação entre pessoas para separar do efeito da IA.
-2. As katas são diferentes em cada tratamento (K2, K4, K6 com IA; K1, K3, K5 sem IA). Diferença de dificuldade entre katas fica misturada com o efeito do tratamento, e o piloto de calibração já mostrou tempos de 5 a 30 minutos entre elas.
-3. A ordem de execução anulou o contrabalanceamento. Os três trials sem IA foram os três primeiros e os três com IA vieram depois (seção 5). Aprendizado e cansaço aparecem misturados com o tratamento.
-4. Com n = 3 por grupo, nenhum teste estatístico tem poder para separar efeito de acaso.
-
-**Sobre o assistente.** O mesmo assistente usado nos trials com IA participou, no Lab02S01, da redação dos enunciados, das suítes de teste e de implementações de referência descartáveis usadas para validar os katas. Como os trials foram feitos na mesma conversa, esse material estava disponível para ele: enunciados, testes e respostas. Isso favorece o tratamento com IA e é o oposto do que o desenho queria, que era usar katas que o assistente não tivesse visto. Os tempos de 59 a 87 s provavelmente subestimam o tempo que o assistente levaria com katas novas.
-
-**Sobre o K1.** O participante encerrou o trial de propósito depois de 101 s, sem escrever código. Pelo protocolo, encerrar antes do limite conta como censurado em 2100 s, e é assim que o registro aparece. É uma decisão do participante, não uma falha de tentativa, e o dado ainda não distingue "não conseguiria" de "não quis continuar".
+**Resposta à RQ3:** a complexidade mediana foi numericamente menor com IA, mas o resultado não atingiu α = 0,05. A duplicação foi 0% em todos os códigos medidos. O código com IA também apresentou menor LOC/SLOC na descrição, mas tamanho isolado não equivale a melhor manutenibilidade.
 
 ---
 
-## 5. Limitações e desvios de protocolo
+## 4. Discussão e ameaças à validade
 
-**Cobertura.** 6 de 18 trials registrados. Faltam os 6 do Guilherme e os 6 do Henrique. Os dois conjuntos não têm linha em `data/trials_raw.csv` gerada pelo cronômetro, e as issues #66 a #71 e #78 a #83 seguem abertas.
+### 4.1 Interpretação conjunta
 
-**Desvios nos trials do Gabriel** (também registrados na seção 6 do `PROTOCOLO.md`):
+Com os seis trials do Henrique recuperados, o padrão descritivo se mantém e fica mais robusto: todos os nove trials com IA ficaram verdes em até 241 s, enquanto dois trials sem IA foram censurados e os demais demoraram de 217 a 1.060 s. Para qualidade funcional, a direção favorece IA, mas muitos empates em 100% reduzem o poder do teste. Para estrutura, a complexidade apresenta tendência descritiva menor com IA, porém p = 0,07812 não permite rejeitar H0 no nível de 5%; a duplicação não diferenciou os tratamentos.
 
-| Trial | Desvio | Tratamento na análise |
-| :--- | :--- | :--- |
-| Todos | Ordem real diferente da planejada: K1, K3, K5 (sem IA) e depois K2, K4, K6 (com IA), todos na mesma noite entre 23:03 e 23:30 | Sem correção possível. Confunde tratamento com ordem e cansaço |
-| K1 | Antes do trial válido, uma versão com solução já escrita fora da janela de tempo foi colocada na pasta e testada. A linha resultante foi apagada do CSV e o trial foi refeito do zero | Trial válido é o refeito. O kata já era conhecido, então há efeito de aprendizado residual |
-| K1 | Verificação final gravou 0/0 testes | Lido como 0 de 9 (o primeiro run do log mostra 0/9) |
-| K2, K4, K5 | O `x` gravou censurado em 2100 s sobre um resultado que já estava verde, porque o cronômetro tinha esse defeito. Os tempos reais (70, 87 e 217 s) foram restaurados a partir do `trial_log.txt`, e a suíte foi reexecutada de forma independente para confirmar 9/9 | Correção manual anotada em `correcao_manual` no `trial.json`. O defeito foi corrigido depois no `timer.py` (issue #61) |
-| K2, K4, K6 | O assistente escreveu a solução direto no arquivo do trial, em vez de o participante colar a sugestão | O tempo mede o ciclo "pedir, receber, testar" |
-| K4, K6 | Além de escrever, o assistente executou a suíte por conta própria antes de o participante pedir o teste no cronômetro | A verificação do assistente não entra no tempo registrado |
-| K2, K4, K6 | Os trials foram conduzidos na mesma conversa em que o assistente escreveu os katas e as suítes (ver seção 4) | Ameaça de contaminação, sem correção possível |
-| Todos | O protocolo operacional (#84) foi escrito depois desses trials | Condições verificadas retroativamente |
+A conclusão responsável é: **nesta coleta, a IA reduziu o tempo de resolução no pareamento por kata; não foi possível demonstrar diferença estatística em qualidade funcional ou estrutura do código.**
 
-**Outras limitações.**
-* `n_prompts` não foi registrado nos trials com IA.
-* Python 3.13.0 e Node 24.13.0 em vez das versões fixadas (seção 2.4).
-* As ameaças gerais (aprendizado, familiaridade com a ferramenta, memorização pelo modelo, validade externa) estão em `DESENHO.md`, seção 5, e continuam valendo.
+### 4.2 Desvios e limitações observados
 
----
+1. **Pareamento diferente do planejado:** cada participante executou cada kata uma única vez, em apenas um tratamento. A inferência foi feita por kata, não por participante.
+2. **Ordem de Gabriel fora do contrabalanceamento:** seus trials sem IA ocorreram antes dos com IA, confundindo tratamento com aprendizagem, cansaço e posição.
+3. **Contaminação do assistente:** nos trials de Gabriel com IA, o mesmo assistente havia sido usado anteriormente para elaborar katas, testes e soluções de referência. Isso pode ter favorecido artificialmente o tratamento com IA.
+4. **Correções manuais de tempo:** registros de K2, K4 e K5 de Gabriel foram corrigidos a partir dos logs porque o comando `x` havia gravado 2.100 s sobre resultados verdes. K1 também teve restauração do denominador de testes.
+5. **Execução direta pelo assistente:** em alguns trials com IA, o Claude Code escreveu diretamente em `solucao.py` e, em K4/K6, executou a suíte antes da verificação registrada pelo cronômetro.
+6. **Prompts não registrados:** `n_prompts` não está disponível nos trials de Gabriel.
+7. **Ambiente divergente:** foi registrada a utilização de Python 3.13.0 e Node 24.13.0 em parte da coleta, enquanto o README fixa outras versões.
+8. **Amostra pequena:** seis pares por kata limitam a precisão e a generalização dos resultados.
 
-## 6. Conclusão e próximos passos
-
-Com os dados registrados até aqui, o experimento não permite concluir nada sobre RQ1, RQ2 ou RQ3. O que existe é um conjunto de seis trials bem documentados, com desvios anotados, e a infraestrutura pronta para receber o restante.
-
-Para fechar o experimento:
-
-1. Registrar pelo cronômetro os 12 trials que faltam (Guilherme e Henrique), respeitando a ordem planejada e as regras de isolamento do protocolo.
-2. Rodar `consolida.py` para validar o desenho, `metricas.py --todos` e `analise_parcial.py` sobre os 18.
-3. Definir o pareamento por kata (seção 2.1) e aplicar o Wilcoxon: RQ1 e RQ2 unilaterais, RQ3 conforme as hipóteses. Com 6 pares, o menor p-valor possível é 0,031 (bilateral).
-4. Se o assistente for o mesmo que escreveu os katas, repetir a discussão da contaminação com os dados completos, ou trocar por katas novas nos trials restantes.
-5. Atualizar as seções 3 a 5 deste relatório e a apresentação com os resultados finais.
+A recuperação do Henrique foi feita de forma rastreável: cada linha adicionada ao CSV corresponde aos campos de `trial.json`, e os tempos/testes também aparecem nos três runs de cada `trial_log.txt`. O CSV original foi preservado como `data/trials_raw.before_henrique_recovery.csv`.
 
 ---
 
-## Anexos
+## 5. Conclusão
 
-* Dados (em `lab-expe-02/data/`): `trials_raw.csv`, `analise_parcial_trials.csv`, `analise_parcial_tratamentos.csv`
-* Código (em `lab-expe-02/src/`): `timer.py`, `consolida.py`, `metricas.py`, `analise_parcial.py`
-* Protocolo e desenho (em `lab-expe-02/`): `PROTOCOLO.md`, `DESENHO.md`
-* Board: https://github.com/users/henriqjmelo/projects/1
+- **RQ1:** há evidência de redução do tempo com IA no pareamento por kata (medianas gerais 87 s vs. 710 s; Wilcoxon unilateral p = 0,01562). H0 é rejeitada para esta amostra e operacionalização.
+- **RQ2:** a taxa de sucesso foi descritivamente melhor com IA (9/9 trials verdes contra 7/9), mas o número de diferenças não nulas foi insuficiente para teste significativo; H0 não é rejeitada.
+- **RQ3:** a complexidade foi menor com IA em termos descritivos, mas sem significância a 5% (p = 0,07812); duplicação foi 0% em ambos os tratamentos; LOC/SLOC e MI não devem ser interpretados isoladamente como qualidade.
+
+O experimento agora está completo em cobertura (**18/18 trials**) após a recuperação dos registros existentes do Henrique. Ainda assim, as ameaças metodológicas devem ser apresentadas junto com os resultados, especialmente o pareamento por kata e a contaminação do assistente na preparação das katas.
+
+---
+
+## 6. Reprodução
+
+A partir de `lab-expe-02/`:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+npm ci
+python src/consolida.py --parcial
+python src/metricas.py --todos
+python src/analise_parcial.py
+python src/inferencia.py
+python -m pytest -q tests_analise
+```
+
+Os gráficos ficam em `graficos/` e as tabelas analíticas em `data/`. A análise final foi executada após a recuperação e os testes automatizados resultaram em **9 passed**.
+
+---
+
+## 7. Referências internas do projeto
+
+- `DESENHO.md` — hipóteses, variáveis, katas e ameaças à validade.
+- `PROTOCOLO.md` — regras dos tratamentos, isolamento, time-box e registro de desvios.
+- `src/timer.py` — coleta de tempo e testes.
+- `src/metricas.py` — Radon e jscpd.
+- `src/analise_parcial.py` — consolidação descritiva e gráficos.
+- `src/inferencia.py` — pareamento por kata e Wilcoxon.
