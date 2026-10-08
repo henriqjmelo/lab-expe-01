@@ -28,8 +28,7 @@ Este repositório reúne **todos os laboratórios da disciplina** ao longo do se
 | Laboratório | Pasta | Tema | Status |
 | :--- | :--- | :--- | :--- |
 | Lab01 | [lab-expe-01/](lab-expe-01/) | Características de repositórios populares do GitHub + setup do Kanban | Concluído |
-| Lab02 | [lab-expe-02/](lab-expe-02/) | Assistentes de IA vs. codificação manual: experimento controlado | Concluído |
-| Lab03 | [lab-expe-03/](lab-expe-03/) | Mineração de métricas DORA em repositórios open-source com GitHub Actions | Em andamento (S01) |
+| Lab02 | [lab-expe-02/](lab-expe-02/) | Assistentes de IA vs. codificação manual: experimento controlado | Em andamento (S01) |
 
 ---
 
