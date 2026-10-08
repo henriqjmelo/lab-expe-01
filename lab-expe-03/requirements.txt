@@ -1,6 +1,2 @@
-# Lab03 - dependencias Python
-# O cliente HTTP usa so a biblioteca padrao (urllib), sem PyGithub.
-# Testado com Python 3.12.
-
 pytest==9.1.1
 pytest-cov==7.0.0

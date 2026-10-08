@@ -1,5 +1,3 @@
-"""Testes do cliente HTTP (Issue #136), sem rede: `abrir` e `dormir` sao falsos."""
-
 from __future__ import annotations
 
 import io
@@ -43,8 +41,6 @@ def erro_http(status, headers=None, corpo=None):
 
 
 class AbrirFalso:
-    """Devolve (ou levanta) as respostas na ordem e registra as URLs pedidas."""
-
     def __init__(self, *respostas):
         self.respostas = list(respostas)
         self.urls = []
@@ -68,9 +64,6 @@ def cliente(abrir, esperas=None, agora=1_000.0):
     )
 
 
-# ------------------------------------------------------------------- token
-
-
 def test_le_token_do_ambiente(monkeypatch):
     monkeypatch.setenv("GITHUB_TOKEN", "  abc  ")
     assert ler_token() == "abc"
@@ -89,9 +82,6 @@ def test_envia_token_e_cabecalhos():
     assert req.get_header("Authorization") == "Bearer token-teste"
     assert req.get_header("Accept") == "application/vnd.github+json"
     assert abrir.urls == ["https://api.github.com/repos/a/b"]
-
-
-# --------------------------------------------------------------- paginacao
 
 
 def test_proxima_pagina_le_link():
@@ -123,16 +113,13 @@ def test_paginar_com_chave_para_workflow_runs():
     assert "event=push" in abrir.urls[0]
 
 
-# -------------------------------------------------------------- rate limit
-
-
 def test_dorme_ate_o_reset_quando_cota_zera():
     esperas = []
     abrir = AbrirFalso(
         RespostaFalsa({"ok": 1}, {"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "1060"})
     )
     cliente(abrir, esperas, agora=1_000.0).get("/x")
-    assert esperas == [61.0]  # 60 s ate o reset + 1 s de folga
+    assert esperas == [61.0]
 
 
 def test_403_de_rate_limit_espera_e_repete():
@@ -158,9 +145,6 @@ def test_403_que_nao_e_rate_limit_nao_repete():
     with pytest.raises(GitHubAPIError) as exc:
         cliente(abrir).get("/x")
     assert exc.value.status == 403
-
-
-# ----------------------------------------------------------------- backoff
 
 
 def test_backoff_exponencial_em_5xx():

@@ -1,29 +1,3 @@
-"""Cliente HTTP proprio para a API REST do GitHub (sem PyGithub).
-
-Responsabilidades (secao 7 do enunciado, Issue #136):
-    - autenticar com o token lido de GITHUB_TOKEN (nunca commitado);
-    - paginar seguindo o header Link (rel="next");
-    - respeitar o rate limit: ler X-RateLimit-Remaining / X-RateLimit-Reset e
-      dormir ate o reset quando a cota zerar;
-    - backoff exponencial em respostas 5xx (1 s, 2 s, 4 s, 8 s...).
-
-O cache e a retomada ficam em cache.py; este modulo so faz a chamada.
-
-Uso:
-    from pipeline.github_client import GitHubClient
-
-    cliente = GitHubClient()  # le GITHUB_TOKEN do ambiente
-    repo = cliente.get("/repos/octocat/Hello-World")
-    for release in cliente.paginar("/repos/octocat/Hello-World/releases"):
-        ...
-    for run in cliente.paginar(
-        "/repos/octocat/Hello-World/actions/runs",
-        params={"branch": "main", "event": "push"},
-        chave="workflow_runs",
-    ):
-        ...
-"""
-
 from __future__ import annotations
 
 import json
@@ -40,23 +14,19 @@ API_URL = "https://api.github.com"
 API_VERSION = "2022-11-28"
 POR_PAGINA = 100
 
-# Backoff em 5xx: espera 1, 2, 4, 8... segundos entre tentativas.
 MAX_TENTATIVAS = 5
 BACKOFF_INICIAL = 1.0
 
-# Folga somada ao reset do rate limit, para nao acordar um instante antes.
 FOLGA_RESET = 1.0
 
 _LINK_NEXT = re.compile(r'<([^>]+)>\s*;\s*rel="next"')
 
 
 class TokenAusenteError(RuntimeError):
-    """GITHUB_TOKEN nao definido no ambiente."""
+    pass
 
 
 class GitHubAPIError(RuntimeError):
-    """Resposta de erro da API que nao deve ser repetida (4xx) ou 5xx esgotado."""
-
     def __init__(self, status: int, url: str, mensagem: str = "") -> None:
         super().__init__(f"HTTP {status} em {url}: {mensagem}".rstrip(": "))
         self.status = status
@@ -64,7 +34,6 @@ class GitHubAPIError(RuntimeError):
 
 
 def ler_token(variavel: str = "GITHUB_TOKEN") -> str:
-    """Le o token do ambiente; falha cedo com mensagem clara se faltar."""
     token = os.environ.get(variavel, "").strip()
     if not token:
         raise TokenAusenteError(
@@ -75,7 +44,6 @@ def ler_token(variavel: str = "GITHUB_TOKEN") -> str:
 
 
 def proxima_pagina(link: str | None) -> str | None:
-    """Extrai a URL rel="next" do header Link, ou None na ultima pagina."""
     if not link:
         return None
     achado = _LINK_NEXT.search(link)
@@ -83,12 +51,6 @@ def proxima_pagina(link: str | None) -> str | None:
 
 
 class GitHubClient:
-    """Cliente minimo da API REST do GitHub.
-
-    `abrir` e `dormir` sao injetaveis para que os testes rodem sem rede e sem
-    esperar de verdade.
-    """
-
     def __init__(
         self,
         token: str | None = None,
@@ -110,10 +72,7 @@ class GitHubClient:
         self._dormir = dormir
         self._agora = agora
 
-    # ------------------------------------------------------------------ URLs
-
     def montar_url(self, caminho: str, params: dict[str, Any] | None = None) -> str:
-        """Aceita caminho relativo (/repos/...) ou URL completa (vinda do Link)."""
         url = caminho if caminho.startswith("http") else f"{self.base_url}/{caminho.lstrip('/')}"
         if params:
             separador = "&" if "?" in url else "?"
@@ -128,12 +87,9 @@ class GitHubClient:
             "User-Agent": "lab-expe-03-dora",
         }
 
-    # ------------------------------------------------------------ requisicao
-
     def requisitar(
         self, caminho: str, params: dict[str, Any] | None = None
     ) -> tuple[Any, dict[str, str]]:
-        """GET com rate limit e backoff. Devolve (json, headers)."""
         url = self.montar_url(caminho, params)
         espera = self.backoff_inicial
 
@@ -160,7 +116,6 @@ class GitHubClient:
         raise GitHubAPIError(0, url, f"esgotadas {self.max_tentativas} tentativas")
 
     def get(self, caminho: str, params: dict[str, Any] | None = None) -> Any:
-        """GET simples; devolve so o JSON."""
         dados, _ = self.requisitar(caminho, params)
         return dados
 
@@ -171,11 +126,6 @@ class GitHubClient:
         *,
         chave: str | None = None,
     ) -> Iterator[Any]:
-        """Itera todos os itens seguindo o header Link.
-
-        `chave` e para endpoints que embrulham a lista num objeto, como
-        /actions/runs ({"total_count": ..., "workflow_runs": [...]}).
-        """
         params = {"per_page": POR_PAGINA, **(params or {})}
         url: str | None = self.montar_url(caminho, params)
         while url:
@@ -185,10 +135,7 @@ class GitHubClient:
             url = proxima_pagina(headers.get("Link"))
 
     def rate_limit(self) -> dict[str, Any]:
-        """Diagnostico da cota (GET /rate_limit nao consome cota)."""
         return self.get("/rate_limit")
-
-    # ------------------------------------------------------------ rate limit
 
     @staticmethod
     def _limite_estourado(status: int, headers: dict[str, str]) -> bool:
@@ -204,7 +151,6 @@ class GitHubClient:
         self._dormir(max(reset - self._agora(), 0.0) + FOLGA_RESET)
 
     def _respeitar_cota(self, headers: dict[str, str]) -> None:
-        """Se a resposta gastou a ultima chamada da cota, dorme antes da proxima."""
         if headers.get("X-RateLimit-Remaining") == "0":
             self._esperar_reset(headers)
 
