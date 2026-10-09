@@ -18,7 +18,7 @@
 ## Links Importantes
 
 * Repositório: `https://github.com/henriqjmelo/lab-expe-01`
-* GitHub Projects (v2): `https://github.com/users/henriqjmelo/projects/1`
+* GitHub Projects (v2): `https://github.com/users/henriqjmelo/projects/2`
 * Relatório final: [relatorio-e-slide/RELATORIO.md](relatorio-e-slide/RELATORIO.md)
 
 ---
