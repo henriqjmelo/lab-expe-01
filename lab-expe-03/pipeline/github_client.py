@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import http.client
 import json
 import os
 import re
@@ -139,8 +140,8 @@ class GitHubClient:
                 if erro.code == 404 and self.cache is not None:
                     self.cache.gravar(chave, {"status": 404})
                 raise GitHubAPIError(erro.code, url, mensagem) from erro
-            except (urllib.error.URLError, TimeoutError, ConnectionError) as erro:
-                # Queda de rede: mesmo tratamento de um 5xx.
+            except (http.client.HTTPException, OSError) as erro:
+                # Queda de rede ou resposta cortada no meio (IncompleteRead): mesmo tratamento de um 5xx.
                 if tentativa < self.max_tentativas:
                     self._dormir(espera)
                     espera *= 2

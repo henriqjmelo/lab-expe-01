@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import http.client
 import io
 import json
 import urllib.error
@@ -146,3 +147,10 @@ def test_queda_de_rede_persistente_vira_erro():
     abrir = AbrirFalso(*[urllib.error.URLError("sem rede")] * 5)
     with pytest.raises(GitHubAPIError):
         novo_cliente(abrir, None).get("/x")
+
+
+def test_resposta_cortada_no_meio_tem_backoff():
+    esperas = []
+    abrir = AbrirFalso(http.client.IncompleteRead(b"x", 10), RespostaFalsa({"ok": True}))
+    assert novo_cliente(abrir, None, esperas).get("/x") == {"ok": True}
+    assert esperas == [1.0]
