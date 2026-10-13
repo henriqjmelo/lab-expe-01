@@ -68,7 +68,8 @@ def comparar(
     """Datas (commit.author.date) dos commits entre base e head, paginando o compare.
 
     None = 404 (tag apagada/reescrita); TRUNCADO = mais de `max_commits` commits,
-    descoberto ja na primeira pagina pelo campo total_commits (nao baixa o resto)."""
+    descoberto ja na primeira pagina pelo campo total_commits (nao baixa o resto),
+    ou 422 "diff is taking too long" (o GitHub desiste de calcular o compare)."""
     caminho = f"repos/{owner}/{repo}/compare/{base}...{head}"
     datas: list[str] = []
     pagina = 1
@@ -78,6 +79,10 @@ def comparar(
         except GitHubAPIError as erro:
             if erro.status == 404:
                 return None
+            if erro.status == 422 and "too long" in str(erro).lower():
+                # "Sorry, this diff is taking too long to generate": compare enorme
+                # (ex.: qgis/QGIS entre linhas 4.0 e 4.2) - mesmo tratamento do limite.
+                return TRUNCADO
             raise
         if pagina == 1 and (resultado.get("total_commits") or 0) > max_commits:
             return TRUNCADO

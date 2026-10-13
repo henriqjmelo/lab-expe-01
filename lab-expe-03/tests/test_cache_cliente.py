@@ -97,10 +97,20 @@ def test_404_fica_no_cache_e_continua_levantando(tmp_path):
     assert segundo.value.status == 404
 
 
+def test_422_fica_no_cache_com_a_mensagem(tmp_path):
+    cache = CacheDisco(tmp_path)
+    with pytest.raises(GitHubAPIError):
+        novo_cliente(AbrirFalso(erro_http(422, {"message": "diff is taking too long"})), cache).get("/x")
+    with pytest.raises(GitHubAPIError) as segundo:
+        novo_cliente(AbrirFalso(), cache).get("/x")
+    assert segundo.value.status == 422
+    assert "too long" in str(segundo.value)
+
+
 def test_outros_erros_nao_vao_pro_cache(tmp_path):
     cache = CacheDisco(tmp_path)
     with pytest.raises(GitHubAPIError):
-        novo_cliente(AbrirFalso(erro_http(422)), cache).get("/x")
+        novo_cliente(AbrirFalso(erro_http(409)), cache).get("/x")
     assert novo_cliente(AbrirFalso(RespostaFalsa({"ok": 1})), cache).get("/x") == {"ok": 1}
 
 

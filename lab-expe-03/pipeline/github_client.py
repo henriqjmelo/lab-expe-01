@@ -113,8 +113,9 @@ class GitHubClient:
             guardada = self.cache.ler(chave)
             if guardada is not None:
                 self.ultima_atividade = time.monotonic()  # retomada pelo cache tambem e progresso
-                if guardada.get("status") == 404:
-                    raise GitHubAPIError(404, url, "Not Found (cache)")
+                if guardada.get("status") in (404, 422):
+                    mensagem = guardada.get("mensagem") or "Not Found"
+                    raise GitHubAPIError(guardada["status"], url, f"{mensagem} (cache)")
                 link = guardada.get("link")
                 return guardada.get("corpo"), ({"Link": link} if link else {})
 
@@ -144,8 +145,9 @@ class GitHubClient:
                     self._pausar(espera)
                     espera *= 2
                     continue
-                if erro.code == 404 and self.cache is not None:
-                    self.cache.gravar(chave, {"status": 404})
+                if erro.code in (404, 422) and self.cache is not None:
+                    # Respostas definitivas: guardadas para a retomada nao repetir a chamada.
+                    self.cache.gravar(chave, {"status": erro.code, "mensagem": mensagem})
                 raise GitHubAPIError(erro.code, url, mensagem) from erro
             except (http.client.HTTPException, OSError) as erro:
                 # Queda de rede ou resposta cortada no meio (IncompleteRead): mesmo tratamento de um 5xx.

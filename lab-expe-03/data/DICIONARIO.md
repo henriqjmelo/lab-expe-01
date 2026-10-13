@@ -39,7 +39,7 @@ As colunas abaixo se repetem para cada unidade `<u>`:
 | `lt_b_<u>_dias` | decimal | dias | **Lead time (b), por commit (RQ 02).** `data(D) − commit.author.date` para cada commit de cada deploy. O valor é a mediana de todos os commits |
 | `lt_<u>_n_avaliadas` | inteiro | deploys | Deploys que entraram no lead time (a). Ficam fora: o primeiro da história, compare 404, compare grande demais e deploy sem commit novo |
 | `lt_<u>_compare_404` | inteiro | deploys | Deploys ignorados porque o compare respondeu 404 (tag apagada ou reescrita) |
-| `lt_<u>_compare_grande` | inteiro | deploys | Deploys ignorados porque o compare tinha mais de 1.000 commits (`total_commits`). Em geral é comparação entre linhas diferentes, como `v10.x → v11.x` ou pacotes distintos de um monorepo |
+| `lt_<u>_compare_grande` | inteiro | deploys | Deploys ignorados porque o compare tinha mais de 1.000 commits (`total_commits`), ou porque a API respondeu 422 "diff is taking too long to generate". Em geral é comparação entre linhas diferentes, como `v10.x → v11.x` ou pacotes distintos de um monorepo |
 | `lt_<u>_omitido` | booleano | — | `True` quando `n_<u>` passou de `coleta.max_compares_por_unidade` (300). Nesse caso o lead time da unidade não foi calculado, para preservar a cota |
 | `cfr_b_<u>` | decimal 0–1 | proporção | **CFR (b), proxy de entrega (RQ 03).** `deploys que falharam / deploys avaliados`. D falhou se houve um deploy **corretivo** em até 7 dias depois dele |
 | `cfr_b_<u>_n_avaliadas` | inteiro | deploys | Denominador do CFR (b): deploys da janela, menos os dos últimos 7 dias |

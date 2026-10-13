@@ -445,3 +445,15 @@ def test_fila_adiantada_maior_nao_muda_o_resultado():
     avaliar_candidatos(candidatos, 3, largo, avaliar_por_roteiro(roteiro), lambda a: None, workers=3, adiantar=30)
     assert largo.descartes == base.descartes
     assert largo.linhas() == base.linhas()
+
+
+def test_compare_422_diff_demorado_conta_como_grande():
+    erro = GitHubAPIError(422, "u", "Server Error: Sorry, this diff is taking too long to generate.")
+    cliente = ClienteFalso(gets={"repos/o/r/compare/a...b": erro})
+    assert comparar(cliente, "o", "r", "a", "b") == "truncado"
+
+
+def test_compare_422_de_outro_tipo_propaga():
+    cliente = ClienteFalso(gets={"repos/o/r/compare/a...b": GitHubAPIError(422, "u", "Validation Failed")})
+    with pytest.raises(GitHubAPIError):
+        comparar(cliente, "o", "r", "a", "b")
