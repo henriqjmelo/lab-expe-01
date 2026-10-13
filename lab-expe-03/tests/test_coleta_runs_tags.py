@@ -124,3 +124,20 @@ def test_tags_graphql_leve_e_anotada_paginadas_e_ordenadas():
 
 def test_tags_graphql_repositorio_inexistente():
     assert listar_tags_graphql(ClienteGraphQL([{"data": {"repository": None}}]), "o", "r") == []
+
+
+def test_meses_em_paralelo_dao_o_mesmo_resultado_que_sequencial():
+    por_faixa = {
+        "2025-01-01..2025-01-31": [bruto(1, dia="2025-01-05")],
+        "2025-02-01..2025-02-14": [bruto(2, "failure", dia="2025-02-03")],
+        "2025-02-15..2025-02-28": [bruto(3, dia="2025-02-20")],
+        "2025-03-01..2025-03-31": [bruto(4, "cancelled", dia="2025-03-09")],
+    }
+    totais = {"2025-02-01..2025-02-28": 1500}
+    seq = coletar_runs(ClienteRuns(por_faixa, totais), "o", "r", "main", date(2025, 1, 1), date(2025, 3, 31))
+    par = coletar_runs(
+        ClienteRuns(por_faixa, totais), "o", "r", "main", date(2025, 1, 1), date(2025, 3, 31), threads=3
+    )
+    assert par.runs == seq.runs
+    assert [r.run_started_at[:10] for r in par.runs] == ["2025-01-05", "2025-02-03", "2025-02-20", "2025-03-09"]
+    assert (par.meses_no_teto, par.dias_truncados) == (seq.meses_no_teto, seq.dias_truncados) == (1, 0)

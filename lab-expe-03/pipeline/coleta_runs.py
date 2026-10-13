@@ -5,10 +5,15 @@ devolve no maximo 1.000 resultados por consulta. A janela e consultada mes a
 mes; um mes com mais de 1.000 runs e dividido ao meio recursivamente ate caber
 (conta como "mes no teto"). Um unico dia ainda acima do teto fica truncado e e
 contado a parte - nesse caso os dados daquele dia estao incompletos.
+
+Repositorios gigantes (ex.: getsentry/sentry, milhares de runs por mes e paginas
+de ~1,5 MB) levam horas numa thread so; com `threads` > 1 os meses sao baixados
+em paralelo. A ordem dos runs no resultado e a mesma da execucao sequencial.
 """
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 
@@ -75,14 +80,39 @@ def _coletar_intervalo(
     return [_para_run(r) for r in brutos], total
 
 
+def _coletar_mes(cliente: GitHubClient, caminho: str, branch: str, ini: date, fim: date) -> ResultadoRuns:
+    """Um mes da janela, com o proprio contador (seguro para rodar em paralelo)."""
+    parcial = ResultadoRuns()
+    runs, total = _coletar_intervalo(cliente, caminho, branch, ini, fim, parcial)
+    parcial.runs = runs
+    parcial.meses_no_teto = 1 if total > TETO_RESULTADOS else 0
+    return parcial
+
+
 def coletar_runs(
-    cliente: GitHubClient, owner: str, repo: str, branch: str, inicio: date, fim: date
+    cliente: GitHubClient,
+    owner: str,
+    repo: str,
+    branch: str,
+    inicio: date,
+    fim: date,
+    threads: int = 1,
 ) -> ResultadoRuns:
-    resultado = ResultadoRuns()
     caminho = f"repos/{owner}/{repo}/actions/runs"
-    for ini, ult in intervalos_mensais(inicio, fim):
-        runs, total = _coletar_intervalo(cliente, caminho, branch, ini, ult, resultado)
-        if total > TETO_RESULTADOS:
-            resultado.meses_no_teto += 1
-        resultado.runs.extend(runs)
+    meses = intervalos_mensais(inicio, fim)
+
+    def mes(intervalo: tuple[date, date]) -> ResultadoRuns:
+        return _coletar_mes(cliente, caminho, branch, *intervalo)
+
+    if threads > 1:
+        with ThreadPoolExecutor(max_workers=threads, thread_name_prefix="runs") as executor:
+            parciais = list(executor.map(mes, meses))
+    else:
+        parciais = [mes(m) for m in meses]
+
+    resultado = ResultadoRuns()
+    for parcial in parciais:
+        resultado.runs.extend(parcial.runs)
+        resultado.meses_no_teto += parcial.meses_no_teto
+        resultado.dias_truncados += parcial.dias_truncados
     return resultado

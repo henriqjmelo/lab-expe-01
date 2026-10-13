@@ -80,6 +80,8 @@ class Config:
     espera_retentativa: float = 30.0
     gravar_parcial_a_cada: int = 10
     threads: int = 1
+    threads_runs: int = 1
+    adiantar: int = 0
     watchdog_minutos: float = 10.0
 
 
@@ -106,6 +108,8 @@ def ler_config(caminho: Path) -> Config:
         espera_retentativa=float(bruto["coleta"].get("espera_retentativa_s", 30)),
         gravar_parcial_a_cada=int(bruto["coleta"].get("gravar_parcial_a_cada", 10)),
         threads=int(bruto["coleta"].get("threads", 1)),
+        threads_runs=int(bruto["coleta"].get("threads_runs", 1)),
+        adiantar=int(bruto["coleta"].get("adiantar", 0)),
         watchdog_minutos=float(bruto["coleta"].get("watchdog_minutos", 10)),
     )
 
@@ -236,7 +240,9 @@ class Coleta:
                 return Avaliacao(c, MOTIVO_POUCAS_RELEASES, estado["etapa"], str(n_rel))
 
             estado["etapa"] = "min_50_runs"
-            runs = coletar_runs(self.cliente, owner, repo, c["default_branch"], janela.inicio, janela.fim)
+            runs = coletar_runs(
+                self.cliente, owner, repo, c["default_branch"], janela.inicio, janela.fim, threads=cfg.threads_runs
+            )
             validos = sum(1 for r in runs.runs if classificar_conclusao(r.conclusion) in (SUCESSO, FALHA))
             if validos < cfg.min_runs:
                 return Avaliacao(c, MOTIVO_POUCOS_RUNS, estado["etapa"], str(validos))
@@ -276,7 +282,14 @@ class Coleta:
         candidatos = buscar_candidatos(self.cliente, cfg.faixas, cfg.janela.inicio)
         ordem = embaralhar(candidatos, cfg.semente)
         avaliar_candidatos(
-            ordem, cfg.alvo, self.funil, self.avaliar, self.registrar, self.log, workers=cfg.threads
+            ordem,
+            cfg.alvo,
+            self.funil,
+            self.avaliar,
+            self.registrar,
+            self.log,
+            workers=cfg.threads,
+            adiantar=cfg.adiantar or None,
         )
 
 

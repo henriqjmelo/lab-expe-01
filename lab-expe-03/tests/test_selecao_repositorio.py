@@ -435,3 +435,13 @@ def test_coleta_ponta_a_ponta_gera_os_csvs(tmp_path, threads):
 
 def test_idade_em_anos():
     assert executar.idade_anos("2020-12-31T00:00:00Z", date(2025, 12, 31)) == pytest.approx(5.0, abs=0.01)
+
+
+def test_fila_adiantada_maior_nao_muda_o_resultado():
+    candidatos = [{"full_name": f"o/r{i}"} for i in range(7)]
+    roteiro = roteiro_de_avaliacoes()
+    base, largo = Funil(), Funil()
+    avaliar_candidatos(candidatos, 3, base, avaliar_por_roteiro(roteiro), lambda a: None, workers=1)
+    avaliar_candidatos(candidatos, 3, largo, avaliar_por_roteiro(roteiro), lambda a: None, workers=3, adiantar=30)
+    assert largo.descartes == base.descartes
+    assert largo.linhas() == base.linhas()

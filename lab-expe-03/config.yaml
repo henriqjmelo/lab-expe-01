@@ -41,6 +41,12 @@ coleta:
   # Candidatos avaliados em paralelo. O teto real e a cota (5.000 chamadas/h):
   # com ~3 threads a coleta ja encosta nela; mais que isso so gera espera.
   threads: 3
+  # Meses de workflow runs baixados em paralelo dentro de um mesmo repositorio
+  # (repositorios gigantes como getsentry/sentry levam horas numa thread so).
+  threads_runs: 3
+  # Candidatos adiantados na fila: as threads livres seguem trabalhando enquanto
+  # um repositorio pesado na frente termina. A ordem do funil nao muda.
+  adiantar: 30
   # Sem nenhuma chamada concluida por este tempo (fora de espera de cota/backoff),
   # o processo sai com codigo 75 e scripts/coletar.sh reinicia. 0 desliga.
   watchdog_minutos: 10

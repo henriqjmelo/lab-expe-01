@@ -152,6 +152,7 @@ def avaliar_candidatos(
     registrar: Callable[[Avaliacao], None],
     log: Callable[[str], None] = lambda _: None,
     workers: int = 1,
+    adiantar: int | None = None,
 ) -> None:
     """Percorre os candidatos ate `alvo` aceitos.
 
@@ -160,11 +161,15 @@ def avaliar_candidatos(
     funil na ordem do sorteio, na thread principal: a amostra e o funil saem
     iguais aos de uma execucao sequencial, e candidatos adiantados alem do alvo
     sao simplesmente ignorados (o que baixaram fica no cache).
+
+    `adiantar` = quantos candidatos ficam em voo (padrao 2 x workers). Uma fila
+    maior evita que um repositorio gigante na frente deixe as outras threads
+    paradas esperando por ele.
     """
     funil.candidatos = len(candidatos)
     fila = iter(candidatos)
     em_voo: deque[tuple[dict, Future]] = deque()
-    adiantar = max(1, workers) * 2
+    adiantar = adiantar or max(1, workers) * 2
     executor = ThreadPoolExecutor(max_workers=max(1, workers), thread_name_prefix="coleta")
 
     def encher() -> None:
