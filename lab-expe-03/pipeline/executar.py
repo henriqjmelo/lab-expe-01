@@ -76,6 +76,7 @@ class Config:
     threads_runs: int = 1
     adiantar: int = 0
     watchdog_minutos: float = 10.0
+    excluir: tuple[Path, ...] = ()
 
 
 def _data(valor: Any) -> date:
@@ -104,6 +105,7 @@ def ler_config(caminho: Path) -> Config:
         threads_runs=int(bruto["coleta"].get("threads_runs", 1)),
         adiantar=int(bruto["coleta"].get("adiantar", 0)),
         watchdog_minutos=float(bruto["coleta"].get("watchdog_minutos", 10)),
+        excluir=tuple(base / c for c in bruto["amostra"].get("excluir") or []),
     )
 
 
@@ -138,6 +140,14 @@ def colunas_dataset() -> list[str]:
         "dias_truncados_runs",
     ]
     return colunas
+
+
+def repositorios_excluidos(caminhos: tuple[Path, ...]) -> set[str]:
+    fora: set[str] = set()
+    for caminho in caminhos:
+        with caminho.open(newline="", encoding="utf-8") as f:
+            fora.update(f"{l['owner']}/{l['repo']}".lower() for l in csv.DictReader(f))
+    return fora
 
 
 def idade_anos(criado_em: str, referencia: date) -> float:
@@ -260,6 +270,12 @@ class Coleta:
         cfg = self.config
         self.log(f"Buscando candidatos em {len(cfg.faixas)} faixas de estrelas...")
         candidatos = buscar_candidatos(self.cliente, cfg.faixas, cfg.janela.inicio)
+        if cfg.excluir:
+            fora = repositorios_excluidos(cfg.excluir)
+            antes = len(candidatos)
+            candidatos = [c for c in candidatos if c["full_name"].lower() not in fora]
+            self.funil.excluidos = antes - len(candidatos)
+            self.log(f"Excluidos {self.funil.excluidos} candidatos de amostras anteriores.")
         ordem = embaralhar(candidatos, cfg.semente)
         avaliar_candidatos(
             ordem,

@@ -39,6 +39,7 @@ ETAPAS = (
 @dataclass
 class Funil:
     candidatos: int = 0
+    excluidos: int = 0
     avaliados: int = 0
     descartes: list[dict] = field(default_factory=list)
     aceitos: int = 0
@@ -50,7 +51,7 @@ class Funil:
 
     def linhas(self) -> list[dict]:
         linhas = [
-            {"etapa": "candidatos_busca", "restantes": self.candidatos, "descartados": 0, "motivo": ""},
+            {"etapa": "candidatos_busca", "restantes": self.candidatos + self.excluidos, "descartados": 0, "motivo": ""},
             {
                 "etapa": "avaliados",
                 "restantes": self.avaliados,
@@ -58,6 +59,13 @@ class Funil:
                 "motivo": "nao avaliados: alvo da amostra ja atingido",
             },
         ]
+        if self.excluidos:
+            linhas.insert(1, {
+                "etapa": "fora_de_amostra_anterior",
+                "restantes": self.candidatos,
+                "descartados": self.excluidos,
+                "motivo": "ja estavam numa amostra anterior (amostras independentes)",
+            })
         restantes = self.avaliados
         for etapa, descricao in ETAPAS:
             da_etapa = [d for d in self.descartes if d["etapa"] == etapa]

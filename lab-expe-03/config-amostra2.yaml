@@ -1,0 +1,61 @@
+# Amostra 2 (issue #151): mesma janela e filtros da amostra 1, outra semente, sem repetir repositorios.
+# Uso: python -m pipeline --config config-amostra2.yaml  (ou CONFIG=config-amostra2.yaml scripts/coletar.sh)
+# Caminhos relativos a esta pasta.
+
+janela:
+  # 12 meses. Ajustar para as datas fixadas pelo professor se forem outras.
+  inicio: 2025-10-01
+  fim: 2026-09-30        # inclusive
+
+amostra:
+  alvo: 300              # para quando atingir este numero de repositorios aceitos
+  semente: 2026          # semente diferente da amostra 1 (42)
+  excluir:               # amostra 2 nao repete nenhum repositorio da amostra 1
+    - data/repositorios.csv
+
+busca:
+  # Cada consulta da Search API devolve no maximo 1.000 resultados: fatiar.
+  # null = sem limite superior.
+  faixas_estrelas:
+    - [1000, 1199]
+    - [1200, 1499]
+    - [1500, 1999]
+    - [2000, 2999]
+    - [3000, 4999]
+    - [5000, 9999]
+    - [10000, 19999]
+    - [20000, 49999]
+    - [50000, null]
+
+inclusao:
+  min_releases: 5
+  min_runs_validos: 50
+
+coleta:
+  # Um compare por deploy na janela; acima disso o lead time da unidade fica vazio
+  # (coluna lt_<unidade>_omitido = True) para nao estourar a cota.
+  max_compares_por_unidade: 300
+  cache: .cache/github
+  # Tolerancia a falhas:
+  max_tentativas_chamada: 8      # por chamada HTTP (5xx/rede), backoff 1 s, 2 s, 4 s... ~2 min
+  retentativas_repositorio: 3    # por repositorio, esperando 30 s, 60 s, 120 s
+  espera_retentativa_s: 30
+  gravar_parcial_a_cada: 10      # regrava os CSVs a cada 10 repositorios aceitos
+  # Candidatos avaliados em paralelo. O teto real e a cota (5.000 chamadas/h):
+  # com ~3 threads a coleta ja encosta nela; mais que isso so gera espera.
+  threads: 3
+  # Meses de workflow runs baixados em paralelo dentro de um mesmo repositorio
+  # (repositorios gigantes como getsentry/sentry levam horas numa thread so).
+  threads_runs: 3
+  # Candidatos adiantados na fila: as threads livres seguem trabalhando enquanto
+  # um repositorio pesado na frente termina. A ordem do funil nao muda.
+  adiantar: 30
+  # Sem nenhuma chamada concluida por este tempo (fora de espera de cota/backoff),
+  # o processo sai com codigo 75 e scripts/coletar.sh reinicia. 0 desliga.
+  watchdog_minutos: 10
+
+saida:
+  dataset: data/amostra2/dataset_dora.csv
+  repositorios: data/amostra2/repositorios.csv
+  funil: data/amostra2/funil.csv
+  descartes: data/amostra2/descartes.csv
