@@ -10,6 +10,8 @@ import urllib.request
 from collections.abc import Callable, Iterator
 from typing import Any
 
+from pipeline.cache import CacheDisco
+
 API_URL = "https://api.github.com"
 API_VERSION = "2022-11-28"
 POR_PAGINA = 100
@@ -18,6 +20,9 @@ MAX_TENTATIVAS = 5
 BACKOFF_INICIAL = 1.0
 
 FOLGA_RESET = 1.0
+
+# Limite secundario (abuso) as vezes vem sem Retry-After nem Remaining=0: espera fixa e dobra.
+ESPERA_LIMITE_SECUNDARIO = 60.0
 
 _LINK_NEXT = re.compile(r'<([^>]+)>\s*;\s*rel="next"')
 
@@ -62,6 +67,7 @@ class GitHubClient:
         abrir: Callable[..., Any] = urllib.request.urlopen,
         dormir: Callable[[float], None] = time.sleep,
         agora: Callable[[], float] = time.time,
+        cache: CacheDisco | None = None,
     ) -> None:
         self.token = token if token is not None else ler_token()
         self.base_url = base_url.rstrip("/")
@@ -71,6 +77,7 @@ class GitHubClient:
         self._abrir = abrir
         self._dormir = dormir
         self._agora = agora
+        self.cache = cache
 
     def montar_url(self, caminho: str, params: dict[str, Any] | None = None) -> str:
         url = caminho if caminho.startswith("http") else f"{self.base_url}/{caminho.lstrip('/')}"
@@ -88,30 +95,65 @@ class GitHubClient:
         }
 
     def requisitar(
-        self, caminho: str, params: dict[str, Any] | None = None
+        self,
+        caminho: str,
+        params: dict[str, Any] | None = None,
+        *,
+        corpo: dict[str, Any] | None = None,
+        chave_cache: str | None = None,
     ) -> tuple[Any, dict[str, str]]:
         url = self.montar_url(caminho, params)
+        chave = chave_cache or url
+        if self.cache is not None:
+            guardada = self.cache.ler(chave)
+            if guardada is not None:
+                if guardada.get("status") == 404:
+                    raise GitHubAPIError(404, url, "Not Found (cache)")
+                link = guardada.get("link")
+                return guardada.get("corpo"), ({"Link": link} if link else {})
+
+        dados = json.dumps(corpo).encode() if corpo is not None else None
         espera = self.backoff_inicial
+        espera_secundario = ESPERA_LIMITE_SECUNDARIO
 
         for tentativa in range(1, self.max_tentativas + 1):
-            requisicao = urllib.request.Request(url, headers=self._cabecalhos())
+            requisicao = urllib.request.Request(url, data=dados, headers=self._cabecalhos())
             try:
                 with self._abrir(requisicao, timeout=self.timeout) as resposta:
                     headers = dict(resposta.headers.items())
-                    corpo = resposta.read()
+                    bruto = resposta.read()
             except urllib.error.HTTPError as erro:
                 headers = dict(erro.headers.items()) if erro.headers else {}
                 if self._limite_estourado(erro.code, headers):
                     self._esperar_reset(headers)
                     continue
+                mensagem = _mensagem_erro(erro)
+                if erro.code in (403, 429) and "rate limit" in mensagem.lower():
+                    self._dormir(espera_secundario)
+                    espera_secundario *= 2
+                    continue
                 if erro.code >= 500 and tentativa < self.max_tentativas:
                     self._dormir(espera)
                     espera *= 2
                     continue
-                raise GitHubAPIError(erro.code, url, _mensagem_erro(erro)) from erro
+                if erro.code == 404 and self.cache is not None:
+                    self.cache.gravar(chave, {"status": 404})
+                raise GitHubAPIError(erro.code, url, mensagem) from erro
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as erro:
+                # Queda de rede: mesmo tratamento de um 5xx.
+                if tentativa < self.max_tentativas:
+                    self._dormir(espera)
+                    espera *= 2
+                    continue
+                raise GitHubAPIError(0, url, str(erro)) from erro
 
             self._respeitar_cota(headers)
-            return (json.loads(corpo) if corpo else None), headers
+            conteudo = json.loads(bruto) if bruto else None
+            if self.cache is not None:
+                self.cache.gravar(
+                    chave, {"status": 200, "corpo": conteudo, "link": headers.get("Link")}
+                )
+            return conteudo, headers
 
         raise GitHubAPIError(0, url, f"esgotadas {self.max_tentativas} tentativas")
 
@@ -134,8 +176,20 @@ class GitHubClient:
             yield from itens or []
             url = proxima_pagina(headers.get("Link"))
 
+    def graphql(self, consulta: str, variaveis: dict[str, Any] | None = None) -> Any:
+        """POST /graphql. A chave do cache e a consulta + variaveis, nao a URL (que e sempre a mesma)."""
+        corpo = {"query": consulta, "variables": variaveis or {}}
+        chave = "graphql:" + json.dumps(corpo, sort_keys=True)
+        dados, _ = self.requisitar("/graphql", corpo=corpo, chave_cache=chave)
+        return dados
+
     def rate_limit(self) -> dict[str, Any]:
-        return self.get("/rate_limit")
+        # Diagnostico: nunca vem do cache, a resposta muda a cada chamada.
+        cache, self.cache = self.cache, None
+        try:
+            return self.get("/rate_limit")
+        finally:
+            self.cache = cache
 
     @staticmethod
     def _limite_estourado(status: int, headers: dict[str, str]) -> bool:
