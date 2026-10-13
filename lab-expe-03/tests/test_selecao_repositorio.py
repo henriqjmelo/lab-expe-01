@@ -442,3 +442,24 @@ def test_compare_422_de_outro_tipo_propaga():
     cliente = ClienteFalso(gets={"repos/o/r/compare/a...b": GitHubAPIError(422, "u", "Validation Failed")})
     with pytest.raises(GitHubAPIError):
         comparar(cliente, "o", "r", "a", "b")
+
+
+def test_funil_com_exclusao_de_amostra_anterior():
+    funil = Funil(candidatos=8, excluidos=2, avaliados=8)
+    linhas = funil.linhas()
+    assert [l["etapa"] for l in linhas[:3]] == ["candidatos_busca", "fora_de_amostra_anterior", "avaliados"]
+    assert linhas[0]["restantes"] == 10
+    assert (linhas[1]["restantes"], linhas[1]["descartados"]) == (8, 2)
+
+
+def test_coleta_exclui_repositorios_de_amostra_anterior(tmp_path):
+    (tmp_path / "c.yaml").write_text(CONFIG.replace("semente: 1}", "semente: 1, excluir: [anterior.csv]}"))
+    (tmp_path / "anterior.csv").write_text("owner,repo\nC,OK\n")
+    cfg = executar.ler_config(tmp_path / "c.yaml")
+    cliente = ClienteFalso(paginas={"search/repositories": [item("a/semactions"), item("c/ok")]},
+                           gets={"repos/a/semactions/actions/workflows": {"total_count": 0}})
+    coleta = executar.Coleta(cliente, cfg, log=lambda _: None)
+    coleta.rodar()
+    assert coleta.funil.excluidos == 1
+    assert coleta.funil.avaliados == 1
+    assert [d["full_name"] for d in coleta.funil.descartes] == ["a/semactions"]
