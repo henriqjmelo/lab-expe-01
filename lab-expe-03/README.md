@@ -93,6 +93,34 @@ Script **próprio** do grupo via API REST e/ou GraphQL — **não é permitido**
 
 ---
 
+## Execução do pipeline
+
+Pré-requisitos: Python 3.12 e um token do GitHub (só leitura de repositórios públicos), exportado como `GITHUB_TOKEN`. O token **nunca** vai para o repositório: `.env` e `lab-expe-03/.cache/` estão no `.gitignore`.
+
+```bash
+cd lab-expe-03
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+export GITHUB_TOKEN=ghp_...
+python -m pipeline --config config.yaml
+```
+
+O comando único faz a seleção (busca fatiada por estrelas → tem Actions → ≥ 5 releases → ≥ 50 runs válidos), coleta tudo e grava:
+
+| Arquivo | Conteúdo |
+| :--- | :--- |
+| `data/dataset_dora.csv` | Uma linha por repositório com todas as métricas e variantes — colunas em [`data/DICIONARIO.md`](data/DICIONARIO.md) |
+| `data/funil.csv` | Funil de seleção (etapa, restantes, descartados, motivo) |
+| `data/descartes.csv` | Cada repositório descartado e o motivo |
+| `data/repositorios.csv` | `owner,repo` da amostra final |
+
+* **Configuração** (`config.yaml`): janela, alvo da amostra (300), semente, faixas de estrelas, critérios de inclusão e caminhos.
+* **Cache e retomada:** toda resposta da API fica em `.cache/github/` (JSON + gzip). Depois de `Ctrl+C` ou queda, rode o mesmo comando: o que já foi baixado não é pedido de novo. Com o cache completo, a reexecução reproduz o dataset sem gastar cota.
+* **Rate limit:** o cliente lê `X-RateLimit-Remaining`/`X-RateLimit-Reset` e dorme até o reset; limite secundário e erros 5xx/rede têm *backoff* exponencial. A coleta completa leva várias horas por causa da cota de 5.000 chamadas/hora.
+* **Testes:** `python -m pytest --cov=metricas --cov-report=term-missing` (o CI em `.github/workflows/lab03-testes.yml` exige ≥ 80%).
+
+---
+
 ## Questões de Pesquisa
 
 Em todas as RQs, reportar **mediana e IQR** (não média e desvio-padrão).
