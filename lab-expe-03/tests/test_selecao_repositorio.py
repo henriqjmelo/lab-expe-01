@@ -24,6 +24,7 @@ from pipeline.repositorio import (
     montar_com_commits,
 )
 from pipeline.selecao import (
+    Avaliacao,
     Funil,
     avaliar_candidatos,
     buscar_candidatos,
@@ -121,27 +122,44 @@ def test_contribuidores_sem_link_e_lista_muito_grande():
     assert contar_contribuidores(erro, "o", "r") is None
 
 
-def test_avaliar_para_no_alvo_e_monta_o_funil():
+def roteiro_de_avaliacoes():
+    """Resultado programado por candidato: descarte (motivo, etapa) ou aceito."""
+    return {
+        "o/r0": ("sem_actions", "com_actions"),
+        "o/r1": None,
+        "o/r2": ("menos_de_5_releases", "min_5_releases"),
+        "o/r3": None,
+        "o/r4": ("erro_api", "amostra_final"),
+        "o/r5": None,
+        "o/r6": None,
+    }
+
+
+def avaliar_por_roteiro(roteiro, atraso=None):
+    import time
+
+    def avaliar(c):
+        if atraso:
+            time.sleep(atraso(c))
+        r = roteiro.get(c["full_name"])
+        if r is None:
+            return Avaliacao(c, None, linha={"owner": "o", "repo": c["full_name"]})
+        return Avaliacao(c, r[0], r[1])
+
+    return avaliar
+
+
+@pytest.mark.parametrize("workers", [1, 3, 8])
+def test_avaliar_para_no_alvo_e_monta_o_funil(workers):
     candidatos = [{"full_name": f"o/r{i}"} for i in range(10)]
     funil = Funil()
-    respostas = iter([("x", "com_actions"), None, ("y", "min_5_releases"), None, "falha", None, None])
-
-    def filtros(c):
-        r = next(respostas)
-        if r is None or r == "falha":
-            return None, r
-        funil.descartar(c, r[1], r[0])
-        return r[0], None
-
-    def ao_aceitar(c, contexto):
-        if contexto == "falha":
-            funil.descartar(c, "amostra_final", "erro_api")
-            return False
-        return True
-
-    avaliar_candidatos(candidatos, 3, funil, filtros, ao_aceitar)
+    registrados = []
+    avaliar_candidatos(
+        candidatos, 3, funil, avaliar_por_roteiro(roteiro_de_avaliacoes()), registrados.append, workers=workers
+    )
     assert funil.aceitos == 3
     assert funil.avaliados == 6
+    assert [a.candidato["full_name"] for a in registrados] == ["o/r1", "o/r3", "o/r5"]
     linhas = {l["etapa"]: l for l in funil.linhas()}
     assert linhas["candidatos_busca"]["restantes"] == 10
     assert linhas["avaliados"]["descartados"] == 4
@@ -150,6 +168,53 @@ def test_avaliar_para_no_alvo_e_monta_o_funil():
     assert linhas["min_50_runs"]["restantes"] == 4
     assert linhas["amostra_final"]["restantes"] == 3
     assert "1 por erro da API" in linhas["amostra_final"]["motivo"]
+
+
+def test_paralelo_mantem_a_ordem_do_sorteio_mesmo_com_tempos_diferentes():
+    # Os primeiros candidatos demoram mais: terminam depois dos seguintes, mas
+    # o funil e a amostra seguem a ordem da fila, igual a execucao sequencial.
+    candidatos = [{"full_name": f"o/r{i}"} for i in range(7)]
+    atraso = lambda c: 0.05 if c["full_name"] in ("o/r0", "o/r1") else 0.0  # noqa: E731
+    sequencial, paralelo = Funil(), Funil()
+    reg_seq, reg_par = [], []
+    roteiro = roteiro_de_avaliacoes()
+    avaliar_candidatos(candidatos, 3, sequencial, avaliar_por_roteiro(roteiro), reg_seq.append, workers=1)
+    avaliar_candidatos(candidatos, 3, paralelo, avaliar_por_roteiro(roteiro, atraso), reg_par.append, workers=4)
+    assert paralelo.descartes == sequencial.descartes
+    assert paralelo.linhas() == sequencial.linhas()
+    assert [a.linha for a in reg_par] == [a.linha for a in reg_seq]
+
+
+def test_paralelo_usa_varias_threads():
+    import threading
+
+    nomes = set()
+    barreira = threading.Barrier(3, timeout=2)
+
+    def avaliar(c):
+        nomes.add(threading.current_thread().name)
+        barreira.wait()  # so passa se 3 candidatos estiverem sendo avaliados ao mesmo tempo
+        return Avaliacao(c, "sem_actions", "com_actions")
+
+    candidatos = [{"full_name": f"o/r{i}"} for i in range(3)]
+    avaliar_candidatos(candidatos, 1, Funil(), avaliar, lambda a: None, workers=3)
+    assert len(nomes) == 3
+
+
+def test_erro_numa_thread_chega_na_ordem_e_interrompe():
+    candidatos = [{"full_name": f"o/r{i}"} for i in range(5)]
+    funil = Funil()
+
+    def avaliar(c):
+        if c["full_name"] == "o/r2":
+            raise RuntimeError("interrompe")
+        return Avaliacao(c, "sem_actions", "com_actions")
+
+    with pytest.raises(RuntimeError):
+        avaliar_candidatos(candidatos, 10, funil, avaliar, lambda a: None, workers=3)
+    # o/r0 e o/r1 ja tinham sido aplicados; nada depois do erro entra no funil.
+    assert funil.avaliados == 2
+    assert [d["full_name"] for d in funil.descartes] == ["o/r0", "o/r1"]
 
 
 # --- repositorio -------------------------------------------------------------
@@ -322,10 +387,12 @@ def test_ler_config_resolve_caminhos(tmp_path):
     assert cfg.saida["dataset"] == tmp_path / "out/dataset.csv"
 
 
-def test_coleta_ponta_a_ponta_gera_os_csvs(tmp_path):
+@pytest.mark.parametrize("threads", [1, 3])
+def test_coleta_ponta_a_ponta_gera_os_csvs(tmp_path, threads):
     (tmp_path / "c.yaml").write_text(CONFIG)
     cfg = executar.ler_config(tmp_path / "c.yaml")
     cfg.alvo = 2
+    cfg.threads = threads
     cliente = ClienteFalso(
         paginas={
             "search/repositories": [item("a/semactions"), item("b/poucas"), item("c/ok"), item("d/erro")],

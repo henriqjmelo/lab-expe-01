@@ -13,6 +13,7 @@ from pipeline import executar
 from pipeline.executar import ColetaInterrompida, Config, Coleta, erro_transitorio
 from pipeline.github_client import GitHubAPIError
 from pipeline.repositorio import Janela
+from pipeline.selecao import Avaliacao
 
 
 def config(tmp_path, **extra):
@@ -70,7 +71,7 @@ def test_erro_transitorio_tenta_de_novo_e_segue(tmp_path):
     esperas = []
     cliente = ClienteSequencia(GitHubAPIError(502, "u"), {"total_count": 0})
     coleta = Coleta(cliente, config(tmp_path), log=lambda _: None, dormir=esperas.append)
-    assert coleta.filtros(CANDIDATO) == ("sem_actions", None)
+    assert coleta.avaliar(CANDIDATO).motivo == "sem_actions"
     assert esperas == [30.0]
 
 
@@ -79,16 +80,17 @@ def test_erro_transitorio_persistente_interrompe_sem_descartar(tmp_path):
     cliente = ClienteSequencia(*[GitHubAPIError(503, "u")] * 3)
     coleta = Coleta(cliente, config(tmp_path), log=lambda _: None, dormir=esperas.append)
     with pytest.raises(ColetaInterrompida):
-        coleta.filtros(CANDIDATO)
+        coleta.avaliar(CANDIDATO)
     assert esperas == [30.0, 60.0]
     assert coleta.funil.descartes == []
 
 
 def test_erro_inesperado_repetido_vira_descarte(tmp_path):
     coleta = Coleta(ClienteSequencia(), config(tmp_path), log=lambda _: None, dormir=lambda _: None)
-    coleta._filtros = lambda c: (_ for _ in ()).throw(KeyError("default_branch"))
-    assert coleta.filtros(CANDIDATO) == ("erro_inesperado", None)
-    assert coleta.funil.descartes[0]["motivo"] == "erro_inesperado"
+    coleta._avaliar = lambda c, estado: (_ for _ in ()).throw(KeyError("default_branch"))
+    avaliacao = coleta.avaliar(CANDIDATO)
+    assert (avaliacao.motivo, avaliacao.etapa) == ("erro_inesperado", "com_actions")
+    coleta.funil.descartar(CANDIDATO, avaliacao.etapa, avaliacao.motivo)
     assert "erro inesperado" in coleta.funil.linhas()[2]["motivo"]
 
 
@@ -96,17 +98,16 @@ def test_erro_permanente_descarta_sem_retentativa(tmp_path):
     esperas = []
     cliente = ClienteSequencia(GitHubAPIError(451, "u", "bloqueado"))
     coleta = Coleta(cliente, config(tmp_path), log=lambda _: None, dormir=esperas.append)
-    assert coleta.filtros(CANDIDATO) == ("erro_api", None)
+    assert coleta.avaliar(CANDIDATO).motivo == "erro_api"
     assert esperas == []
 
 
 def test_grava_csvs_parciais_a_cada_n_aceitos(tmp_path):
     cfg = config(tmp_path, gravar_parcial_a_cada=2)
     coleta = Coleta(None, cfg, log=lambda _: None)
-    coleta._ao_aceitar = lambda c, ctx: coleta.linhas.append({"owner": c["owner"], "repo": c["repo"]}) or True
-    coleta.ao_aceitar({"full_name": "a/1", "owner": "a", "repo": "1"}, None)
+    coleta.registrar(Avaliacao({}, None, linha={"owner": "a", "repo": "1"}))
     assert not cfg.saida["dataset"].exists()
-    coleta.ao_aceitar({"full_name": "a/2", "owner": "a", "repo": "2"}, None)
+    coleta.registrar(Avaliacao({}, None, linha={"owner": "a", "repo": "2"}))
     assert len(cfg.saida["dataset"].read_text().splitlines()) == 3
 
 

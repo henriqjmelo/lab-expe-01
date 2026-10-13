@@ -14,7 +14,9 @@ Cada descarte e registrado com o motivo; o funil sai dessas contagens.
 from __future__ import annotations
 
 import random
+from collections import deque
 from collections.abc import Callable, Iterable
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import date
 
@@ -27,6 +29,17 @@ MOTIVO_ERRO_API = "erro_api"
 MOTIVO_ERRO_INESPERADO = "erro_inesperado"
 
 _LINK_LAST = "rel=\"last\""
+
+
+@dataclass
+class Avaliacao:
+    """Resultado de um candidato. motivo None = aceito, com a linha do dataset."""
+
+    candidato: dict
+    motivo: str | None
+    etapa: str | None = None
+    detalhe: str = ""
+    linha: dict | None = None
 
 
 ETAPAS = (
@@ -135,27 +148,48 @@ def avaliar_candidatos(
     candidatos: list[dict],
     alvo: int,
     funil: Funil,
-    filtros: Callable[[dict], tuple[str | None, object]],
-    ao_aceitar: Callable[[dict, object], bool],
+    avaliar: Callable[[dict], Avaliacao],
+    registrar: Callable[[Avaliacao], None],
     log: Callable[[str], None] = lambda _: None,
+    workers: int = 1,
 ) -> None:
-    """Percorre os candidatos ate `alvo` aceitos. `filtros(c)` devolve (motivo, contexto):
-    motivo None = passou nos filtros; o contexto (dados ja coletados) segue para
-    `ao_aceitar`, que calcula as metricas e devolve False se nao conseguiu (o
-    descarte da etapa amostra_final fica por conta dela)."""
-    funil.candidatos = len(candidatos)
-    for candidato in candidatos:
-        if funil.aceitos >= alvo:
-            break
-        funil.avaliados += 1
-        motivo, contexto = filtros(candidato)
-        if motivo is None:
-            if ao_aceitar(candidato, contexto):
-                funil.aceitos += 1
-            else:
-                motivo = "falha_metricas"
-        log(
-            f"[{funil.avaliados}/{funil.candidatos}] {candidato['full_name']}: "
-            f"{motivo or 'aceito'} (amostra {funil.aceitos}/{alvo})"
-        )
+    """Percorre os candidatos ate `alvo` aceitos.
 
+    `avaliar` (filtros + metricas, so leitura da API) roda em `workers` threads,
+    adiantando os proximos candidatos da fila. Os resultados sao aplicados ao
+    funil na ordem do sorteio, na thread principal: a amostra e o funil saem
+    iguais aos de uma execucao sequencial, e candidatos adiantados alem do alvo
+    sao simplesmente ignorados (o que baixaram fica no cache).
+    """
+    funil.candidatos = len(candidatos)
+    fila = iter(candidatos)
+    em_voo: deque[tuple[dict, Future]] = deque()
+    adiantar = max(1, workers) * 2
+    executor = ThreadPoolExecutor(max_workers=max(1, workers), thread_name_prefix="coleta")
+
+    def encher() -> None:
+        while len(em_voo) < adiantar:
+            candidato = next(fila, None)
+            if candidato is None:
+                return
+            em_voo.append((candidato, executor.submit(avaliar, candidato)))
+
+    try:
+        encher()
+        while em_voo and funil.aceitos < alvo:
+            candidato, futuro = em_voo.popleft()
+            avaliacao = futuro.result()
+            funil.avaliados += 1
+            if avaliacao.motivo is None:
+                funil.aceitos += 1
+                registrar(avaliacao)
+            else:
+                funil.descartar(candidato, avaliacao.etapa, avaliacao.motivo, avaliacao.detalhe)
+            log(
+                f"[{funil.avaliados}/{funil.candidatos}] {candidato['full_name']}: "
+                f"{avaliacao.motivo or 'aceito'} (amostra {funil.aceitos}/{alvo})"
+            )
+            if funil.aceitos < alvo:
+                encher()
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)

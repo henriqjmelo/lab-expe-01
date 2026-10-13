@@ -37,6 +37,7 @@ from pipeline.repositorio import (
 )
 from pipeline.selecao import (
     MOTIVO_ERRO_API,
+    Avaliacao,
     MOTIVO_ERRO_INESPERADO,
     MOTIVO_POUCAS_RELEASES,
     MOTIVO_POUCOS_RUNS,
@@ -76,6 +77,7 @@ class Config:
     retentativas_repositorio: int = 3
     espera_retentativa: float = 30.0
     gravar_parcial_a_cada: int = 10
+    threads: int = 1
 
 
 def _data(valor: Any) -> date:
@@ -100,6 +102,7 @@ def ler_config(caminho: Path) -> Config:
         retentativas_repositorio=int(bruto["coleta"].get("retentativas_repositorio", 3)),
         espera_retentativa=float(bruto["coleta"].get("espera_retentativa_s", 30)),
         gravar_parcial_a_cada=int(bruto["coleta"].get("gravar_parcial_a_cada", 10)),
+        threads=int(bruto["coleta"].get("threads", 1)),
     )
 
 
@@ -156,6 +159,9 @@ def erro_transitorio(erro: BaseException) -> bool:
 
 
 class Coleta:
+    """`avaliar` roda nas threads e so le a API (nao mexe no funil nem nas linhas);
+    `registrar` roda na thread principal, na ordem do sorteio."""
+
     def __init__(
         self,
         cliente: GitHubClient,
@@ -170,20 +176,21 @@ class Coleta:
         self.log = log
         self._dormir = dormir
 
-    def _com_retentativas(self, c: dict, etapa_erro: str, funcao: Callable[[], Any], falha: Any) -> Any:
-        """Roda `funcao` ate `retentativas_repositorio` vezes.
+    def avaliar(self, c: dict) -> Avaliacao:
+        """Filtros + metricas de um candidato, com retentativas.
 
         - erro transitorio: espera (30 s, 60 s, 120 s...) e tenta de novo; se nao
           passar, levanta ColetaInterrompida (o repositorio NAO e descartado);
         - erro inesperado (dado estranho, bug): registra o traceback no log, tenta
-          de novo e, se repetir, descarta com motivo erro_inesperado em vez de
-          derrubar a coleta inteira.
+          de novo e, se repetir, vira descarte erro_inesperado em vez de derrubar
+          a coleta inteira.
         """
         tentativas = self.config.retentativas_repositorio
         espera = self.config.espera_retentativa
         for tentativa in range(1, tentativas + 1):
+            estado = {"etapa": "com_actions"}
             try:
-                return funcao()
+                return self._avaliar(c, estado)
             except Exception as erro:
                 ultima = tentativa == tentativas
                 if erro_transitorio(erro):
@@ -194,34 +201,25 @@ class Coleta:
                     self.log(f"  {c['full_name']}: erro inesperado; tentativa {tentativa}/{tentativas}")
                     self.log(traceback.format_exc())
                     if ultima:
-                        self.funil.descartar(c, etapa_erro, MOTIVO_ERRO_INESPERADO, repr(erro)[:200])
-                        return falha
+                        return Avaliacao(c, MOTIVO_ERRO_INESPERADO, estado["etapa"], repr(erro)[:200])
                 self._dormir(espera)
                 espera *= 2
-        return falha
+        raise AssertionError("inalcancavel")
 
-    def filtros(self, c: dict) -> tuple[str | None, Any]:
-        return self._com_retentativas(
-            c, "com_actions", lambda: self._filtros(c), (MOTIVO_ERRO_INESPERADO, None)
-        )
-
-    def ao_aceitar(self, c: dict, contexto: Any) -> bool:
-        ok = self._com_retentativas(c, "amostra_final", lambda: self._ao_aceitar(c, contexto), False)
+    def registrar(self, avaliacao: Avaliacao) -> None:
+        self.linhas.append(avaliacao.linha)
         a_cada = self.config.gravar_parcial_a_cada
-        if ok and a_cada and len(self.linhas) % a_cada == 0:
+        if a_cada and len(self.linhas) % a_cada == 0:
             gravar_saidas(self)
-        return ok
 
-    def _filtros(self, c: dict) -> tuple[str | None, Any]:
+    def _avaliar(self, c: dict, estado: dict) -> Avaliacao:
         cfg, janela = self.config, self.config.janela
         owner, repo = c["owner"], c["repo"]
-        etapa = "com_actions"
         try:
             if not tem_actions(self.cliente, owner, repo):
-                self.funil.descartar(c, etapa, MOTIVO_SEM_ACTIONS)
-                return MOTIVO_SEM_ACTIONS, None
+                return Avaliacao(c, MOTIVO_SEM_ACTIONS, estado["etapa"])
 
-            etapa = "min_5_releases"
+            estado["etapa"] = "min_5_releases"
             releases = listar_releases(self.cliente, owner, repo)
             n_rel = sum(
                 1
@@ -231,60 +229,51 @@ class Coleta:
                 and na_janela(r.get("published_at"), janela.inicio_iso, janela.fim_iso)
             )
             if n_rel < cfg.min_releases:
-                self.funil.descartar(c, etapa, MOTIVO_POUCAS_RELEASES, str(n_rel))
-                return MOTIVO_POUCAS_RELEASES, None
+                return Avaliacao(c, MOTIVO_POUCAS_RELEASES, estado["etapa"], str(n_rel))
 
-            etapa = "min_50_runs"
+            estado["etapa"] = "min_50_runs"
             runs = coletar_runs(self.cliente, owner, repo, c["default_branch"], janela.inicio, janela.fim)
             validos = sum(1 for r in runs.runs if classificar_conclusao(r.conclusion) in (SUCESSO, FALHA))
             if validos < cfg.min_runs:
-                self.funil.descartar(c, etapa, MOTIVO_POUCOS_RUNS, str(validos))
-                return MOTIVO_POUCOS_RUNS, None
+                return Avaliacao(c, MOTIVO_POUCOS_RUNS, estado["etapa"], str(validos))
+
+            estado["etapa"] = "amostra_final"
+            return Avaliacao(c, None, linha=self._linha(c, releases, runs))
         except GitHubAPIError as erro:
             if erro_transitorio(erro):
                 raise
             # Permanente (404 apagado, 451 bloqueado, 409 vazio...): descarta.
-            self.funil.descartar(c, etapa, MOTIVO_ERRO_API, str(erro)[:200])
-            return MOTIVO_ERRO_API, None
-        return None, (releases, runs)
+            return Avaliacao(c, MOTIVO_ERRO_API, estado["etapa"], str(erro)[:200])
 
-    def _ao_aceitar(self, c: dict, contexto: Any) -> bool:
-        releases, runs = contexto
+    def _linha(self, c: dict, releases: list[dict], runs: Any) -> dict:
         owner, repo = c["owner"], c["repo"]
         janela = self.config.janela
-        try:
-            tags = listar_tags_graphql(self.cliente, owner, repo)
-            linha = {
-                "owner": owner,
-                "repo": repo,
-                "estrelas": c["estrelas"],
-                "linguagem": c["linguagem"],
-                "default_branch": c["default_branch"],
-                "criado_em": c["criado_em"],
-                "idade_anos": idade_anos(c["criado_em"], janela.fim),
-                "contribuidores": contar_contribuidores(self.cliente, owner, repo),
-            }
-            for unidade, deploys in deploys_por_unidade(releases, tags).items():
-                linha.update(
-                    metricas_da_unidade(
-                        self.cliente, owner, repo, unidade, deploys, janela, self.config.max_compares
-                    )
-                )
-            linha.update(metricas_dos_runs(runs))
-        except GitHubAPIError as erro:
-            if erro_transitorio(erro):
-                raise
-            self.funil.descartar(c, "amostra_final", MOTIVO_ERRO_API, str(erro)[:200])
-            return False
-        self.linhas.append(linha)
-        return True
+        tags = listar_tags_graphql(self.cliente, owner, repo)
+        linha = {
+            "owner": owner,
+            "repo": repo,
+            "estrelas": c["estrelas"],
+            "linguagem": c["linguagem"],
+            "default_branch": c["default_branch"],
+            "criado_em": c["criado_em"],
+            "idade_anos": idade_anos(c["criado_em"], janela.fim),
+            "contribuidores": contar_contribuidores(self.cliente, owner, repo),
+        }
+        for unidade, deploys in deploys_por_unidade(releases, tags).items():
+            linha.update(
+                metricas_da_unidade(self.cliente, owner, repo, unidade, deploys, janela, self.config.max_compares)
+            )
+        linha.update(metricas_dos_runs(runs))
+        return linha
 
     def rodar(self) -> None:
         cfg = self.config
         self.log(f"Buscando candidatos em {len(cfg.faixas)} faixas de estrelas...")
         candidatos = buscar_candidatos(self.cliente, cfg.faixas, cfg.janela.inicio)
         ordem = embaralhar(candidatos, cfg.semente)
-        avaliar_candidatos(ordem, cfg.alvo, self.funil, self.filtros, self.ao_aceitar, self.log)
+        avaliar_candidatos(
+            ordem, cfg.alvo, self.funil, self.avaliar, self.registrar, self.log, workers=cfg.threads
+        )
 
 
 def gravar_csv(caminho: Path, linhas: list[dict], campos: list[str]) -> None:

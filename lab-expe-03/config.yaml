@@ -38,6 +38,9 @@ coleta:
   retentativas_repositorio: 3    # por repositorio, esperando 30 s, 60 s, 120 s
   espera_retentativa_s: 30
   gravar_parcial_a_cada: 10      # regrava os CSVs a cada 10 repositorios aceitos
+  # Candidatos avaliados em paralelo. O teto real e a cota (5.000 chamadas/h):
+  # com ~3 threads a coleta ja encosta nela; mais que isso so gera espera.
+  threads: 3
 
 saida:
   dataset: data/dataset_dora.csv
