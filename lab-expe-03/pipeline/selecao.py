@@ -4,6 +4,7 @@ import random
 from collections import deque
 from collections.abc import Callable, Iterable
 from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturoAtrasado
 from dataclasses import dataclass, field
 from datetime import date
 
@@ -16,6 +17,10 @@ MOTIVO_ERRO_API = "erro_api"
 MOTIVO_ERRO_INESPERADO = "erro_inesperado"
 
 _LINK_LAST = "rel=\"last\""
+
+
+class SemProgresso(RuntimeError):
+    pass
 
 
 @dataclass
@@ -144,6 +149,7 @@ def avaliar_candidatos(
     log: Callable[[str], None] = lambda _: None,
     workers: int = 1,
     adiantar: int | None = None,
+    sem_progresso: float | None = None,
 ) -> None:
     funil.candidatos = len(candidatos)
     fila = iter(candidatos)
@@ -162,7 +168,12 @@ def avaliar_candidatos(
         encher()
         while em_voo and funil.aceitos < alvo:
             candidato, futuro = em_voo.popleft()
-            avaliacao = futuro.result()
+            try:
+                avaliacao = futuro.result(timeout=sem_progresso)
+            except FuturoAtrasado as erro:
+                raise SemProgresso(
+                    f"{candidato['full_name']} sem resultado ha {sem_progresso / 60:.0f} min"
+                ) from erro
             funil.avaliados += 1
             if avaliacao.motivo is None:
                 funil.aceitos += 1

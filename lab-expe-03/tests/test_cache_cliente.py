@@ -16,8 +16,9 @@ class RespostaFalsa:
         self._corpo = json.dumps(corpo).encode()
         self.headers = headers or {}
 
-    def read(self):
-        return self._corpo
+    def read(self, n=-1):
+        corpo, self._corpo = self._corpo, b""
+        return corpo
 
     def __enter__(self):
         return self
@@ -161,3 +162,37 @@ def test_resposta_cortada_no_meio_tem_backoff():
     abrir = AbrirFalso(http.client.IncompleteRead(b"x", 10), RespostaFalsa({"ok": True}))
     assert novo_cliente(abrir, None, esperas).get("/x") == {"ok": True}
     assert esperas == [1.0]
+
+
+class RespostaLenta:
+    def __init__(self, blocos, relogio):
+        self.blocos = list(blocos)
+        self.relogio = relogio
+        self.headers = {}
+
+    def read(self, n=-1):
+        self.relogio[0] += 50
+        return self.blocos.pop(0) if self.blocos else b""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def test_resposta_que_chega_aos_poucos_estoura_o_prazo_e_tenta_de_novo(monkeypatch):
+    import pipeline.github_client as gc
+
+    relogio = [0.0]
+    monkeypatch.setattr(gc.time, "monotonic", lambda: relogio[0])
+    esperas = []
+    lenta = RespostaLenta([b"{", b'"a"', b": 1", b"}"], relogio)
+    abrir = AbrirFalso(lenta, RespostaFalsa({"a": 1}))
+    assert novo_cliente(abrir, None, esperas).get("/x") == {"a": 1}
+    assert esperas == [1.0]
+
+
+def test_resposta_em_blocos_dentro_do_prazo():
+    rapida = RespostaLenta([b'{"a"', b": 2}"], [0.0])
+    assert novo_cliente(AbrirFalso(rapida), None).get("/x") == {"a": 2}

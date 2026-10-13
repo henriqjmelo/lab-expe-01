@@ -22,6 +22,9 @@ BACKOFF_INICIAL = 1.0
 
 FOLGA_RESET = 1.0
 
+PRAZO_RESPOSTA = 120.0
+TAMANHO_BLOCO = 64 * 1024
+
 ESPERA_LIMITE_SECUNDARIO = 60.0
 
 _LINK_NEXT = re.compile(r'<([^>]+)>\s*;\s*rel="next"')
@@ -64,6 +67,7 @@ class GitHubClient:
         max_tentativas: int = MAX_TENTATIVAS,
         backoff_inicial: float = BACKOFF_INICIAL,
         timeout: float = 30.0,
+        prazo_resposta: float = PRAZO_RESPOSTA,
         abrir: Callable[..., Any] = urllib.request.urlopen,
         dormir: Callable[[float], None] = time.sleep,
         agora: Callable[[], float] = time.time,
@@ -74,6 +78,7 @@ class GitHubClient:
         self.max_tentativas = max_tentativas
         self.backoff_inicial = backoff_inicial
         self.timeout = timeout
+        self.prazo_resposta = prazo_resposta
         self._abrir = abrir
         self._dormir = dormir
         self._agora = agora
@@ -125,7 +130,7 @@ class GitHubClient:
             try:
                 with self._abrir(requisicao, timeout=self.timeout) as resposta:
                     headers = dict(resposta.headers.items())
-                    bruto = resposta.read()
+                    bruto = self._ler_com_prazo(resposta, url)
                 self.ultima_atividade = time.monotonic()
             except urllib.error.HTTPError as erro:
                 self.ultima_atividade = time.monotonic()
@@ -180,6 +185,17 @@ class GitHubClient:
             itens = dados.get(chave, []) if chave else dados
             yield from itens or []
             url = proxima_pagina(headers.get("Link"))
+
+    def _ler_com_prazo(self, resposta: Any, url: str) -> bytes:
+        limite = time.monotonic() + self.prazo_resposta
+        partes = []
+        while True:
+            bloco = resposta.read(TAMANHO_BLOCO)
+            if not bloco:
+                return b"".join(partes)
+            partes.append(bloco)
+            if time.monotonic() > limite:
+                raise TimeoutError(f"resposta de {url} passou de {self.prazo_resposta:.0f} s")
 
     def graphql(self, consulta: str, variaveis: dict[str, Any] | None = None) -> Any:
         corpo = {"query": consulta, "variables": variaveis or {}}

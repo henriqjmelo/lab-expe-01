@@ -53,6 +53,9 @@ coleta:
   # Sem nenhuma chamada concluida por este tempo (fora de espera de cota/backoff),
   # o processo sai com codigo 75 e scripts/coletar.sh reinicia. 0 desliga.
   watchdog_minutos: 10
+  # Se o candidato da frente da fila nao terminar em tantos minutos (conexao presa,
+  # resposta chegando a conta-gotas), grava os CSVs parciais e sai para reiniciar.
+  sem_progresso_minutos: 60
 
 saida:
   dataset: data/amostra2/dataset_dora.csv
