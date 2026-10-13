@@ -1,6 +1,6 @@
 # 2. Metodologia
 
-> Rascunho da issue #139, a ser revisado por Henrique e Gabriel antes de ir para o Overleaf. Os trechos marcados com **[PENDENTE]** dependem da coleta completa ou das issues #137 (kappa) e #138 (F1 da heurística).
+> Rascunho da issue #139, a ser revisado por Henrique e Gabriel antes de ir para o Overleaf. Os números da coleta são os do `data/` desta versão. Os trechos marcados com **[PENDENTE]** dependem das issues #137 (kappa) e #138 (F1 da heurística) ou das datas da janela.
 
 ## 2.1 Fonte de dados
 
@@ -21,7 +21,20 @@ A janela tem 12 meses, de **1º de outubro de 2025 a 30 de setembro de 2026** **
 
 O funil é gerado automaticamente pelo pipeline (`data/funil.csv`), e cada descarte fica registrado com o motivo em `data/descartes.csv`.
 
-**[PENDENTE: Tabela 1 com o `funil.csv` final: candidatos → avaliados → com Actions → ≥ 5 releases → ≥ 50 runs → amostra final.]**
+**Tabela 1 — Funil de seleção** (`data/funil.csv`).
+
+| Etapa | Restantes | Descartados | Motivo do descarte |
+| :--- | ---: | ---: | :--- |
+| Candidatos da busca | 8.457 | — | — |
+| Avaliados (ordem aleatória, até o alvo) | 1.108 | 7.349 | não avaliados: alvo de 300 já atingido |
+| Usam GitHub Actions | 937 | 171 | nenhum workflow cadastrado |
+| ≥ 5 releases na janela | 399 | 538 | menos de 5 releases publicadas (sem pré-release) |
+| ≥ 50 runs válidos na janela | 300 | 99 | menos de 50 runs válidos em `push` no *default branch* |
+| **Amostra final** | **300** | 0 | — |
+
+O filtro mais restritivo é o de releases: 57% dos repositórios que usam Actions publicaram menos de 5 releases em 12 meses. Isso indica que muitos projetos populares entregam por outros meios, como *rolling release*, publicação direta em registros de pacotes ou ausência de versionamento formal. Esse ponto é retomado nas ameaças à validade.
+
+Como cada faixa de estrelas contribui com no máximo 1.000 candidatos, os mais estrelados de cada faixa, a amostra fica deslocada para repositórios mais populares do que uma amostra uniforme de todos os repositórios com mais de 1.000 estrelas. A mediana é de 9.485 estrelas (IQR 2.844–28.694).
 
 ## 2.4 Definições operacionais
 
@@ -43,7 +56,7 @@ Métricas por repositório:
   - Ficam fora do cálculo, e são contados à parte:
     - o primeiro deploy da história;
     - os *compare* com resposta 404 (tag apagada ou reescrita);
-    - os *compare* com mais de 1.000 commits. Esse último critério é do grupo: são quase sempre comparações entre linhas de versão diferentes ou entre pacotes distintos de um monorepo, intercalados por data, e não representam o que entrou no deploy.
+    - os *compare* com mais de 1.000 commits, ou que a API se recusa a gerar (HTTP 422, *diff* demorado demais). Esse último critério é do grupo: são quase sempre comparações entre linhas de versão diferentes ou entre pacotes distintos de um monorepo, intercalados por data, e não representam o que entrou no deploy.
 - **Change failure rate (RQ 03):**
   - (a) Proxy de CI: falhas ÷ (falhas + sucessos), com todos os workflows juntos.
   - (b) Proxy de entrega: o deploy D falhou se um deploy **corretivo** foi publicado em até 7 dias depois dele. Deploys dos últimos 7 dias da janela ficam fora do denominador (censura). A heurística de corretiva usada nesta versão é a **v0**: a versão SemVer mantém `maior.menor` do deploy anterior e sobe só o `patch`. **[PENDENTE: substituir pela versão final da heurística (#138), com precisão, recall e F1 na amostra-ouro e o histórico das versões testadas.]**
@@ -74,7 +87,18 @@ O dataset final (`data/dataset_dora.csv`) tem uma linha por repositório. Ele tr
 
 Cada coluna está descrita em `data/DICIONARIO.md`, com nome, tipo, unidade e fórmula ou campo de origem na API.
 
-**[PENDENTE: número final de repositórios e quantos tiveram meses no teto, dias truncados e releases ignoradas.]**
+A amostra final tem **300 repositórios** em 27 linguagens. As mais frequentes são TypeScript (61), Python (55), Go (49), Rust (28), C++ (20) e JavaScript (19). A idade mediana é de 5,8 anos (IQR 2,0–10,9), e o número mediano de contribuidores é 142 (IQR 49–337). A coleta somou 17.217 releases, 28.792 tags e 833.582 workflow runs válidos na janela. A Tabela 2 resume a qualidade da coleta.
+
+**Tabela 2 — Contagens de qualidade da coleta.**
+
+| Ocorrência | Quantidade |
+| :--- | :--- |
+| Repositórios com algum mês acima de 1.000 runs (subdividido) | 34 |
+| Dias ainda acima de 1.000 runs após a subdivisão (dados incompletos) | 19 dias em 4 repositórios |
+| Releases ignoradas no lead time por *compare* 404 | 8 |
+| Releases ignoradas no lead time por *compare* com mais de 1.000 commits ou que a API não conseguiu gerar (422) | 244 |
+| Repositórios com lead time de release omitido (mais de 300 releases na janela) | 7 |
+| Episódios de falha de CI censurados (sem recuperação até o fim da janela) | 139 de 20.077, em 74 repositórios |
 
 ## 2.7 Validação manual (amostra-ouro)
 
