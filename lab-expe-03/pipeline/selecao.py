@@ -24,6 +24,7 @@ MOTIVO_SEM_ACTIONS = "sem_actions"
 MOTIVO_POUCAS_RELEASES = "menos_de_5_releases"
 MOTIVO_POUCOS_RUNS = "menos_de_50_runs_validos"
 MOTIVO_ERRO_API = "erro_api"
+MOTIVO_ERRO_INESPERADO = "erro_inesperado"
 
 _LINK_LAST = "rel=\"last\""
 
@@ -63,7 +64,10 @@ class Funil:
             da_etapa = [d for d in self.descartes if d["etapa"] == etapa]
             restantes -= len(da_etapa)
             erros = sum(1 for d in da_etapa if d["motivo"] == MOTIVO_ERRO_API)
-            motivo = descricao + (f" (inclui {erros} por erro da API)" if erros else "")
+            inesperados = sum(1 for d in da_etapa if d["motivo"] == MOTIVO_ERRO_INESPERADO)
+            notas = [f"{erros} por erro da API"] if erros else []
+            notas += [f"{inesperados} por erro inesperado"] if inesperados else []
+            motivo = descricao + (f" (inclui {'; '.join(notas)})" if notas else "")
             linhas.append(
                 {"etapa": etapa, "restantes": restantes, "descartados": len(da_etapa), "motivo": motivo}
             )

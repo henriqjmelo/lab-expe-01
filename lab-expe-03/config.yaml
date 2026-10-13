@@ -33,6 +33,11 @@ coleta:
   # (coluna lt_<unidade>_omitido = True) para nao estourar a cota.
   max_compares_por_unidade: 300
   cache: .cache/github
+  # Tolerancia a falhas:
+  max_tentativas_chamada: 8      # por chamada HTTP (5xx/rede), backoff 1 s, 2 s, 4 s... ~2 min
+  retentativas_repositorio: 3    # por repositorio, esperando 30 s, 60 s, 120 s
+  espera_retentativa_s: 30
+  gravar_parcial_a_cada: 10      # regrava os CSVs a cada 10 repositorios aceitos
 
 saida:
   dataset: data/dataset_dora.csv
