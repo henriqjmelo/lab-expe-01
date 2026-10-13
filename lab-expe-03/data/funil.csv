@@ -1,0 +1,7 @@
+etapa,restantes,descartados,motivo
+candidatos_busca,8457,0,
+avaliados,354,8103,nao avaliados: alvo da amostra ja atingido
+com_actions,306,48,actions/workflows com total_count = 0
+min_5_releases,133,173,menos de 5 releases publicadas (sem pre-release) na janela
+min_50_runs,101,32,menos de 50 workflow runs validos (push no default branch) na janela
+amostra_final,100,1,falha ao calcular as metricas (inclui 1 por erro da API)
