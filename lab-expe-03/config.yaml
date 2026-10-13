@@ -1,0 +1,41 @@
+# Configuracao do pipeline do Lab03 (python -m pipeline --config config.yaml).
+# Caminhos relativos a esta pasta.
+
+janela:
+  # 12 meses. Ajustar para as datas fixadas pelo professor se forem outras.
+  inicio: 2025-10-01
+  fim: 2026-09-30        # inclusive
+
+amostra:
+  alvo: 300              # para quando atingir este numero de repositorios aceitos
+  semente: 42            # ordem aleatoria de avaliacao dos candidatos
+
+busca:
+  # Cada consulta da Search API devolve no maximo 1.000 resultados: fatiar.
+  # null = sem limite superior.
+  faixas_estrelas:
+    - [1000, 1199]
+    - [1200, 1499]
+    - [1500, 1999]
+    - [2000, 2999]
+    - [3000, 4999]
+    - [5000, 9999]
+    - [10000, 19999]
+    - [20000, 49999]
+    - [50000, null]
+
+inclusao:
+  min_releases: 5
+  min_runs_validos: 50
+
+coleta:
+  # Um compare por deploy na janela; acima disso o lead time da unidade fica vazio
+  # (coluna lt_<unidade>_omitido = True) para nao estourar a cota.
+  max_compares_por_unidade: 300
+  cache: .cache/github
+
+saida:
+  dataset: data/dataset_dora.csv
+  repositorios: data/repositorios.csv
+  funil: data/funil.csv
+  descartes: data/descartes.csv
