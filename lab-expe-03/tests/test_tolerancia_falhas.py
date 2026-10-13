@@ -146,3 +146,10 @@ def test_main_devolve_130_no_ctrl_c(tmp_path, monkeypatch):
 
     monkeypatch.setattr(Coleta, "rodar", interrompe)
     assert executar.main(["--config", str(tmp_path / "c.yaml")]) == executar.SAIDA_INTERROMPIDA
+
+
+def test_gravar_csv_e_atomico(tmp_path):
+    destino = tmp_path / "x.csv"
+    executar.gravar_csv(destino, [{"a": 1}], ["a"])
+    assert destino.read_text().splitlines() == ["a", "1"]
+    assert not (tmp_path / "x.csv.tmp").exists()

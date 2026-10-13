@@ -277,11 +277,14 @@ class Coleta:
 
 
 def gravar_csv(caminho: Path, linhas: list[dict], campos: list[str]) -> None:
+    """Escrita atomica: um sinal no meio da gravacao nunca deixa o CSV pela metade."""
     caminho.parent.mkdir(parents=True, exist_ok=True)
-    with caminho.open("w", newline="", encoding="utf-8") as f:
+    temporario = caminho.with_name(caminho.name + ".tmp")
+    with temporario.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=campos, extrasaction="ignore")
         w.writeheader()
         w.writerows(linhas)
+    temporario.replace(caminho)
 
 
 def gravar_saidas(coleta: Coleta) -> None:
@@ -326,6 +329,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         coleta.rodar()
     except KeyboardInterrupt:
+        # Um segundo SIGTERM (ex.: supervisor + kill) nao pode cortar a gravacao final.
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
         gravar_saidas(coleta)
         log("Interrompido. CSVs parciais gravados; o cache ficou salvo: rode o mesmo comando para continuar.")
         return SAIDA_INTERROMPIDA
