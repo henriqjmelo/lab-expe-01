@@ -1,18 +1,4 @@
 #!/usr/bin/env bash
-# Coleta completa supervisionada (issue #139).
-#
-# - Mantem o Mac acordado com caffeinate (-i: sem sono por inatividade, -s: sem
-#   sono do sistema enquanto estiver na tomada, -m: disco). A tela pode apagar.
-#   Em Linux/sem caffeinate roda direto.
-# - Se o pipeline cair (erro transitorio persistente, queda de rede, crash),
-#   espera e roda de novo: o cache em disco faz a retomada sem repetir chamadas.
-#   Espera 1 min, 2 min, 4 min... ate 15 min entre tentativas.
-# - Para quando o pipeline termina (saida 0) ou quando e interrompido (Ctrl+C / kill).
-#
-# Uso (de dentro de lab-expe-03):
-#   export GITHUB_TOKEN=ghp_...
-#   nohup scripts/coletar.sh > /dev/null 2>&1 &
-#   tail -f .cache/coleta.log
 set -u
 cd "$(dirname "$0")/.."
 
@@ -43,7 +29,6 @@ while true; do
     filho=$!
     wait "$filho"
     codigo=$?
-    # Rodou bem por mais de 10 min antes de cair: volta a espera para o inicio.
     [ $(( $(date +%s) - inicio )) -gt 600 ] && espera=$ESPERA_INICIAL
 
     if [ "$codigo" -eq 0 ]; then

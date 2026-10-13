@@ -1,16 +1,3 @@
-"""Selecao de repositorios e funil (secao 7 do ENUNCIADO.md), usada na coleta completa da #139.
-
-1. Candidatos: GET /search/repositories, fatiado por faixa de estrelas porque
-   cada consulta devolve no maximo 1.000 resultados.
-2. Os candidatos sao embaralhados com semente fixa e avaliados nessa ordem ate
-   a amostra atingir o alvo - assim a amostra nao fica so com os mais
-   estrelados de cada faixa.
-3. Filtros na ordem do mais barato pro mais caro: tem Actions? >= 5 releases
-   na janela? >= 50 workflow runs validos na janela?
-
-Cada descarte e registrado com o motivo; o funil sai dessas contagens.
-"""
-
 from __future__ import annotations
 
 import random
@@ -33,7 +20,6 @@ _LINK_LAST = "rel=\"last\""
 
 @dataclass
 class Avaliacao:
-    """Resultado de um candidato. motivo None = aceito, com a linha do dataset."""
 
     candidato: dict
     motivo: str | None
@@ -96,7 +82,6 @@ def consulta_busca(faixa: tuple[int, int | None], ativo_desde: date) -> str:
 def buscar_candidatos(
     cliente: GitHubClient, faixas: Iterable[tuple[int, int | None]], ativo_desde: date
 ) -> list[dict]:
-    """Candidatos unicos de todas as faixas, com os campos que a selecao e o dataset usam."""
     vistos: dict[str, dict] = {}
     for faixa in faixas:
         params = {"q": consulta_busca(faixa, ativo_desde), "sort": "stars", "order": "desc"}
@@ -125,13 +110,11 @@ def tem_actions(cliente: GitHubClient, owner: str, repo: str) -> bool:
 
 
 def contar_contribuidores(cliente: GitHubClient, owner: str, repo: str) -> int | None:
-    """per_page=1 + numero da ultima pagina no Link = total de contribuidores (com anonimos)."""
     try:
         dados, headers = cliente.requisitar(
             f"repos/{owner}/{repo}/contributors", {"per_page": 1, "anon": "true"}
         )
     except GitHubAPIError:
-        # Repositorios muito grandes respondem 403 "history or contributor list is too large".
         return None
     link = headers.get("Link") or ""
     for parte in link.split(","):
@@ -154,18 +137,6 @@ def avaliar_candidatos(
     workers: int = 1,
     adiantar: int | None = None,
 ) -> None:
-    """Percorre os candidatos ate `alvo` aceitos.
-
-    `avaliar` (filtros + metricas, so leitura da API) roda em `workers` threads,
-    adiantando os proximos candidatos da fila. Os resultados sao aplicados ao
-    funil na ordem do sorteio, na thread principal: a amostra e o funil saem
-    iguais aos de uma execucao sequencial, e candidatos adiantados alem do alvo
-    sao simplesmente ignorados (o que baixaram fica no cache).
-
-    `adiantar` = quantos candidatos ficam em voo (padrao 2 x workers). Uma fila
-    maior evita que um repositorio gigante na frente deixe as outras threads
-    paradas esperando por ele.
-    """
     funil.candidatos = len(candidatos)
     fila = iter(candidatos)
     em_voo: deque[tuple[dict, Future]] = deque()

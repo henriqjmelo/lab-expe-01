@@ -1,16 +1,3 @@
-"""Tempo de recuperacao (RQ 04), issue #139.
-
-As execucoes de um mesmo workflow sao ordenadas no tempo. Um episodio comeca
-na primeira falha depois de um sucesso e termina no proximo sucesso; duracao =
-updated_at do sucesso - run_started_at da primeira falha. Valor do repositorio
-= mediana dos episodios de todos os workflows, em horas.
-
-Episodio sem sucesso ate o fim dos dados e censurado: entra na contagem, nao
-na mediana. Falhas no comeco da janela, antes do primeiro sucesso, nao abrem
-episodio (nao da pra saber quando a falha comecou) e sao contadas a parte.
-Runs ignorados (cancelled, skipped...) nao abrem nem fecham episodio.
-"""
-
 from __future__ import annotations
 
 import statistics
@@ -34,7 +21,6 @@ def _parse(data: str) -> datetime:
 
 
 def episodios_do_workflow(runs: list[Run]) -> tuple[list[float], int, int]:
-    """(duracoes em horas dos episodios fechados, episodios censurados, falhas sem sucesso anterior)."""
     duracoes: list[float] = []
     houve_sucesso = False
     inicio_episodio: datetime | None = None

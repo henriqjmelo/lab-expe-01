@@ -1,12 +1,3 @@
-"""Tags com data via GraphQL, para a variante "tag como unidade de deploy" da RQ 07 (issue #139).
-
-Tags nao tem data propria: usa a data de autoria do commit apontado. Pela REST
-isso custa uma chamada por tag (pipeline/coleta_releases.listar_tags_com_data);
-na coleta completa, com repositorios de centenas de tags, a consulta GraphQL
-abaixo traz 100 tags ja com a data por chamada. Tags anotadas apontam para um
-objeto Tag, que por sua vez aponta para o commit.
-"""
-
 from __future__ import annotations
 
 from pipeline.github_client import GitHubClient
@@ -41,7 +32,6 @@ def _commit_da_tag(alvo: dict | None) -> dict | None:
 
 
 def listar_tags_graphql(cliente: GitHubClient, owner: str, repo: str) -> list[dict]:
-    """[{name, sha, data}] em ordem cronologica. Tags que apontam para arvore/blob ficam de fora."""
     tags = []
     cursor = None
     while True:

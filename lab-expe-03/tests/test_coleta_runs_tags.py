@@ -1,5 +1,3 @@
-"""Testes de pipeline/coleta_runs.py e pipeline/coleta_tags.py (issue #139)."""
-
 from __future__ import annotations
 
 from datetime import date
@@ -17,7 +15,6 @@ def bruto(i, conclusion="success", dia="2025-01-05"):
 
 
 class ClienteRuns:
-    """requisitar() responde pela faixa `created`; `totais` simula meses acima do teto."""
 
     def __init__(self, por_faixa, totais=None, paginas_extra=None):
         self.por_faixa = por_faixa
@@ -26,7 +23,7 @@ class ClienteRuns:
         self.faixas = []
 
     def requisitar(self, caminho, params=None):
-        if params is None:  # URL de proxima pagina
+        if params is None:
             return {"workflow_runs": self.paginas_extra[caminho]}, {}
         faixa = params["created"]
         self.faixas.append(faixa)

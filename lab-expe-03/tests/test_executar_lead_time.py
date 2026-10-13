@@ -1,9 +1,3 @@
-"""Testes de pipeline/executar_lead_time.py (issue #135).
-
-Usa o mesmo ClienteFalso de test_coleta_releases.py. Nao precisa de
-GITHUB_TOKEN nem de rede: e so a orquestracao (ler repos -> calcular -> csv).
-"""
-
 from __future__ import annotations
 
 import csv
@@ -50,11 +44,10 @@ def test_lead_time_do_repositorio_com_release_valida():
     assert resultado["owner"] == "dono1"
     assert resultado["a_n_releases"] == 1
     assert resultado["a_mediana_dias"] == 10
-    assert resultado["a_releases_ignoradas"] == 1  # v1 e a primeira da historia
+    assert resultado["a_releases_ignoradas"] == 1
 
 
 def test_lead_time_do_repositorio_com_uma_unica_release():
-    # dono2/repo2 so tem uma release: nao ha anterior pra comparar, fica tudo ignorado.
     resultado = lead_time_do_repositorio(cliente_de_dois_repos(), "dono2", "repo2")
 
     assert resultado["a_n_releases"] == 0

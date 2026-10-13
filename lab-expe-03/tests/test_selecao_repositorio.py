@@ -1,8 +1,3 @@
-"""Testes de pipeline/selecao.py, pipeline/repositorio.py e pipeline/executar.py (issue #139).
-
-Um cliente falso responde por caminho; nada aqui faz chamada de rede.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -71,8 +66,6 @@ class ClienteFalso:
         return self._graphql
 
 
-# --- selecao ---------------------------------------------------------------
-
 def test_consulta_busca_por_faixa():
     assert consulta_busca((1000, 1999), date(2025, 1, 1)) == "stars:1000..1999 archived:false pushed:>=2025-01-01"
     assert consulta_busca((50000, None), date(2025, 1, 1)).startswith("stars:>=50000 ")
@@ -123,7 +116,6 @@ def test_contribuidores_sem_link_e_lista_muito_grande():
 
 
 def roteiro_de_avaliacoes():
-    """Resultado programado por candidato: descarte (motivo, etapa) ou aceito."""
     return {
         "o/r0": ("sem_actions", "com_actions"),
         "o/r1": None,
@@ -171,10 +163,8 @@ def test_avaliar_para_no_alvo_e_monta_o_funil(workers):
 
 
 def test_paralelo_mantem_a_ordem_do_sorteio_mesmo_com_tempos_diferentes():
-    # Os primeiros candidatos demoram mais: terminam depois dos seguintes, mas
-    # o funil e a amostra seguem a ordem da fila, igual a execucao sequencial.
     candidatos = [{"full_name": f"o/r{i}"} for i in range(7)]
-    atraso = lambda c: 0.05 if c["full_name"] in ("o/r0", "o/r1") else 0.0  # noqa: E731
+    atraso = lambda c: 0.05 if c["full_name"] in ("o/r0", "o/r1") else 0.0
     sequencial, paralelo = Funil(), Funil()
     reg_seq, reg_par = [], []
     roteiro = roteiro_de_avaliacoes()
@@ -193,7 +183,7 @@ def test_paralelo_usa_varias_threads():
 
     def avaliar(c):
         nomes.add(threading.current_thread().name)
-        barreira.wait()  # so passa se 3 candidatos estiverem sendo avaliados ao mesmo tempo
+        barreira.wait()
         return Avaliacao(c, "sem_actions", "com_actions")
 
     candidatos = [{"full_name": f"o/r{i}"} for i in range(3)]
@@ -212,12 +202,9 @@ def test_erro_numa_thread_chega_na_ordem_e_interrompe():
 
     with pytest.raises(RuntimeError):
         avaliar_candidatos(candidatos, 10, funil, avaliar, lambda a: None, workers=3)
-    # o/r0 e o/r1 ja tinham sido aplicados; nada depois do erro entra no funil.
     assert funil.avaliados == 2
     assert [d["full_name"] for d in funil.descartes] == ["o/r0", "o/r1"]
 
-
-# --- repositorio -------------------------------------------------------------
 
 def test_janela_iso():
     assert JANELA.inicio_iso == "2025-01-01T00:00:00Z"
@@ -251,7 +238,7 @@ def compare(commits_por_par):
 
 def test_montar_com_commits_so_compara_deploys_da_janela():
     deploys = [
-        Deploy("v0", "2024-06-01T00:00:00Z"),  # fora: so serve de base
+        Deploy("v0", "2024-06-01T00:00:00Z"),
         Deploy("v1", "2025-03-15T00:00:00Z"),
         Deploy("v2", "2025-05-01T00:00:00Z"),
     ]
@@ -344,8 +331,6 @@ def test_metricas_dos_runs():
     assert linha["recuperacao_mediana_horas"] == pytest.approx(1.0)
     assert linha["meses_no_teto_runs"] == 2
 
-
-# --- executar (ponta a ponta com cliente falso) ------------------------------
 
 CONFIG = """
 janela: {inicio: 2025-01-01, fim: 2025-12-31}

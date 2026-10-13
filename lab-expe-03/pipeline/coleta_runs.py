@@ -1,16 +1,3 @@
-"""Coleta de workflow runs do default branch (issues #136 e #139).
-
-GET /repos/{owner}/{repo}/actions/runs?branch=...&event=push&created=A..B
-devolve no maximo 1.000 resultados por consulta. A janela e consultada mes a
-mes; um mes com mais de 1.000 runs e dividido ao meio recursivamente ate caber
-(conta como "mes no teto"). Um unico dia ainda acima do teto fica truncado e e
-contado a parte - nesse caso os dados daquele dia estao incompletos.
-
-Repositorios gigantes (ex.: getsentry/sentry, milhares de runs por mes e paginas
-de ~1,5 MB) levam horas numa thread so; com `threads` > 1 os meses sao baixados
-em paralelo. A ordem dos runs no resultado e a mesma da execucao sequencial.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
@@ -31,7 +18,6 @@ class ResultadoRuns:
 
 
 def intervalos_mensais(inicio: date, fim: date) -> list[tuple[date, date]]:
-    """Fatias [primeiro dia, ultimo dia] de cada mes entre inicio e fim (inclusive)."""
     fatias = []
     atual = inicio
     while atual <= fim:
@@ -81,7 +67,6 @@ def _coletar_intervalo(
 
 
 def _coletar_mes(cliente: GitHubClient, caminho: str, branch: str, ini: date, fim: date) -> ResultadoRuns:
-    """Um mes da janela, com o proprio contador (seguro para rodar em paralelo)."""
     parcial = ResultadoRuns()
     runs, total = _coletar_intervalo(cliente, caminho, branch, ini, fim, parcial)
     parcial.runs = runs

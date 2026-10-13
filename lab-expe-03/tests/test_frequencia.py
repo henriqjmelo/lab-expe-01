@@ -1,5 +1,3 @@
-"""Testes de metricas/frequencia.py: deployment frequency (RQ 01), issue #139."""
-
 from __future__ import annotations
 
 import pytest
@@ -16,10 +14,10 @@ def test_janela_de_12_meses_tem_cerca_de_52_1_semanas():
 
 def test_conta_so_as_datas_da_janela():
     datas = [
-        "2025-09-30T23:59:59Z",  # antes
-        "2025-10-01T00:00:00Z",  # primeiro instante, entra
+        "2025-09-30T23:59:59Z",
+        "2025-10-01T00:00:00Z",
         "2026-03-15T12:00:00Z",
-        "2026-10-01T00:00:00Z",  # limite exclusivo, fica fora
+        "2026-10-01T00:00:00Z",
     ]
     assert frequencia_semanal(datas, INICIO, FIM) == pytest.approx(2 / 52.142857)
 

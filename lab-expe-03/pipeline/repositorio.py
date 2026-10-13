@@ -1,16 +1,3 @@
-"""Metricas DORA de um repositorio em todas as variantes (issue #139).
-
-Junta as coletas (releases, tags, compare, workflow runs) e as funcoes de
-metricas/ numa linha do dataset_dora.csv. Unidades de deploy (RQ 07):
-
-    release      releases publicadas, sem pre-release (definicao principal)
-    release_pre  releases publicadas, incluindo pre-releases
-    tag          tags, datadas pelo commit apontado
-
-Para cada unidade: deployment frequency, lead time (a) e (b) e CFR (b). CFR (a)
-e tempo de recuperacao vem dos workflow runs e nao dependem da unidade.
-"""
-
 from __future__ import annotations
 
 import urllib.parse
@@ -27,8 +14,6 @@ from pipeline.github_client import GitHubAPIError, GitHubClient
 UNIDADES = ("release", "release_pre", "tag")
 
 COMMITS_POR_PAGINA = 100
-# Compare acima disso quase sempre e entre linhas diferentes (v10.x -> v11.x, ou
-# pacotes distintos de um monorepo intercalados por data): sai do lead time e e contado.
 MAX_COMMITS_COMPARE = 1000
 
 TRUNCADO = "truncado"
@@ -37,7 +22,7 @@ TRUNCADO = "truncado"
 @dataclass
 class Janela:
     inicio: date
-    fim: date  # inclusive
+    fim: date
 
     @property
     def inicio_iso(self) -> str:
@@ -45,12 +30,10 @@ class Janela:
 
     @property
     def fim_iso(self) -> str:
-        """Limite exclusivo: meia-noite do dia seguinte ao ultimo dia da janela."""
         return f"{date.fromordinal(self.fim.toordinal() + 1).isoformat()}T00:00:00Z"
 
 
 def deploys_por_unidade(releases: list[dict], tags: list[dict]) -> dict[str, list[Deploy]]:
-    """Historico completo de cada unidade em ordem cronologica (inclui o que esta fora da janela)."""
     publicadas = sorted(
         (r for r in releases if not r.get("draft") and r.get("published_at")),
         key=lambda r: r["published_at"],
@@ -65,11 +48,6 @@ def deploys_por_unidade(releases: list[dict], tags: list[dict]) -> dict[str, lis
 def comparar(
     cliente: GitHubClient, owner: str, repo: str, base: str, head: str, max_commits: int = MAX_COMMITS_COMPARE
 ) -> list[str] | None | str:
-    """Datas (commit.author.date) dos commits entre base e head, paginando o compare.
-
-    None = 404 (tag apagada/reescrita); TRUNCADO = mais de `max_commits` commits,
-    descoberto ja na primeira pagina pelo campo total_commits (nao baixa o resto),
-    ou 422 "diff is taking too long" (o GitHub desiste de calcular o compare)."""
     caminho = f"repos/{owner}/{repo}/compare/{base}...{head}"
     datas: list[str] = []
     pagina = 1
@@ -80,8 +58,6 @@ def comparar(
             if erro.status == 404:
                 return None
             if erro.status == 422 and "too long" in str(erro).lower():
-                # "Sorry, this diff is taking too long to generate": compare enorme
-                # (ex.: qgis/QGIS entre linhas 4.0 e 4.2) - mesmo tratamento do limite.
                 return TRUNCADO
             raise
         if pagina == 1 and (resultado.get("total_commits") or 0) > max_commits:
@@ -100,9 +76,6 @@ def montar_com_commits(
     deploys: list[Deploy],
     janela: Janela,
 ) -> tuple[list[ReleaseComCommits], int, int]:
-    """So os deploys da janela, cada um com os commits desde o deploy anterior
-    (que pode estar fora dela). Devolve tambem quantos compare deram 404 e
-    quantos passaram de MAX_COMMITS_COMPARE (ambos ficam como ignorados)."""
     montadas: list[ReleaseComCommits] = []
     n_404 = n_truncados = 0
     for i, deploy in enumerate(deploys):
@@ -140,7 +113,6 @@ def metricas_da_unidade(
     }
 
     if n_janela > max_compares:
-        # Custo de cota alto demais (um compare por deploy): lead time fica vazio e marcado.
         linha.update({
             f"lt_a_{unidade}_dias": None,
             f"lt_b_{unidade}_dias": None,

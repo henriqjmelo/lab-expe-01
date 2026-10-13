@@ -1,32 +1,17 @@
-"""Coleta de releases, tags e commits entre releases (issue #135).
-
-Usa o GitHubClient de pipeline/github_client.py (issue #136) para paginacao,
-rate limit e backoff. Este modulo so monta os dados; quem calcula o lead time
-e metricas/lead_time.py, que nao depende de rede e e testado isoladamente.
-
-A execucao real sobre os 100 repositorios da amostra depende do cache e da
-retomada da issue #136 (ainda nao prontos): sem eles, repetir a coleta depois
-de uma queda refaz chamadas que ja tinham sido gastas na cota de rate limit.
-"""
-
 from __future__ import annotations
 
 from metricas.lead_time import ReleaseComCommits
 from pipeline.github_client import GitHubAPIError, GitHubClient
 
-# Sem paginar o compare, o endpoint para em 250 commits (ver issue #135).
 COMMITS_POR_PAGINA = 100
 
 
 def listar_releases(cliente: GitHubClient, owner: str, repo: str) -> list[dict]:
-    """GET /repos/{owner}/{repo}/releases, ordenadas da mais antiga pra mais nova."""
     brutas = list(cliente.paginar(f"repos/{owner}/{repo}/releases"))
     return sorted(brutas, key=lambda r: r["published_at"] or "")
 
 
 def listar_tags_com_data(cliente: GitHubClient, owner: str, repo: str) -> list[dict]:
-    """GET /repos/{owner}/{repo}/tags. Tags nao tem data propria (RQ 07): usa a
-    data do commit apontado, via GET /repos/{owner}/{repo}/commits/{sha}."""
     tags = list(cliente.paginar(f"repos/{owner}/{repo}/tags"))
     resultado = []
     for tag in tags:
@@ -41,11 +26,6 @@ def listar_tags_com_data(cliente: GitHubClient, owner: str, repo: str) -> list[d
 def comparar_commits(
     cliente: GitHubClient, owner: str, repo: str, base: str, head: str
 ) -> list[str] | None:
-    """GET /repos/{owner}/{repo}/compare/{base}...{head}, paginado por page/per_page.
-
-    Devolve as datas de commit.author.date de cada commit entre base e head, ou
-    None se a comparacao der 404 (tag apagada ou reescrita - issue #135 pede pra
-    registrar e contar, nao propagar o erro)."""
     datas: list[str] = []
     pagina = 1
     while True:
@@ -68,12 +48,6 @@ def comparar_commits(
 def montar_releases_com_commits(
     cliente: GitHubClient, owner: str, repo: str, releases: list[dict] | None = None
 ) -> list[ReleaseComCommits]:
-    """Monta a lista que metricas/lead_time.py consome: uma entrada por release
-    publicada, com os commits desde a release anterior.
-
-    A primeira release da historia e marcada como ignorada (nao ha release
-    anterior pra comparar), igual uma comparacao que devolveu 404.
-    """
     publicadas = [r for r in (releases or listar_releases(cliente, owner, repo)) if not r["draft"]]
 
     montadas = []

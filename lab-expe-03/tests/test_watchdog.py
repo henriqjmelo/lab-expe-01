@@ -1,5 +1,3 @@
-"""Testes de pipeline/watchdog.py e da marcacao de atividade no cliente (issue #139)."""
-
 from __future__ import annotations
 
 import time
@@ -32,7 +30,7 @@ def test_nao_dispara_dentro_do_limite():
 
 def test_pausa_de_cota_em_andamento_nao_conta_como_travado():
     disparos = []
-    cliente = ClienteFalso(ultima_atividade=0, pausado_ate=3000)  # esperando reset da cota
+    cliente = ClienteFalso(ultima_atividade=0, pausado_ate=3000)
     assert not watchdog(cliente, 2000, disparos).verificar()
 
 

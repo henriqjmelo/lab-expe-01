@@ -1,5 +1,3 @@
-"""Testes do cache em disco e da retomada no GitHubClient (issues #136 e #139)."""
-
 from __future__ import annotations
 
 import http.client
@@ -80,7 +78,6 @@ def test_retomada_segunda_execucao_nao_chama_a_api(tmp_path):
     assert list(novo_cliente(primeiro, cache).paginar("/x")) == [1, 2, 3]
     assert len(primeiro.requisicoes) == 2
 
-    # "Depois do Ctrl+C": cliente novo, mesmo cache, nenhuma resposta programada.
     segundo = AbrirFalso()
     assert list(novo_cliente(segundo, cache).paginar("/x")) == [1, 2, 3]
     assert segundo.requisicoes == []
@@ -120,7 +117,7 @@ def test_graphql_usa_post_e_cache_por_consulta(tmp_path):
     c = novo_cliente(abrir, cache)
     assert c.graphql("q", {"v": 1}) == {"data": 1}
     assert c.graphql("q", {"v": 2}) == {"data": 2}
-    assert c.graphql("q", {"v": 1}) == {"data": 1}  # cache
+    assert c.graphql("q", {"v": 1}) == {"data": 1}
     assert len(abrir.requisicoes) == 2
     req = abrir.requisicoes[0]
     assert req.get_method() == "POST"

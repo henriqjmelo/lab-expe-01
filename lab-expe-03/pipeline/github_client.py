@@ -22,7 +22,6 @@ BACKOFF_INICIAL = 1.0
 
 FOLGA_RESET = 1.0
 
-# Limite secundario (abuso) as vezes vem sem Retry-After nem Remaining=0: espera fixa e dobra.
 ESPERA_LIMITE_SECUNDARIO = 60.0
 
 _LINK_NEXT = re.compile(r'<([^>]+)>\s*;\s*rel="next"')
@@ -79,8 +78,6 @@ class GitHubClient:
         self._dormir = dormir
         self._agora = agora
         self.cache = cache
-        # Lidos pelo watchdog (pipeline/watchdog.py): ultima chamada concluida e
-        # ate quando ha uma pausa legitima (cota, backoff) em andamento.
         self.ultima_atividade = time.monotonic()
         self.pausado_ate = 0.0
 
@@ -112,7 +109,7 @@ class GitHubClient:
         if self.cache is not None:
             guardada = self.cache.ler(chave)
             if guardada is not None:
-                self.ultima_atividade = time.monotonic()  # retomada pelo cache tambem e progresso
+                self.ultima_atividade = time.monotonic()
                 if guardada.get("status") in (404, 422):
                     mensagem = guardada.get("mensagem") or "Not Found"
                     raise GitHubAPIError(guardada["status"], url, f"{mensagem} (cache)")
@@ -146,11 +143,9 @@ class GitHubClient:
                     espera *= 2
                     continue
                 if erro.code in (404, 422) and self.cache is not None:
-                    # Respostas definitivas: guardadas para a retomada nao repetir a chamada.
                     self.cache.gravar(chave, {"status": erro.code, "mensagem": mensagem})
                 raise GitHubAPIError(erro.code, url, mensagem) from erro
             except (http.client.HTTPException, OSError) as erro:
-                # Queda de rede ou resposta cortada no meio (IncompleteRead): mesmo tratamento de um 5xx.
                 if tentativa < self.max_tentativas:
                     self._pausar(espera)
                     espera *= 2
@@ -187,14 +182,12 @@ class GitHubClient:
             url = proxima_pagina(headers.get("Link"))
 
     def graphql(self, consulta: str, variaveis: dict[str, Any] | None = None) -> Any:
-        """POST /graphql. A chave do cache e a consulta + variaveis, nao a URL (que e sempre a mesma)."""
         corpo = {"query": consulta, "variables": variaveis or {}}
         chave = "graphql:" + json.dumps(corpo, sort_keys=True)
         dados, _ = self.requisitar("/graphql", corpo=corpo, chave_cache=chave)
         return dados
 
     def rate_limit(self) -> dict[str, Any]:
-        # Diagnostico: nunca vem do cache, a resposta muda a cada chamada.
         cache, self.cache = self.cache, None
         try:
             return self.get("/rate_limit")

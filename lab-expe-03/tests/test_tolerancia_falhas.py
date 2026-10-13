@@ -1,7 +1,3 @@
-"""Testes da tolerancia a falhas da coleta (issue #139): retentativas por
-repositorio, erro transitorio que interrompe sem descartar, erro inesperado que
-vira descarte e CSVs parciais."""
-
 from __future__ import annotations
 
 import http.client
@@ -37,7 +33,6 @@ CANDIDATO = {"full_name": "o/r", "owner": "o", "repo": "r", "default_branch": "m
 
 
 class ClienteSequencia:
-    """actions/workflows responde a sequencia programada (erro ou valor), um item por chamada."""
 
     def __init__(self, *respostas):
         self.respostas = list(respostas)

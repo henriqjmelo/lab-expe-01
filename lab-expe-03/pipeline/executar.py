@@ -1,10 +1,3 @@
-"""Coleta completa: selecao + metricas de todos os repositorios + CSVs (issue #139).
-
-Chamado por `python -m pipeline --config config.yaml`. Toda chamada a API passa
-pelo cache em disco: interromper e rodar de novo retoma de onde parou, e uma
-segunda execucao completa so le o cache (reproduz o dataset sem gastar cota).
-"""
-
 from __future__ import annotations
 
 import csv
@@ -153,12 +146,10 @@ def idade_anos(criado_em: str, referencia: date) -> float:
 
 
 class ColetaInterrompida(RuntimeError):
-    """Erro transitorio que nao passou nem com as retentativas: a coleta para sem
-    descartar o repositorio, e a proxima execucao retoma dele pelo cache."""
+    pass
 
 
 def erro_transitorio(erro: BaseException) -> bool:
-    """Erros que podem passar sozinhos (rede, 5xx, limite de taxa) - nunca viram descarte."""
     if isinstance(erro, GitHubAPIError):
         if erro.status == 0 or erro.status >= 500:
             return True
@@ -167,8 +158,6 @@ def erro_transitorio(erro: BaseException) -> bool:
 
 
 class Coleta:
-    """`avaliar` roda nas threads e so le a API (nao mexe no funil nem nas linhas);
-    `registrar` roda na thread principal, na ordem do sorteio."""
 
     def __init__(
         self,
@@ -185,14 +174,6 @@ class Coleta:
         self._dormir = dormir
 
     def avaliar(self, c: dict) -> Avaliacao:
-        """Filtros + metricas de um candidato, com retentativas.
-
-        - erro transitorio: espera (30 s, 60 s, 120 s...) e tenta de novo; se nao
-          passar, levanta ColetaInterrompida (o repositorio NAO e descartado);
-        - erro inesperado (dado estranho, bug): registra o traceback no log, tenta
-          de novo e, se repetir, vira descarte erro_inesperado em vez de derrubar
-          a coleta inteira.
-        """
         tentativas = self.config.retentativas_repositorio
         espera = self.config.espera_retentativa
         for tentativa in range(1, tentativas + 1):
@@ -252,7 +233,6 @@ class Coleta:
         except GitHubAPIError as erro:
             if erro_transitorio(erro):
                 raise
-            # Permanente (404 apagado, 451 bloqueado, 409 vazio...): descarta.
             return Avaliacao(c, MOTIVO_ERRO_API, estado["etapa"], str(erro)[:200])
 
     def _linha(self, c: dict, releases: list[dict], runs: Any) -> dict:
@@ -294,7 +274,6 @@ class Coleta:
 
 
 def gravar_csv(caminho: Path, linhas: list[dict], campos: list[str]) -> None:
-    """Escrita atomica: um sinal no meio da gravacao nunca deixa o CSV pela metade."""
     caminho.parent.mkdir(parents=True, exist_ok=True)
     temporario = caminho.with_name(caminho.name + ".tmp")
     with temporario.open("w", newline="", encoding="utf-8") as f:
@@ -317,9 +296,8 @@ def gravar_saidas(coleta: Coleta) -> None:
     )
 
 
-# Codigos de saida lidos por scripts/coletar.sh.
 SAIDA_OK = 0
-SAIDA_TRANSITORIA = 75  # EX_TEMPFAIL: tentar de novo mais tarde
+SAIDA_TRANSITORIA = 75
 SAIDA_INTERROMPIDA = 130
 
 
@@ -345,8 +323,6 @@ def main(argv: list[str] | None = None) -> int:
     coleta = Coleta(cliente, config, log)
 
     def travou(parado: float) -> None:
-        # Threads presas em socket nao respondem a excecao: sai do processo de vez.
-        # Os CSVs parciais e o cache ja estao em disco; o supervisor reinicia.
         log(f"Watchdog: nenhuma chamada concluida ha {parado / 60:.0f} min; encerrando para reiniciar.")
         os._exit(SAIDA_TRANSITORIA)
 
@@ -355,7 +331,6 @@ def main(argv: list[str] | None = None) -> int:
     try:
         coleta.rodar()
     except KeyboardInterrupt:
-        # Um segundo SIGTERM (ex.: supervisor + kill) nao pode cortar a gravacao final.
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         gravar_saidas(coleta)
         log("Interrompido. CSVs parciais gravados; o cache ficou salvo: rode o mesmo comando para continuar.")

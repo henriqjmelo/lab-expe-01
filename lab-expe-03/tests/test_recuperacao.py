@@ -1,5 +1,3 @@
-"""Testes de metricas/recuperacao.py: tempo de recuperacao (RQ 04), issue #139."""
-
 from __future__ import annotations
 
 import pytest
@@ -12,7 +10,6 @@ def run(wf, conclusion, inicio, fim=None):
 
 
 def test_exemplo_do_enunciado_1h20():
-    # sucesso antes; falhas 10:00 e 10:30; sucesso as 11:15 terminando 11:20.
     runs = [
         run(1, "success", "09:00", "09:05"),
         run(1, "failure", "10:00", "10:05"),
@@ -47,7 +44,6 @@ def test_cancelados_nao_abrem_nem_fecham_episodio():
 
 
 def test_workflows_diferentes_nao_se_misturam():
-    # A falha do workflow 1 nao e "recuperada" pelo sucesso do workflow 2.
     runs = [
         run(1, "success", "08:00"),
         run(1, "failure", "09:00"),
@@ -73,11 +69,11 @@ def test_mediana_entre_episodios_de_varios_workflows_e_ordem_da_entrada_nao_impo
         run(2, "success", "12:00", "12:00"),
         run(1, "success", "08:00"),
         run(1, "failure", "09:00"),
-        run(1, "success", "10:00", "10:00"),  # 1h
+        run(1, "success", "10:00", "10:00"),
         run(2, "success", "07:00"),
-        run(2, "startup_failure", "08:00"),  # ate 12:00 = 4h
+        run(2, "startup_failure", "08:00"),
         run(1, "failure", "13:00"),
-        run(1, "success", "15:00", "15:00"),  # 2h
+        run(1, "success", "15:00", "15:00"),
     ]
     r = tempo_recuperacao(runs)
     assert r["n_episodios"] == 3

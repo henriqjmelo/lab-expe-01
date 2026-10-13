@@ -1,5 +1,3 @@
-"""Testes de metricas/cfr.py: CFR (a) proxy de CI e (b) proxy de entrega (issue #139)."""
-
 from __future__ import annotations
 
 import pytest
@@ -76,9 +74,9 @@ def test_marcar_corretivas_compara_com_o_deploy_anterior():
 def test_cfr_entrega_release_seguida_de_corretiva_em_ate_7_dias_falhou():
     deploys = [
         Deploy("v1.0.0", "2025-03-01T00:00:00Z"),
-        Deploy("v1.0.1", "2025-03-05T00:00:00Z"),  # corrige a v1.0.0 em 4 dias
+        Deploy("v1.0.1", "2025-03-05T00:00:00Z"),
         Deploy("v1.1.0", "2025-04-01T00:00:00Z"),
-        Deploy("v1.1.1", "2025-04-20T00:00:00Z"),  # corretiva, mas 19 dias depois
+        Deploy("v1.1.1", "2025-04-20T00:00:00Z"),
     ]
     r = cfr_entrega(deploys, INICIO, FIM)
     assert r["n_avaliadas"] == 4
@@ -90,7 +88,7 @@ def test_cfr_entrega_release_seguida_de_corretiva_em_ate_7_dias_falhou():
 def test_cfr_entrega_censura_os_ultimos_7_dias_da_janela():
     deploys = [
         Deploy("v1.0.0", "2025-06-01T00:00:00Z"),
-        Deploy("v1.1.0", "2025-12-28T00:00:00Z"),  # 4 dias antes do fim
+        Deploy("v1.1.0", "2025-12-28T00:00:00Z"),
     ]
     r = cfr_entrega(deploys, INICIO, FIM)
     assert r["n_avaliadas"] == 1
@@ -99,8 +97,8 @@ def test_cfr_entrega_censura_os_ultimos_7_dias_da_janela():
 
 def test_cfr_entrega_ignora_deploys_fora_da_janela_mas_usa_como_anterior():
     deploys = [
-        Deploy("v1.0.0", "2024-12-30T00:00:00Z"),  # fora da janela
-        Deploy("v1.0.1", "2025-01-02T00:00:00Z"),  # corretiva da anterior, dentro
+        Deploy("v1.0.0", "2024-12-30T00:00:00Z"),
+        Deploy("v1.0.1", "2025-01-02T00:00:00Z"),
     ]
     r = cfr_entrega(deploys, INICIO, FIM)
     assert r["n_avaliadas"] == 1
