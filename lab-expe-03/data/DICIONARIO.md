@@ -86,7 +86,7 @@ Classificação por `conclusion`:
 | :--- | :--- | :--- |
 | `full_name` | texto | `owner/repo` |
 | `etapa` | texto | Etapa do funil em que saiu |
-| `motivo` | texto | `sem_actions`, `menos_de_5_releases`, `menos_de_50_runs_validos` ou `erro_api` |
+| `motivo` | texto | `sem_actions`, `menos_de_5_releases`, `menos_de_50_runs_validos`, `erro_api` (erro permanente da API: 404, 451, 409...) ou `erro_inesperado` (dado fora do formato esperado, repetido nas 3 tentativas) |
 | `detalhe` | texto | Contagem que reprovou o repositório (releases ou runs válidos na janela), ou a mensagem do erro |
 
 ## `repositorios.csv`
