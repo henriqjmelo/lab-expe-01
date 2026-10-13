@@ -1,10 +1,3 @@
-"""Testes de pipeline/coleta_releases.py (issue #135).
-
-Usa um cliente falso no lugar do GitHubClient real: os testes nao fazem
-chamada de rede, so verificam como o modulo monta as releases a partir das
-respostas da API (paginacao do compare, 404, release sem anterior).
-"""
-
 from __future__ import annotations
 
 import pytest
@@ -19,8 +12,6 @@ from pipeline.github_client import GitHubAPIError
 
 
 class ClienteFalso:
-    """paginar() devolve o que foi programado por caminho; get() segue a mesma
-    logica, mas pode levantar GitHubAPIError pra simular um 404 do compare."""
 
     def __init__(self, paginas: dict[str, list] | None = None, gets: dict | None = None):
         self.paginas = paginas or {}
@@ -69,8 +60,6 @@ def test_listar_tags_busca_a_data_do_commit_apontado():
 
 
 def test_comparar_commits_segue_paginacao_ate_a_pagina_incompleta():
-    # Sem paginar, o compare para em 250 commits (ver issue #135): o modulo
-    # precisa continuar pedindo pagina enquanto a pagina voltar cheia.
     pagina_1 = {"commits": [{"commit": {"author": {"date": f"2024-01-{d:02d}T00:00:00Z"}}} for d in range(1, 101)]}
     pagina_2 = {"commits": [{"commit": {"author": {"date": "2024-02-01T00:00:00Z"}}}]}
 

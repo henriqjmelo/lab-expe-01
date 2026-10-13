@@ -17,3 +17,7 @@ node_modules/
 
 # Relatorios temporarios do jscpd
 jscpd-report.json
+
+# Cache das respostas da API do Lab03
+lab-expe-03/.cache/
+.coverage

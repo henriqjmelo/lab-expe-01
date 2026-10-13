@@ -1,19 +1,3 @@
-"""Junta coleta_releases.py e metricas/lead_time.py numa linha de comando (issue #135).
-
-Le uma lista de repositorios (owner,repo) de um CSV, calcula o lead time (a) e
-(b) de cada um e grava o resultado em outro CSV. E o pedaco que falta pra ir
-da funcao isolada ao "roda sobre os 100 repositorios da S01" do DoD da issue.
-
-A execucao real sobre a amostra depende de:
-    - lab-expe-03/data/repositorios.csv, gerado pela selecao da issue #134;
-    - cache/retomada no GitHubClient da issue #136 (ainda nao existem) -
-      sem eles, repetir a coleta apos uma queda refaz chamadas ja gastas.
-
-Uso:
-    python -m pipeline.executar_lead_time --repos data/repositorios.csv \
-        --saida data/lead_time.csv
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -37,7 +21,6 @@ CAMPOS_SAIDA = (
 
 
 def ler_repositorios(caminho: Path) -> list[tuple[str, str]]:
-    """CSV com colunas owner,repo (uma linha por repositorio da amostra)."""
     with caminho.open(newline="", encoding="utf-8") as f:
         return [(linha["owner"], linha["repo"]) for linha in csv.DictReader(f)]
 
@@ -71,7 +54,7 @@ def gravar_csv(caminho: Path, linhas: list[dict]) -> None:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(description="Calcula o lead time (a) e (b) de uma lista de repositorios.")
     ap.add_argument("--repos", type=Path, required=True, help="CSV com colunas owner,repo")
     ap.add_argument("--saida", type=Path, required=True, help="CSV de saida com o lead time")
     args = ap.parse_args()
