@@ -79,6 +79,10 @@ class GitHubClient:
         self._dormir = dormir
         self._agora = agora
         self.cache = cache
+        # Lidos pelo watchdog (pipeline/watchdog.py): ultima chamada concluida e
+        # ate quando ha uma pausa legitima (cota, backoff) em andamento.
+        self.ultima_atividade = time.monotonic()
+        self.pausado_ate = 0.0
 
     def montar_url(self, caminho: str, params: dict[str, Any] | None = None) -> str:
         url = caminho if caminho.startswith("http") else f"{self.base_url}/{caminho.lstrip('/')}"
@@ -108,6 +112,7 @@ class GitHubClient:
         if self.cache is not None:
             guardada = self.cache.ler(chave)
             if guardada is not None:
+                self.ultima_atividade = time.monotonic()  # retomada pelo cache tambem e progresso
                 if guardada.get("status") == 404:
                     raise GitHubAPIError(404, url, "Not Found (cache)")
                 link = guardada.get("link")
@@ -123,18 +128,20 @@ class GitHubClient:
                 with self._abrir(requisicao, timeout=self.timeout) as resposta:
                     headers = dict(resposta.headers.items())
                     bruto = resposta.read()
+                self.ultima_atividade = time.monotonic()
             except urllib.error.HTTPError as erro:
+                self.ultima_atividade = time.monotonic()
                 headers = dict(erro.headers.items()) if erro.headers else {}
                 if self._limite_estourado(erro.code, headers):
                     self._esperar_reset(headers)
                     continue
                 mensagem = _mensagem_erro(erro)
                 if erro.code in (403, 429) and "rate limit" in mensagem.lower():
-                    self._dormir(espera_secundario)
+                    self._pausar(espera_secundario)
                     espera_secundario *= 2
                     continue
                 if erro.code >= 500 and tentativa < self.max_tentativas:
-                    self._dormir(espera)
+                    self._pausar(espera)
                     espera *= 2
                     continue
                 if erro.code == 404 and self.cache is not None:
@@ -143,7 +150,7 @@ class GitHubClient:
             except (http.client.HTTPException, OSError) as erro:
                 # Queda de rede ou resposta cortada no meio (IncompleteRead): mesmo tratamento de um 5xx.
                 if tentativa < self.max_tentativas:
-                    self._dormir(espera)
+                    self._pausar(espera)
                     espera *= 2
                     continue
                 raise GitHubAPIError(0, url, str(erro)) from erro
@@ -200,10 +207,14 @@ class GitHubClient:
 
     def _esperar_reset(self, headers: dict[str, str]) -> None:
         if "Retry-After" in headers:
-            self._dormir(float(headers["Retry-After"]))
+            self._pausar(float(headers["Retry-After"]))
             return
         reset = float(headers.get("X-RateLimit-Reset", self._agora()))
-        self._dormir(max(reset - self._agora(), 0.0) + FOLGA_RESET)
+        self._pausar(max(reset - self._agora(), 0.0) + FOLGA_RESET)
+
+    def _pausar(self, segundos: float) -> None:
+        self.pausado_ate = max(self.pausado_ate, time.monotonic() + segundos)
+        self._dormir(segundos)
 
     def _respeitar_cota(self, headers: dict[str, str]) -> None:
         if headers.get("X-RateLimit-Remaining") == "0":

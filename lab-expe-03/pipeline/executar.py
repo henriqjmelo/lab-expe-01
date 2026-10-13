@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import csv
 import http.client
+import os
 import signal
 import sys
 import time
@@ -28,6 +29,7 @@ from pipeline.coleta_releases import listar_releases
 from pipeline.coleta_runs import coletar_runs
 from pipeline.coleta_tags import listar_tags_graphql
 from pipeline.github_client import GitHubAPIError, GitHubClient
+from pipeline.watchdog import Watchdog
 from pipeline.repositorio import (
     UNIDADES,
     Janela,
@@ -78,6 +80,7 @@ class Config:
     espera_retentativa: float = 30.0
     gravar_parcial_a_cada: int = 10
     threads: int = 1
+    watchdog_minutos: float = 10.0
 
 
 def _data(valor: Any) -> date:
@@ -103,6 +106,7 @@ def ler_config(caminho: Path) -> Config:
         espera_retentativa=float(bruto["coleta"].get("espera_retentativa_s", 30)),
         gravar_parcial_a_cada=int(bruto["coleta"].get("gravar_parcial_a_cada", 10)),
         threads=int(bruto["coleta"].get("threads", 1)),
+        watchdog_minutos=float(bruto["coleta"].get("watchdog_minutos", 10)),
     )
 
 
@@ -326,6 +330,15 @@ def main(argv: list[str] | None = None) -> int:
 
     signal.signal(signal.SIGTERM, _sigterm_vira_interrupcao)
     coleta = Coleta(cliente, config, log)
+
+    def travou(parado: float) -> None:
+        # Threads presas em socket nao respondem a excecao: sai do processo de vez.
+        # Os CSVs parciais e o cache ja estao em disco; o supervisor reinicia.
+        log(f"Watchdog: nenhuma chamada concluida ha {parado / 60:.0f} min; encerrando para reiniciar.")
+        os._exit(SAIDA_TRANSITORIA)
+
+    if config.watchdog_minutos > 0:
+        Watchdog(cliente, config.watchdog_minutos * 60, travou).iniciar()
     try:
         coleta.rodar()
     except KeyboardInterrupt:
