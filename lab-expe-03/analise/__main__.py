@@ -34,6 +34,13 @@ def gerar(df: pd.DataFrame, funil: pd.DataFrame | None, pasta: Path, rotulo: str
         g.fig_rq06(rq06, figuras / "fig08_rq06_fatores.png"),
         g.fig_rq07(completos, rq07, figuras / "fig09_rq07_sensibilidade.png"),
     ]
+    if "cfr_c_revert" in df.columns:
+        est.resumo_alternativas(df).to_csv(tabelas / "medidas_alternativas.csv", index=False)
+        gerados += [
+            g.fig_cfr_proxies(df, figuras / "fig13_cfr_proxies.png"),
+            g.fig_feedback_ci(df, figuras / "fig14_feedback_ci.png"),
+            g.fig_distribuicao_trabalho(df, figuras / "fig15_distribuicao_trabalho.png"),
+        ]
     return gerados
 
 
@@ -60,10 +67,10 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     g.estilo()
-    a1 = est.carregar(args.dados)
+    a1 = est.carregar_com_alternativas(args.dados)
     gerados = gerar(a1, pd.read_csv(args.funil), args.saida, f"Amostra 1 · n = {len(a1)}")
 
-    extras = [est.carregar(p) for p in args.extra if p.exists()]
+    extras = [est.carregar_com_alternativas(p) for p in args.extra if p.exists()]
     if extras:
         todas = pd.concat([a1, *extras], ignore_index=True)
         n = len(todas)

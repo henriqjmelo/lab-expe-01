@@ -91,6 +91,7 @@ def test_cfr_revert_sem_releases():
         ("wip: algo", None),
         ("", None),
         (None, None),
+        (float("nan"), None),
     ],
 )
 def test_tipo_commit(mensagem, tipo):

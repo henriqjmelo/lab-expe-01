@@ -11,7 +11,7 @@ LIMIAR_ADOCAO = 0.5
 
 
 def tipo_commit(mensagem: str | None) -> str | None:
-    texto = (mensagem or "").strip()
+    texto = mensagem.strip() if isinstance(mensagem, str) else ""
     if _REVERT_GIT.match(texto):
         return "revert"
     achado = _CONVENCIONAL.match(texto)
