@@ -22,6 +22,9 @@ BACKOFF_INICIAL = 1.0
 
 FOLGA_RESET = 1.0
 
+PRAZO_RESPOSTA = 120.0
+TAMANHO_BLOCO = 64 * 1024
+
 ESPERA_LIMITE_SECUNDARIO = 60.0
 
 _LINK_NEXT = re.compile(r'<([^>]+)>\s*;\s*rel="next"')
@@ -55,6 +58,19 @@ def proxima_pagina(link: str | None) -> str | None:
     return achado.group(1) if achado else None
 
 
+def pagina_menor(url: str) -> str | None:
+    partes = urllib.parse.urlsplit(url)
+    consulta = dict(urllib.parse.parse_qsl(partes.query))
+    por_pagina = int(consulta.get("per_page", 30))
+    novo = {100: 25, 25: 5}.get(por_pagina)
+    if novo is None:
+        return None
+    pagina = int(consulta.get("page", 1))
+    consulta["per_page"] = str(novo)
+    consulta["page"] = str((pagina - 1) * por_pagina // novo + 1)
+    return urllib.parse.urlunsplit(partes._replace(query=urllib.parse.urlencode(consulta)))
+
+
 class GitHubClient:
     def __init__(
         self,
@@ -64,6 +80,7 @@ class GitHubClient:
         max_tentativas: int = MAX_TENTATIVAS,
         backoff_inicial: float = BACKOFF_INICIAL,
         timeout: float = 30.0,
+        prazo_resposta: float = PRAZO_RESPOSTA,
         abrir: Callable[..., Any] = urllib.request.urlopen,
         dormir: Callable[[float], None] = time.sleep,
         agora: Callable[[], float] = time.time,
@@ -74,6 +91,7 @@ class GitHubClient:
         self.max_tentativas = max_tentativas
         self.backoff_inicial = backoff_inicial
         self.timeout = timeout
+        self.prazo_resposta = prazo_resposta
         self._abrir = abrir
         self._dormir = dormir
         self._agora = agora
@@ -125,7 +143,7 @@ class GitHubClient:
             try:
                 with self._abrir(requisicao, timeout=self.timeout) as resposta:
                     headers = dict(resposta.headers.items())
-                    bruto = resposta.read()
+                    bruto = self._ler_com_prazo(resposta, url)
                 self.ultima_atividade = time.monotonic()
             except urllib.error.HTTPError as erro:
                 self.ultima_atividade = time.monotonic()
@@ -153,7 +171,14 @@ class GitHubClient:
                 raise GitHubAPIError(0, url, str(erro)) from erro
 
             self._respeitar_cota(headers)
-            conteudo = json.loads(bruto) if bruto else None
+            try:
+                conteudo = json.loads(bruto) if bruto else None
+            except ValueError as erro:
+                if tentativa < self.max_tentativas:
+                    self._pausar(espera)
+                    espera *= 2
+                    continue
+                raise GitHubAPIError(0, url, f"resposta truncada: {erro}") from erro
             if self.cache is not None:
                 self.cache.gravar(
                     chave, {"status": 200, "corpo": conteudo, "link": headers.get("Link")}
@@ -176,10 +201,28 @@ class GitHubClient:
         params = {"per_page": POR_PAGINA, **(params or {})}
         url: str | None = self.montar_url(caminho, params)
         while url:
-            dados, headers = self.requisitar(url)
+            try:
+                dados, headers = self.requisitar(url)
+            except GitHubAPIError as erro:
+                menor = pagina_menor(url) if erro.status in (502, 503, 504) else None
+                if menor is None:
+                    raise
+                url = menor
+                continue
             itens = dados.get(chave, []) if chave else dados
             yield from itens or []
             url = proxima_pagina(headers.get("Link"))
+
+    def _ler_com_prazo(self, resposta: Any, url: str) -> bytes:
+        limite = time.monotonic() + self.prazo_resposta
+        partes = []
+        while True:
+            bloco = resposta.read(TAMANHO_BLOCO)
+            if not bloco:
+                return b"".join(partes)
+            partes.append(bloco)
+            if time.monotonic() > limite:
+                raise TimeoutError(f"resposta de {url} passou de {self.prazo_resposta:.0f} s")
 
     def graphql(self, consulta: str, variaveis: dict[str, Any] | None = None) -> Any:
         corpo = {"query": consulta, "variables": variaveis or {}}

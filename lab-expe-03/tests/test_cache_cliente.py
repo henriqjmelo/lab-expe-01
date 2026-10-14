@@ -16,8 +16,9 @@ class RespostaFalsa:
         self._corpo = json.dumps(corpo).encode()
         self.headers = headers or {}
 
-    def read(self):
-        return self._corpo
+    def read(self, n=-1):
+        corpo, self._corpo = self._corpo, b""
+        return corpo
 
     def __enter__(self):
         return self
@@ -161,3 +162,96 @@ def test_resposta_cortada_no_meio_tem_backoff():
     abrir = AbrirFalso(http.client.IncompleteRead(b"x", 10), RespostaFalsa({"ok": True}))
     assert novo_cliente(abrir, None, esperas).get("/x") == {"ok": True}
     assert esperas == [1.0]
+
+
+class RespostaLenta:
+    def __init__(self, blocos, relogio):
+        self.blocos = list(blocos)
+        self.relogio = relogio
+        self.headers = {}
+
+    def read(self, n=-1):
+        self.relogio[0] += 50
+        return self.blocos.pop(0) if self.blocos else b""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def test_resposta_que_chega_aos_poucos_estoura_o_prazo_e_tenta_de_novo(monkeypatch):
+    import pipeline.github_client as gc
+
+    relogio = [0.0]
+    monkeypatch.setattr(gc.time, "monotonic", lambda: relogio[0])
+    esperas = []
+    lenta = RespostaLenta([b"{", b'"a"', b": 1", b"}"], relogio)
+    abrir = AbrirFalso(lenta, RespostaFalsa({"a": 1}))
+    assert novo_cliente(abrir, None, esperas).get("/x") == {"a": 1}
+    assert esperas == [1.0]
+
+
+def test_resposta_em_blocos_dentro_do_prazo():
+    rapida = RespostaLenta([b'{"a"', b": 2}"], [0.0])
+    assert novo_cliente(AbrirFalso(rapida), None).get("/x") == {"a": 2}
+
+
+class RespostaCortada:
+    headers = {}
+
+    def __init__(self, corpo):
+        self._corpo = corpo
+
+    def read(self, n=-1):
+        corpo, self._corpo = self._corpo, b""
+        return corpo
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def test_json_truncado_e_tentado_de_novo_e_nao_vai_pro_cache(tmp_path):
+    cache = CacheDisco(tmp_path)
+    esperas = []
+    abrir = AbrirFalso(RespostaCortada(b'{"a": "cort'), RespostaFalsa({"a": "ok"}))
+    assert novo_cliente(abrir, cache, esperas).get("/x") == {"a": "ok"}
+    assert esperas == [1.0]
+    assert novo_cliente(AbrirFalso(), cache).get("/x") == {"a": "ok"}
+
+
+def test_json_truncado_persistente_vira_erro_transitorio():
+    abrir = AbrirFalso(*[RespostaCortada(b'{"a"') for _ in range(5)])
+    with pytest.raises(GitHubAPIError) as erro:
+        novo_cliente(abrir, None).get("/x")
+    assert erro.value.status == 0
+    assert "truncada" in str(erro.value)
+
+
+def test_pagina_menor_preserva_o_deslocamento():
+    from pipeline.github_client import pagina_menor
+
+    assert pagina_menor("https://x/r?per_page=100&page=3") == "https://x/r?per_page=25&page=9"
+    assert pagina_menor("https://x/r?per_page=100") == "https://x/r?per_page=25&page=1"
+    assert pagina_menor("https://x/r?per_page=25&page=2") == "https://x/r?per_page=5&page=6"
+    assert pagina_menor("https://x/r?per_page=5&page=2") is None
+
+
+def test_pagina_que_sempre_da_504_e_refeita_em_paginas_menores():
+    abrir = AbrirFalso(
+        *[erro_http(504, {"message": "We couldn't respond to your request in time."})] * 5,
+        RespostaFalsa([1, 2], {"Link": '<https://api.github.com/x?per_page=25&page=2>; rel="next"'}),
+        RespostaFalsa([3]),
+    )
+    c = novo_cliente(abrir, None)
+    assert list(c.paginar("/x")) == [1, 2, 3]
+    assert "per_page=25" in abrir.requisicoes[5].full_url
+
+
+def test_404_na_paginacao_continua_propagando():
+    with pytest.raises(GitHubAPIError):
+        list(novo_cliente(AbrirFalso(erro_http(404)), None).paginar("/x"))

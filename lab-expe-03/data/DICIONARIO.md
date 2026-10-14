@@ -92,3 +92,69 @@ Classificação por `conclusion`:
 ## `repositorios.csv`
 
 Colunas `owner` e `repo` da amostra final. É a entrada de `pipeline/executar_lead_time.py` (#135).
+
+## `candidatos.csv`
+
+Todos os candidatos devolvidos pela busca (`GET /search/repositories`, fatiada por estrelas), comuns às amostras 1 e 2. Gerado por `python -m pipeline.exportar --candidatos data/candidatos.csv`.
+
+| Coluna | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `full_name`, `owner`, `repo` | texto | identificação do repositório |
+| `estrelas` | inteiro | `stargazers_count` no momento da busca |
+| `linguagem` | texto | `language` (vazio se não detectada) |
+| `default_branch` | texto | branch padrão |
+| `criado_em` | data-hora ISO 8601 | `created_at` |
+
+A situação de cada candidato numa amostra vem do cruzamento com o `repositorios.csv` (aceito) e o `descartes.csv` (descartado, com a etapa) da amostra. Os demais candidatos não foram avaliados, porque o alvo de 300 foi atingido antes.
+
+## `eventos/` (um diretório por amostra: `data/eventos/` = A1, `data/amostra2/eventos/` = A2)
+
+Eventos por repositório da amostra, exportados do cache da coleta por `python -m pipeline.exportar --config <config> --saida <diretório>`. Servem para análises por período (RQ08), heurísticas sobre commits (#138, #154) e qualquer recálculo, sem precisar coletar de novo. Os arquivos `.csv.gz` são lidos direto pelo `pd.read_csv`.
+
+### `releases.csv`
+
+| Coluna | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `owner`, `repo` | texto | repositório |
+| `tag_name` | texto | tag da release |
+| `published_at` | data-hora ISO 8601 | publicação (releases em rascunho ficam de fora) |
+| `prerelease` | booleano | `prerelease` da API |
+| `na_janela` | booleano | `published_at` dentro da janela de observação |
+
+Inclui as releases anteriores à janela (servem de "release anterior" no lead time e na heurística corretiva).
+
+### `lead_time_releases.csv`
+
+Uma linha por release (sem pré-release) publicada na janela, com os commits desde a release anterior (`compare`).
+
+| Coluna | Tipo | Unidade | Descrição |
+| :--- | :--- | :--- | :--- |
+| `owner`, `repo`, `tag_name`, `published_at` | — | — | release |
+| `n_commits` | inteiro | commits | commits da release |
+| `lt_a_dias` | decimal | dias | `published_at − commit mais antigo` (vazio se ignorada ou sem commits) |
+| `lt_b_mediana_dias` | decimal | dias | mediana de `published_at − data de cada commit` |
+| `ignorada` | booleano | — | primeira release da história, compare 404 ou com mais de 1.000 commits |
+
+Repositórios com lead time omitido (mais de 300 releases na janela) não aparecem.
+
+### `commits_releases.csv.gz`
+
+| Coluna | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `owner`, `repo`, `tag_name` | texto | release que inclui o commit |
+| `sha` | texto | SHA do commit |
+| `data` | data-hora ISO 8601 | `commit.author.date` |
+| `mensagem` | texto | primeira linha da mensagem (até 300 caracteres) |
+| `reverte_sha` | texto | SHA(s) citados em `This reverts commit <sha>` no corpo da mensagem, separados por `;` (vazio se não for revert) |
+
+### `runs.csv.gz`
+
+| Coluna | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `owner`, `repo` | texto | repositório |
+| `workflow_id` | inteiro | workflow do GitHub Actions |
+| `conclusion` | texto | `conclusion` da API |
+| `classe` | texto | `sucesso`, `falha` (`failure`, `timed_out`, `startup_failure`) ou `ignorado` |
+| `run_started_at`, `updated_at` | data-hora ISO 8601 | início e última atualização do run |
+
+Só os runs de `push` no default branch, criados na janela.

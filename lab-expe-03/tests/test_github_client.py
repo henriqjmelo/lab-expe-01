@@ -20,8 +20,9 @@ class RespostaFalsa:
         self._corpo = json.dumps(corpo).encode()
         self.headers = headers or {}
 
-    def read(self):
-        return self._corpo
+    def read(self, n=-1):
+        corpo, self._corpo = self._corpo, b""
+        return corpo
 
     def __enter__(self):
         return self

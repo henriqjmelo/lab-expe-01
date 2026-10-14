@@ -463,3 +463,23 @@ def test_coleta_exclui_repositorios_de_amostra_anterior(tmp_path):
     assert coleta.funil.excluidos == 1
     assert coleta.funil.avaliados == 1
     assert [d["full_name"] for d in coleta.funil.descartes] == ["a/semactions"]
+
+
+def test_fila_parada_levanta_sem_progresso():
+    import threading
+
+    from pipeline.selecao import SemProgresso
+
+    liberar = threading.Event()
+
+    def avaliar(c):
+        if c["full_name"] == "o/r1":
+            liberar.wait(2)
+        return Avaliacao(c, "sem_actions", "com_actions")
+
+    candidatos = [{"full_name": f"o/r{i}"} for i in range(4)]
+    funil = Funil()
+    with pytest.raises(SemProgresso):
+        avaliar_candidatos(candidatos, 10, funil, avaliar, lambda a: None, workers=2, sem_progresso=0.1)
+    liberar.set()
+    assert funil.avaliados == 1

@@ -34,6 +34,7 @@ from pipeline.selecao import (
     MOTIVO_ERRO_API,
     Avaliacao,
     MOTIVO_ERRO_INESPERADO,
+    SemProgresso,
     MOTIVO_POUCAS_RELEASES,
     MOTIVO_POUCOS_RUNS,
     MOTIVO_SEM_ACTIONS,
@@ -76,6 +77,7 @@ class Config:
     threads_runs: int = 1
     adiantar: int = 0
     watchdog_minutos: float = 10.0
+    sem_progresso_minutos: float = 60.0
     excluir: tuple[Path, ...] = ()
 
 
@@ -105,6 +107,7 @@ def ler_config(caminho: Path) -> Config:
         threads_runs=int(bruto["coleta"].get("threads_runs", 1)),
         adiantar=int(bruto["coleta"].get("adiantar", 0)),
         watchdog_minutos=float(bruto["coleta"].get("watchdog_minutos", 10)),
+        sem_progresso_minutos=float(bruto["coleta"].get("sem_progresso_minutos", 60)),
         excluir=tuple(base / c for c in bruto["amostra"].get("excluir") or []),
     )
 
@@ -286,6 +289,7 @@ class Coleta:
             self.log,
             workers=cfg.threads,
             adiantar=cfg.adiantar or None,
+            sem_progresso=cfg.sem_progresso_minutos * 60 if cfg.sem_progresso_minutos > 0 else None,
         )
 
 
@@ -351,6 +355,11 @@ def main(argv: list[str] | None = None) -> int:
         gravar_saidas(coleta)
         log("Interrompido. CSVs parciais gravados; o cache ficou salvo: rode o mesmo comando para continuar.")
         return SAIDA_INTERROMPIDA
+    except SemProgresso as erro:
+        gravar_saidas(coleta)
+        log(f"Fila parada ({erro}). CSVs parciais gravados; encerrando para reiniciar.")
+        sys.stderr.flush()
+        os._exit(SAIDA_TRANSITORIA)
     except (ColetaInterrompida, GitHubAPIError, OSError, http.client.HTTPException) as erro:
         if isinstance(erro, GitHubAPIError) and not erro_transitorio(erro):
             raise
