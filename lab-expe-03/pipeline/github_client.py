@@ -179,7 +179,7 @@ class GitHubClient:
                     espera *= 2
                     continue
                 raise GitHubAPIError(0, url, f"resposta truncada: {erro}") from erro
-            if self.cache is not None:
+            if self.cache is not None and not (isinstance(conteudo, dict) and conteudo.get("errors")):
                 self.cache.gravar(
                     chave, {"status": 200, "corpo": conteudo, "link": headers.get("Link")}
                 )
