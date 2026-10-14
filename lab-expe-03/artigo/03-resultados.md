@@ -262,3 +262,77 @@ Foram avaliados 1.108 candidatos para a A1 e 1.127 para a A2, e nenhum descarte 
 ![A1 × A2, medianas](../analise/saida/comparacao/figuras/fig11_a1_x_a2_medianas.png)
 
 Para a discussão (validade de conclusão): os resultados descritivos são **robustos à amostra sorteada**. Já os testes com muitos grupos (RQ06) são sensíveis ao tamanho da amostra, e por isso devem ser reportados com o `n` e o tamanho de efeito, não só com o p-valor.
+
+---
+
+## 3.10 Medidas alternativas (issue #154)
+
+As métricas DORA aqui são proxies. Esta seção acrescenta quatro medidas, calculadas dos mesmos dados (`data/*/medidas_alternativas.csv`, sem novas chamadas à API), para checar e complementar esses proxies. A análise formal de convergência entre eles fica na #156.
+
+**Tabela 5 — Medidas alternativas, 300 × 600** (`analise/saida/tabelas/medidas_alternativas.csv` e `analise/saida/600/tabelas/medidas_alternativas.csv`).
+
+| Medida | Mediana 300 [IQR] | Mediana 600 [IQR] | % Elite (≤ 15%) 300 / 600 |
+| :--- | :--- | :--- | :--- |
+| CFR (a), falha de CI | 5,6% [2,2% – 11,2%] | 5,0% [2,2% – 10,8%] | 84% / 84% |
+| CFR (a+), com reexecuções | 6,2% [2,5% – 12,3%] | 5,9% [2,6% – 12,2%] | 82% / 81% |
+| Taxa de reexecução de runs | 0,2% [0% – 1,1%] | 0,2% [0% – 1,1%] | — |
+| CFR (b), release corretiva [PRELIMINAR] | 25,0% [5,2% – 56,5%] | 23,8% [5,2% – 50,0%] | 37% / 38% |
+| CFR (c), release revertida | 0% [0% – 0%] | 0% [0% – 0%] | 99% / 99% |
+| Feedback do CI (minutos) | 3,0 [1,2 – 7,1] | 3,0 [1,2 – 7,1] | — |
+| Commits no padrão convencional | 34% [4% – 74%] | 33% [4% – 76%] | — |
+| Repositórios que adotam o padrão (≥ 50%) | 41% | 40% | — |
+
+### CFR (a+): instabilidade escondida no CI
+
+A API do GitHub devolve **só a última tentativa** de cada run. Se o CI falhou e alguém mandou rodar de novo e passou, o CFR (a) enxerga só o sucesso, e essa instabilidade (testes *flaky*, falhas de infraestrutura) fica escondida. O CFR (a+) conta esses runs como falha e funciona como **limite pessimista**: o CFR de CI real fica entre (a) e (a+).
+
+- 68% dos repositórios reexecutaram algum run, mas a taxa é baixa: mediana de 0,2% dos runs.
+- O intervalo entre (a) e (a+) é estreito, cerca de 1 ponto percentual na mediana, e a proporção Elite cai só de 84% para 81–82%.
+- **Conclusão:** a reexecução escondida **não muda** a leitura do CFR de CI. A objeção de que testes instáveis inflariam o CFR (a) vale para falhas que ninguém reexecutou, e essas o GitHub não permite separar.
+
+### CFR (c): releases revertidas
+
+Uma release R conta como falha se algum commit dela foi desfeito (`This reverts commit <sha>`) por um commit de uma release publicada até 30 dias depois. É o sinal mais explícito de "a mudança deu errado" que existe nos dados (Shimagaki et al., ICSME 2016).
+
+- **Revert é raro:** 223 de 17.726 releases avaliadas (1,3%). Em 82% dos repositórios nenhuma release foi revertida, e 99% são Elite por esse proxy.
+- O CFR (c) é um **limite inferior** de falha: só capta falhas resolvidas por revert. Correções por novo commit (*fix forward*) ficam de fora.
+
+![Proxies de falha](../analise/saida/600/figuras/fig13_cfr_proxies.png)
+
+**Como ler.** É a mesma curva acumulada da RQ03, agora com três proxies:
+- a faixa azul clara vai do CFR (a) ao CFR (a+);
+- os pontos marcam a % Elite de cada proxy.
+
+A versão com 300 está em `analise/saida/figuras/fig13_cfr_proxies.png`.
+
+**Resultado:** o mesmo conjunto de repositórios aparece como **99% Elite** (revert), **84% Elite** (CI) ou **38% Elite** (release corretiva v0), conforme o proxy. Os três também quase não se correlacionam entre si (Spearman de 0,03 a 0,16 com 600). É um primeiro indício, a ser formalizado na #156, de que **"falha" depende inteiramente do proxy** e de que cada um mede um fenômeno diferente.
+
+### Ciclo de feedback do CI
+
+| Amostra 1 (300) | A1 + A2 (600) |
+| :---: | :---: |
+| ![Feedback, 300](../analise/saida/figuras/fig14_feedback_ci.png) | ![Feedback, 600](../analise/saida/600/figuras/fig14_feedback_ci.png) |
+
+**Como ler.** É a curva acumulada da duração mediana de um run de CI em cada repositório, em escala log. Os pontos marcam a % abaixo de 5, 10 e 30 minutos.
+
+**Resultado:** metade dos repositórios tem CI que responde em até **3 minutos**, e **82%** ficam abaixo dos 10 minutos do "build de 10 minutos" do XP. O feedback rápido é uma das três dimensões do framework DevEx (Noda et al., 2023).
+
+### Distribuição do trabalho (Conventional Commits)
+
+| Amostra 1 (300) | A1 + A2 (600) |
+| :---: | :---: |
+| ![Trabalho, 300](../analise/saida/figuras/fig15_distribuicao_trabalho.png) | ![Trabalho, 600](../analise/saida/600/figuras/fig15_distribuicao_trabalho.png) |
+
+**Como ler.**
+- À esquerda: a % de repositórios que adotam Conventional Commits (pelo menos metade dos commits no padrão).
+- À direita: entre os que adotam, a curva acumulada da % de commits `fix` e `feat` de cada repositório.
+
+**Resultado:**
+- **40% dos repositórios adotam o padrão.**
+- Entre eles, os commits de **correção superam os de funcionalidade**: mediana de 34% de `fix` contra 18% de `feat`.
+- Isso dá uma medida de **retrabalho** independente de releases e de CI, e alimenta a RQ08 (rework rate, #142).
+- Limitação: só vale para quem adota o padrão, o que restringe a amostra a 40%.
+
+### O que muda de 300 para 600
+
+Nenhuma das medidas alternativas muda de forma relevante: as medianas, os IQR e as proporções da Tabela 5 são praticamente iguais nas duas versões, o que reforça a robustez vista na seção 3.9.
