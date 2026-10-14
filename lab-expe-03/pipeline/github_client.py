@@ -158,7 +158,14 @@ class GitHubClient:
                 raise GitHubAPIError(0, url, str(erro)) from erro
 
             self._respeitar_cota(headers)
-            conteudo = json.loads(bruto) if bruto else None
+            try:
+                conteudo = json.loads(bruto) if bruto else None
+            except ValueError as erro:
+                if tentativa < self.max_tentativas:
+                    self._pausar(espera)
+                    espera *= 2
+                    continue
+                raise GitHubAPIError(0, url, f"resposta truncada: {erro}") from erro
             if self.cache is not None:
                 self.cache.gravar(
                     chave, {"status": 200, "corpo": conteudo, "link": headers.get("Link")}

@@ -196,3 +196,37 @@ def test_resposta_que_chega_aos_poucos_estoura_o_prazo_e_tenta_de_novo(monkeypat
 def test_resposta_em_blocos_dentro_do_prazo():
     rapida = RespostaLenta([b'{"a"', b": 2}"], [0.0])
     assert novo_cliente(AbrirFalso(rapida), None).get("/x") == {"a": 2}
+
+
+class RespostaCortada:
+    headers = {}
+
+    def __init__(self, corpo):
+        self._corpo = corpo
+
+    def read(self, n=-1):
+        corpo, self._corpo = self._corpo, b""
+        return corpo
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def test_json_truncado_e_tentado_de_novo_e_nao_vai_pro_cache(tmp_path):
+    cache = CacheDisco(tmp_path)
+    esperas = []
+    abrir = AbrirFalso(RespostaCortada(b'{"a": "cort'), RespostaFalsa({"a": "ok"}))
+    assert novo_cliente(abrir, cache, esperas).get("/x") == {"a": "ok"}
+    assert esperas == [1.0]
+    assert novo_cliente(AbrirFalso(), cache).get("/x") == {"a": "ok"}
+
+
+def test_json_truncado_persistente_vira_erro_transitorio():
+    abrir = AbrirFalso(*[RespostaCortada(b'{"a"') for _ in range(5)])
+    with pytest.raises(GitHubAPIError) as erro:
+        novo_cliente(abrir, None).get("/x")
+    assert erro.value.status == 0
+    assert "truncada" in str(erro.value)
