@@ -31,6 +31,8 @@ ORDEM_DORA = ("Elite", "High", "Medium", "Low")
 
 RAMPA_AZUL = ["#f4f8fd", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
 
+ROTULO_AMOSTRA = ""
+
 LARGURA = 7.2
 DPI = 220
 
@@ -73,6 +75,8 @@ def estilo() -> None:
 def cabecalho(ax, titulo: str, sub: str, folga: float = 0) -> None:
     comum = dict(xy=(0, 1), xycoords="axes fraction", textcoords="offset points", ha="left", va="bottom",
                  annotation_clip=False)
+    if ROTULO_AMOSTRA:
+        sub = f"{ROTULO_AMOSTRA} · {sub}"
     t = ax.annotate(titulo, xytext=(0, folga + 19), fontsize=10.5, fontweight="bold", color=TINTA, **comum)
     s = ax.annotate(sub, xytext=(0, folga + 5), fontsize=8.5, color=TINTA_2, **comum)
     ax.figure._cabecalho = (ax, [t, s])
@@ -143,7 +147,11 @@ def fig_funil(funil: pd.DataFrame, destino: Path) -> Path:
         "amostra_final": "Amostra final",
     }
     candidatos = int(funil.loc[funil["etapa"] == "candidatos_busca", "restantes"].iloc[0])
-    funil = funil[funil["etapa"] != "candidatos_busca"].reset_index(drop=True)
+    excluidos = funil.loc[funil["etapa"] == "fora_de_amostra_anterior", "descartados"]
+    origem = f"de {fmt_num(candidatos, 0)} candidatos da busca"
+    if len(excluidos):
+        origem += f", excluídos os {fmt_num(int(excluidos.iloc[0]), 0)} já usados em amostra anterior"
+    funil = funil[~funil["etapa"].isin(["candidatos_busca", "fora_de_amostra_anterior"])].reset_index(drop=True)
     if funil["restantes"].iloc[-1] == funil["restantes"].iloc[-2]:
         funil = funil.iloc[:-1].copy()
         rotulos = {**rotulos, funil["etapa"].iloc[-1]: rotulos[funil["etapa"].iloc[-1]] + " = amostra final"}
@@ -152,18 +160,19 @@ def fig_funil(funil: pd.DataFrame, destino: Path) -> Path:
     topo = funil["restantes"].iloc[0]
     for yi, (_, linha) in zip(y, funil.iterrows()):
         ax.barh(yi, linha["restantes"], height=0.56, color=SERIE[0], linewidth=0)
-        ax.text(-12, yi, rotulos.get(linha["etapa"], linha["etapa"]), ha="right", va="center", fontsize=9, color=TINTA)
+        ax.text(-topo * 0.012, yi, rotulos.get(linha["etapa"], linha["etapa"]), ha="right", va="center", fontsize=9,
+                color=TINTA)
         texto = f"{linha['restantes']:,}".replace(",", ".")
         if linha["etapa"] != "avaliados":
             anterior = funil["restantes"].iloc[_ - 1] if _ > 0 else topo
             if anterior:
                 texto += f"   ({fmt_pct(linha['restantes'] / anterior)} da etapa anterior)"
-        ax.text(linha["restantes"] + 14, yi, texto, va="center", fontsize=8.5, color=TINTA_2)
+        ax.text(linha["restantes"] + topo * 0.012, yi, texto, va="center", fontsize=8.5, color=TINTA_2)
     ax.set_xlim(0, topo * 1.55)
     ax.set_ylim(-0.6, len(funil) - 0.4)
     ax.axis("off")
     cabecalho(ax, "Funil de seleção: o filtro de releases é o mais restritivo",
-              f"Repositórios restantes após cada etapa, de {fmt_num(candidatos, 0)} candidatos da busca")
+              f"Repositórios restantes após cada etapa, {origem}")
     return salvar(fig, destino)
 
 
@@ -380,6 +389,24 @@ def fig_rq05(df: pd.DataFrame, tabela: pd.DataFrame, destino: Path) -> Path:
     return salvar(fig, destino)
 
 
+NOMES_FATOR = {
+    "Linguagem": "linguagem",
+    "Estrelas (quartil)": "popularidade",
+    "Contribuidores (quartil)": "tamanho da equipe",
+    "Idade (quartil)": "idade",
+}
+
+
+def titulo_rq06(tabela: pd.DataFrame) -> str:
+    lt = tabela[(tabela["metrica"] == "Lead time (a)") & tabela["significativo"]].sort_values("epsilon2", ascending=False)
+    if lt.empty:
+        return "RQ 06 · Nenhum fator se associa ao lead time após Holm"
+    nomes = [NOMES_FATOR.get(f, f) for f in lt["fator"]]
+    lista = nomes[0] if len(nomes) == 1 else ", ".join(nomes[:-1]) + " e " + nomes[-1]
+    sem = [NOMES_FATOR.get(f, f) for f in NOMES_FATOR if f not in set(tabela.loc[tabela["significativo"], "fator"])]
+    return f"RQ 06 · {lista.capitalize()} se associam ao lead time" + (f"; {sem[0]} não" if len(sem) == 1 else "")
+
+
 def fig_rq06(tabela: pd.DataFrame, destino: Path) -> Path:
     fatores = list(dict.fromkeys(tabela["fator"]))
     metricas = list(dict.fromkeys(tabela["metrica"]))
@@ -405,7 +432,7 @@ def fig_rq06(tabela: pd.DataFrame, destino: Path) -> Path:
     ax.xaxis.tick_top()
     for s in ax.spines.values():
         s.set_visible(False)
-    cabecalho(ax, "RQ 06 · Idade e tamanho da equipe se associam ao lead time; linguagem não",
+    cabecalho(ax, titulo_rq06(tabela),
               f"Tamanho de efeito ε² = H/(n−1) do Kruskal-Wallis · negrito* = p < 0,05 após Holm ({len(tabela)} testes)",
               folga=20)
     ax.text(len(metricas) - 0.5, len(fatores) - 0.35,
@@ -482,6 +509,9 @@ def fig_comparacao_ecdf(a: pd.DataFrame, b: pd.DataFrame, tabela: pd.DataFrame, 
             vv, p = ecdf(v)
             _degraus(ax, vv, p, color=cor, label=rotulo)
         ax.set_xscale(escalas[coluna])
+        if escalas[coluna] == "log":
+            ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",")))
+            ax.xaxis.set_minor_locator(NullLocator())
         ax.set_ylim(0, 1)
         ax.grid(axis="y")
         ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt_pct(v)))
@@ -499,22 +529,30 @@ def fig_comparacao_ecdf(a: pd.DataFrame, b: pd.DataFrame, tabela: pd.DataFrame, 
     return salvar(fig, destino)
 
 
-def fig_comparacao_medianas(a: pd.DataFrame, b: pd.DataFrame, destino: Path) -> Path:
-    fig, eixos = plt.subplots(1, len(est.METRICAS), figsize=(LARGURA, 2.4))
+def fig_comparacao_medianas(
+    amostras: list[tuple[str, pd.DataFrame]],
+    destino: Path,
+    titulo: str = "Medianas por amostra, com IC de 95% (bootstrap)",
+    sub: str = "Intervalos que se sobrepõem indicam medianas compatíveis",
+) -> Path:
+    fig, eixos = plt.subplots(1, len(est.METRICAS), figsize=(LARGURA, 2.5))
     for ax, (coluna, rotulo) in zip(eixos, est.METRICAS):
-        for k, (dados, cor) in enumerate(((a, SERIE[0]), (b, SERIE[1]))):
+        for k, ((nome, dados), cor) in enumerate(zip(amostras, SERIE)):
             m = dados[coluna].median()
             lo, hi = est.ic_bootstrap_mediana(dados[coluna])
             ax.plot([k, k], [lo, hi], color=cor, linewidth=2, solid_capstyle="round")
             ax.plot([k], [m], marker="o", markersize=7, color=cor, markeredgecolor=SUPERFICIE, markeredgewidth=1.5)
-        ax.set_xlim(-0.6, 1.6)
-        ax.set_xticks([0, 1], ["A1", "A2"])
+        ax.set_xlim(-0.6, len(amostras) - 0.4)
+        ax.set_xticks(range(len(amostras)), [nome for nome, _ in amostras])
         ax.grid(axis="y")
         ax.set_title(rotulo, fontsize=8.5, pad=4)
+        lo, hi = ax.get_ylim()
         if coluna.startswith("cfr"):
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt_pct(v)))
+            casas = 1 if hi - lo < 0.05 else 0
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _, c=casas: fmt_pct(v, c)))
+        else:
+            casas = 2 if hi - lo < 1 else 1 if hi - lo < 10 else 0
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _, c=casas: fmt_num(v, c)))
     fig.tight_layout()
-    cabecalho(eixos[0], "Medianas por amostra, com IC de 95% (bootstrap)",
-              "A1 = amostra 1 (azul) · A2 = amostra 2 (laranja) · intervalos que se sobrepõem indicam medianas compatíveis",
-              folga=16)
+    cabecalho(eixos[0], titulo, sub, folga=16)
     return salvar(fig, destino)
