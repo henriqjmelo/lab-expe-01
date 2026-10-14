@@ -31,11 +31,10 @@ query($owner: String!, $name: String!, $base: String!, $estados: [PullRequestSta
                  orderBy: {field: UPDATED_AT, direction: DESC}) {
       pageInfo { hasNextPage endCursor }
       nodes {
-        number createdAt updatedAt mergedAt closedAt additions deletions changedFiles
+        number createdAt updatedAt mergedAt closedAt
         author { login }
-        commits { totalCount }
-        reviews(first: 3) { nodes { createdAt author { login } } }
-        comments(first: 5) { nodes { createdAt author { login } } }
+        reviews(first: 2) { nodes { createdAt author { login } } }
+        comments(first: 3) { nodes { createdAt author { login } } }
       }
     }
   }
@@ -65,10 +64,7 @@ query($owner: String!, $name: String!, $n: Int!, $cursor: String) {
 }
 """
 
-CAMPOS_PRS = (
-    "owner", "repo", "number", "estado", "created_at", "merged_at", "closed_at", "additions", "deletions",
-    "changed_files", "commits", "primeira_resposta_at",
-)
+CAMPOS_PRS = ("owner", "repo", "number", "estado", "created_at", "merged_at", "closed_at", "primeira_resposta_at")
 CAMPOS_ISSUES = ("owner", "repo", "number", "created_at", "closed_at", "labels", "eh_bug")
 CAMPOS_DEPLOYMENTS = ("owner", "repo", "created_at", "environment", "state", "status", "status_at")
 CAMPOS_RESUMO = (
@@ -171,9 +167,7 @@ def coletar_repositorio(cliente: Any, owner: str, repo: str, branch: str, janela
                 prs.append({
                     "owner": owner, "repo": repo, "number": no["number"], "estado": estado.lower(),
                     "created_at": no["createdAt"], "merged_at": no.get("mergedAt") or "",
-                    "closed_at": no.get("closedAt") or "", "additions": no.get("additions"),
-                    "deletions": no.get("deletions"), "changed_files": no.get("changedFiles"),
-                    "commits": (no.get("commits") or {}).get("totalCount"),
+                    "closed_at": no.get("closedAt") or "",
                     "primeira_resposta_at": primeira_resposta(no) or "",
                 })
 
@@ -228,7 +222,7 @@ def _gravar(caminho: Path, linhas: list[dict], campos: tuple[str, ...]) -> None:
 
 def coletar_amostra(caminho_config: Path, destino: Path, threads: int = 3, log=print) -> None:
     config = ler_config(caminho_config)
-    cliente = GitHubClient(cache=CacheDisco(config.cache), max_tentativas=config.max_tentativas_chamada)
+    cliente = GitHubClient(cache=CacheDisco(config.cache), max_tentativas=config.max_tentativas_chamada, registrar=log)
     with config.saida["dataset"].open(newline="", encoding="utf-8") as f:
         repos = [(l["owner"], l["repo"], l["default_branch"]) for l in csv.DictReader(f)]
 

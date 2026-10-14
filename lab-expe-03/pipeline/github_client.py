@@ -85,6 +85,7 @@ class GitHubClient:
         dormir: Callable[[float], None] = time.sleep,
         agora: Callable[[], float] = time.time,
         cache: CacheDisco | None = None,
+        registrar: Callable[[str], None] | None = None,
     ) -> None:
         self.token = token if token is not None else ler_token()
         self.base_url = base_url.rstrip("/")
@@ -96,6 +97,7 @@ class GitHubClient:
         self._dormir = dormir
         self._agora = agora
         self.cache = cache
+        self._registrar = registrar
         self.ultima_atividade = time.monotonic()
         self.pausado_ate = 0.0
 
@@ -153,7 +155,7 @@ class GitHubClient:
                     continue
                 mensagem = _mensagem_erro(erro)
                 if erro.code in (403, 429) and "rate limit" in mensagem.lower():
-                    self._pausar(espera_secundario)
+                    self._pausar(espera_secundario, "limite secundario")
                     espera_secundario *= 2
                     continue
                 if erro.code >= 500 and tentativa < self.max_tentativas:
@@ -245,12 +247,14 @@ class GitHubClient:
 
     def _esperar_reset(self, headers: dict[str, str]) -> None:
         if "Retry-After" in headers:
-            self._pausar(float(headers["Retry-After"]))
+            self._pausar(float(headers["Retry-After"]), "Retry-After")
             return
         reset = float(headers.get("X-RateLimit-Reset", self._agora()))
-        self._pausar(max(reset - self._agora(), 0.0) + FOLGA_RESET)
+        self._pausar(max(reset - self._agora(), 0.0) + FOLGA_RESET, "cota esgotada")
 
-    def _pausar(self, segundos: float) -> None:
+    def _pausar(self, segundos: float, motivo: str = "") -> None:
+        if self._registrar is not None and segundos >= 5:
+            self._registrar(f"  pausa de {segundos:.0f} s{': ' + motivo if motivo else ''}")
         self.pausado_ate = max(self.pausado_ate, time.monotonic() + segundos)
         self._dormir(segundos)
 

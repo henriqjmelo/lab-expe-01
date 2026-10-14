@@ -51,6 +51,14 @@ def test_thread_do_watchdog_dispara_e_para():
     assert len(disparos) == 1
 
 
+def test_cliente_registra_pausas_longas():
+    mensagens = []
+    c = GitHubClient("t", dormir=lambda s: None, agora=lambda: 100.0, registrar=mensagens.append)
+    c._esperar_reset({"X-RateLimit-Reset": "160"})
+    c._pausar(1.0)
+    assert mensagens == ["  pausa de 61 s: cota esgotada"]
+
+
 def test_cliente_marca_atividade_e_pausas():
     esperas = []
     c = GitHubClient("t", dormir=esperas.append, agora=lambda: 100.0)
