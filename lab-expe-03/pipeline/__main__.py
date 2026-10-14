@@ -1,5 +1,9 @@
+import os
 import sys
 
 from pipeline.executar import main
 
-sys.exit(main())
+codigo = main()
+sys.stdout.flush()
+sys.stderr.flush()
+os._exit(codigo)
