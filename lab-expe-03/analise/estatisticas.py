@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from sklearn.metrics import cohen_kappa_score
+import statsmodels.api as sm
 from statsmodels.stats.multitest import multipletests
 
 from metricas.dora import NOMES, classificar
@@ -147,13 +148,51 @@ def distribuicao_categorias(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(linhas)
 
 
+PROXIES_FALHA = (
+    ("cfr_a", "CFR (a)", "proxy de CI"),
+    ("cfr_a_reexec", "CFR (a+)", "CI com reexecuções"),
+    ("cfr_b_release", "CFR (b)", "release corretiva*"),
+    ("cfr_c_revert", "CFR (c)", "release revertida"),
+)
+
+
 def rq05(df: pd.DataFrame) -> pd.DataFrame:
     linhas = []
-    for cfr, rotulo in (("cfr_a", "CFR (a)"), ("cfr_b_release", "CFR (b)")):
+    for cfr, rotulo, _ in PROXIES_FALHA:
+        if cfr not in df.columns:
+            continue
         par = df[["df_release_semana", cfr]].dropna()
         rho, p = stats.spearmanr(par["df_release_semana"], par[cfr])
         linhas.append({"x": "Frequência", "y": rotulo, "coluna_y": cfr, "rho": rho, "p": p, "n": len(par)})
     return pd.DataFrame(linhas)
+
+
+def rq05_revert(df: pd.DataFrame) -> dict:
+    d = df.dropna(subset=["cfr_c_revert"])
+    com = d[d["cfr_c_n_revertidas"] > 0]
+    sem = d[d["cfr_c_n_revertidas"] == 0]
+    ranks = lambda s: s.rank()
+    controle = sm.add_constant(ranks(d["n_commits_releases"]))
+    res_x = sm.OLS(ranks(d["df_release_semana"]), controle).fit().resid
+    res_y = sm.OLS(ranks(d["cfr_c_revert"]), controle).fit().resid
+    parcial, p_parcial = stats.pearsonr(res_x, res_y)
+    rho_com, p_com = stats.spearmanr(com["df_release_semana"], com["cfr_c_revert"])
+    return {
+        "n": len(d),
+        "n_com_revert": len(com),
+        "df_mediana_com_revert": com["df_release_semana"].median(),
+        "df_mediana_sem_revert": sem["df_release_semana"].median(),
+        "rho_parcial_commits": parcial,
+        "p_parcial_commits": p_parcial,
+        "rho_so_com_revert": rho_com,
+        "p_so_com_revert": p_com,
+    }
+
+
+def correlacao_proxies(df: pd.DataFrame) -> pd.DataFrame:
+    colunas = [c for c, _, _ in PROXIES_FALHA if c in df.columns]
+    rotulos = {c: r for c, r, _ in PROXIES_FALHA}
+    return df[colunas].corr(method="spearman").rename(index=rotulos, columns=rotulos)
 
 
 def fatores(df: pd.DataFrame) -> dict[str, pd.Series]:

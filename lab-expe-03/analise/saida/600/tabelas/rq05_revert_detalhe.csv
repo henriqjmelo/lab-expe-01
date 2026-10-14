@@ -1,0 +1,9 @@
+,valor
+n,580.0
+n_com_revert,85.0
+df_mediana_com_revert,0.978082191780822
+df_mediana_sem_revert,0.2876712328767123
+rho_parcial_commits,0.2367260674524973
+p_parcial_commits,7.878127965919896e-09
+rho_so_com_revert,-0.6558913809240348
+p_so_com_revert,9.559161639611504e-12
