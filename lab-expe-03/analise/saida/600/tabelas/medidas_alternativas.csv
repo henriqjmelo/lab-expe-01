@@ -1,0 +1,11 @@
+medida,coluna,unidade,n,mediana,q1,q3,prop_elite
+CFR (a) · falha de CI,cfr_a,proporção,600,0.0497678018575851,0.0214744269949066,0.10810596052801477,0.835
+CFR (a+) · com reexecuções,cfr_a_reexec,proporção,600,0.0586819548391223,0.026395123074897924,0.12157235621521335,0.8133333333333334
+Taxa de reexecução de runs,taxa_reexecucao,proporção,600,0.0023618314650604502,0.0,0.011026495050740225,
+CFR (b) · release corretiva,cfr_b_release,proporção,600,0.23764705882352938,0.052445302445302405,0.5,0.38333333333333336
+CFR (c) · release revertida,cfr_c_revert,proporção,580,0.0,0.0,0.0,0.9913793103448276
+Feedback do CI,feedback_mediana_min,minutos,600,2.9875,1.2312500000000002,7.083333333333333,
+Commits no padrão convencional,prop_convencional,proporção,582,0.32574491930403426,0.041781980319803125,0.7616983678637521,
+fix entre os convencionais,prop_fix,proporção,562,0.3226951060428826,0.1813286133915794,0.4444444444444444,
+feat entre os convencionais,prop_feat,proporção,562,0.12492707117852975,0.03765261538630782,0.24224472210254197,
+Adotam Conventional Commits,adota_convencional,proporção,600,0.4033333333333333,,,

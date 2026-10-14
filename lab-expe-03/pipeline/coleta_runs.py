@@ -34,6 +34,8 @@ def _para_run(bruto: dict) -> Run:
         conclusion=bruto.get("conclusion"),
         run_started_at=bruto.get("run_started_at") or bruto["created_at"],
         updated_at=bruto["updated_at"],
+        run_attempt=bruto.get("run_attempt") or 1,
+        head_sha=bruto.get("head_sha") or "",
     )
 
 

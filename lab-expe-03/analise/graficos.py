@@ -556,3 +556,93 @@ def fig_comparacao_medianas(
     fig.tight_layout()
     cabecalho(eixos[0], titulo, sub, folga=16)
     return salvar(fig, destino)
+
+
+def fig_cfr_proxies(df: pd.DataFrame, destino: Path) -> Path:
+    fig, ax = plt.subplots(figsize=(LARGURA, 3.1))
+    ax.grid(axis="y")
+    for limite in (0.15, 0.30, 0.45):
+        ax.axvline(limite, color=EIXO, linewidth=0.8, zorder=1)
+    grade = np.linspace(0, 1, 501)
+
+    def curva(coluna):
+        v = np.sort(df[coluna].dropna().to_numpy())
+        return np.searchsorted(v, grade, side="right") / len(v), v
+
+    otimista, va = curva("cfr_a")
+    pessimista, _ = curva("cfr_a_reexec")
+    ax.fill_between(grade, pessimista, otimista, color=SERIE[0], alpha=0.18, linewidth=0, zorder=2,
+                    label="faixa de CFR (a) a (a+): instabilidade escondida")
+    ax.plot(grade, otimista, color=SERIE[0], linewidth=2, zorder=3, label="CFR (a) · falha de CI")
+    for coluna, cor, rotulo in (("cfr_b_release", SERIE[1], "CFR (b) · release corretiva em ≤ 7 dias*"),
+                                ("cfr_c_revert", SERIE[2], "CFR (c) · release revertida em ≤ 30 dias")):
+        p, _ = curva(coluna)
+        ax.plot(grade, p, color=cor, linewidth=2, zorder=3, label=rotulo)
+    for coluna, cor in (("cfr_a", SERIE[0]), ("cfr_b_release", SERIE[1]), ("cfr_c_revert", SERIE[2])):
+        frac = (df[coluna].dropna() <= 0.15).mean()
+        ax.plot([0.15], [frac], marker="o", markersize=6, color=cor, markeredgecolor=SUPERFICIE, markeredgewidth=1.5,
+                zorder=4)
+        ax.text(0.165, frac, fmt_pct(frac), va="center", fontsize=8.5, color=TINTA, zorder=5,
+                bbox=dict(boxstyle="round,pad=0.15", facecolor=SUPERFICIE, edgecolor="none", alpha=0.85))
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1.01)
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt_pct(v)))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt_pct(v)))
+    ax.set_xlabel("Change failure rate")
+    ax.set_ylabel("% acumulado de repositórios")
+    ax.legend(loc="lower right", fontsize=8)
+    cabecalho(ax, "Três proxies de falha, três retratos: só a release revertida é quase sempre Elite",
+              "Distribuição acumulada; o ponto marca a % Elite (≤ 15%) · *heurística v0, preliminar")
+    return salvar(fig, destino)
+
+
+def fig_feedback_ci(df: pd.DataFrame, destino: Path) -> Path:
+    v, p = ecdf(df["feedback_mediana_min"].dropna().clip(lower=0.1).to_numpy())
+    fig, ax = plt.subplots(figsize=(LARGURA, 2.9))
+    ax.set_xscale("log")
+    ax.set_xlim(0.1, 600)
+    ax.set_ylim(0, 1)
+    ax.grid(axis="y")
+    _degraus(ax, v, p, color=SERIE[0], zorder=3)
+    for limite, nome in ((5, "5 min"), (10, "10 min"), (30, "30 min")):
+        frac = (v < limite).mean()
+        ax.axvline(limite, color=EIXO, linewidth=0.8, zorder=1)
+        ax.plot([limite], [frac], marker="o", markersize=6, color=SERIE[0], markeredgecolor=SUPERFICIE,
+                markeredgewidth=1.5, zorder=4)
+        ax.text(limite * 1.12, frac - 0.04, f"{fmt_pct(frac)} < {nome}", ha="left", va="top", fontsize=8.5, color=TINTA)
+    _ticks_log(ax, [0.1, 1, 5, 10, 30, 60, 240], ["0,1", "1", "5", "10", "30", "60", "240"])
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda val, _: fmt_pct(val)))
+    ax.set_xlabel("Duração mediana de um run de CI por repositório, em minutos (log)")
+    ax.set_ylabel("% acumulado de repositórios")
+    mediana = np.median(v)
+    cabecalho(ax, f"Ciclo de feedback do CI: metade dos repositórios responde em até {fmt_num(mediana, 0)} minutos",
+              "Referência: o build de 10 minutos do XP (Beck)")
+    return salvar(fig, destino)
+
+
+def fig_distribuicao_trabalho(df: pd.DataFrame, destino: Path) -> Path:
+    adotam = df[df["adota_convencional"] == True]  # noqa: E712
+    fig, (esq, dir_) = plt.subplots(1, 2, figsize=(LARGURA, 2.9), gridspec_kw={"width_ratios": [1, 2.2], "wspace": 0.35})
+    frac = (df["adota_convencional"] == True).mean()  # noqa: E712
+    esq.barh([0], [frac], color=SERIE[0], height=0.5)
+    esq.barh([0], [1 - frac], left=[frac + 0.004], color=GRADE, height=0.5)
+    esq.text(frac / 2, 0, fmt_pct(frac), ha="center", va="center", color="#ffffff", fontsize=9, fontweight="bold")
+    esq.set_xlim(0, 1)
+    esq.set_ylim(-0.8, 0.8)
+    esq.axis("off")
+    esq.text(0, 0.42, "Adotam Conventional Commits\n(≥ 50% dos commits no padrão)", fontsize=8.2, color=TINTA_2, va="bottom")
+    for coluna, cor, rotulo in (("prop_fix", SERIE[1], "fix"), ("prop_feat", SERIE[0], "feat")):
+        v, p = ecdf(adotam[coluna].dropna().to_numpy())
+        _degraus(dir_, v, p, color=cor, label=f"{rotulo} · mediana {fmt_pct(np.median(v))}")
+    dir_.set_xlim(0, 1)
+    dir_.set_ylim(0, 1)
+    dir_.grid(axis="y")
+    dir_.xaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt_pct(v)))
+    dir_.yaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt_pct(v)))
+    dir_.set_xlabel("% dos commits convencionais do repositório")
+    dir_.legend(loc="lower right", fontsize=8)
+    dir_.set_title(f"Entre os que adotam (n = {len(adotam)})", fontsize=9, pad=6)
+    cabecalho(esq, "Distribuição do trabalho: correção supera funcionalidade nas releases",
+              "Commits das releases na janela classificados pelo prefixo (fix:, feat:...) · base para a RQ08 (rework)",
+              folga=22)
+    return salvar(fig, destino)

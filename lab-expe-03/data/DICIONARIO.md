@@ -156,5 +156,27 @@ Repositórios com lead time omitido (mais de 300 releases na janela) não aparec
 | `conclusion` | texto | `conclusion` da API |
 | `classe` | texto | `sucesso`, `falha` (`failure`, `timed_out`, `startup_failure`) ou `ignorado` |
 | `run_started_at`, `updated_at` | data-hora ISO 8601 | início e última atualização do run |
+| `run_attempt` | inteiro | tentativa exibida pela API (a última). `> 1` indica que o run foi reexecutado |
+| `head_sha` | texto | commit testado pelo run |
 
 Só os runs de `push` no default branch, criados na janela.
+
+## `medidas_alternativas.csv` (um por amostra: `data/` = A1, `data/amostra2/` = A2)
+
+Medidas alternativas às do DORA (issue #154), calculadas dos `eventos/` por `python -m analise.alternativas`. Uma linha por repositório da amostra.
+
+| Coluna | Tipo | Unidade | Fórmula / origem |
+| :--- | :--- | :--- | :--- |
+| `owner`, `repo` | texto | — | repositório |
+| `cfr_a` | decimal 0–1 | proporção | CFR (a), igual ao do `dataset_dora.csv` (conferência) |
+| `cfr_a_reexec` | decimal 0–1 | proporção | **CFR (a+), limite pessimista.** `(falhas + runs reexecutados que terminaram em sucesso) / runs válidos`. A API devolve só a última tentativa de cada run, então um run que falhou e passou ao ser reexecutado aparece como sucesso no CFR (a) |
+| `taxa_reexecucao` | decimal 0–1 | proporção | runs válidos com `run_attempt > 1` / runs válidos |
+| `n_reexecutados_sucesso`, `n_reexecutados_falha` | inteiro | runs | runs reexecutados por resultado final |
+| `feedback_mediana_min` | decimal | minutos | **Ciclo de feedback do CI** (DevEx): mediana de `updated_at − run_started_at` dos runs válidos |
+| `cfr_c_revert` | decimal 0–1 | proporção | **CFR (c), por revert.** Releases que tiveram algum commit revertido (`This reverts commit <sha>`) por um commit de uma release **posterior**, publicada em até 30 dias, dividido pelas releases avaliadas. Releases dos últimos 30 dias da janela ficam fora (censura) |
+| `cfr_c_n_avaliadas`, `cfr_c_n_revertidas`, `cfr_c_n_censuradas` | inteiro | releases | componentes do CFR (c) |
+| `n_commits_releases` | inteiro | commits | commits das releases da janela |
+| `prop_convencional` | decimal 0–1 | proporção | commits cuja primeira linha segue Conventional Commits (`tipo(escopo)!: ...`) ou é `Revert "..."` |
+| `adota_convencional` | booleano | — | `prop_convencional >= 0,5` |
+| `prop_fix`, `prop_feat` | decimal 0–1 | proporção | `fix` e `feat` entre os commits convencionais |
+| `prop_revert` | decimal 0–1 | proporção | commits de revert entre todos os commits |

@@ -44,3 +44,9 @@ def test_gravar_csv_simples_e_comprimido(tmp_path):
     _gravar(tmp_path / "t.csv.gz", linhas, ("a", "b"))
     assert list(csv.DictReader(open(tmp_path / "t.csv"))) == [{"a": "1", "b": "x"}]
     assert list(csv.DictReader(gzip.open(tmp_path / "t.csv.gz", "rt"))) == [{"a": "1", "b": "x"}]
+
+
+def test_gz_e_deterministico(tmp_path):
+    _gravar(tmp_path / "a.csv.gz", [{"a": 1}], ("a",))
+    _gravar(tmp_path / "b.csv.gz", [{"a": 1}], ("a",))
+    assert (tmp_path / "a.csv.gz").read_bytes() == (tmp_path / "b.csv.gz").read_bytes()

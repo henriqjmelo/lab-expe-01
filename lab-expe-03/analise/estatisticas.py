@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -53,6 +54,43 @@ LINGUAGENS_MIN = 15
 
 def carregar(caminho) -> pd.DataFrame:
     return pd.read_csv(caminho)
+
+
+ALTERNATIVAS = (
+    ("cfr_a", "CFR (a) · falha de CI", "proporção"),
+    ("cfr_a_reexec", "CFR (a+) · com reexecuções", "proporção"),
+    ("taxa_reexecucao", "Taxa de reexecução de runs", "proporção"),
+    ("cfr_b_release", "CFR (b) · release corretiva", "proporção"),
+    ("cfr_c_revert", "CFR (c) · release revertida", "proporção"),
+    ("feedback_mediana_min", "Feedback do CI", "minutos"),
+    ("prop_convencional", "Commits no padrão convencional", "proporção"),
+    ("prop_fix", "fix entre os convencionais", "proporção"),
+    ("prop_feat", "feat entre os convencionais", "proporção"),
+)
+
+
+def carregar_com_alternativas(caminho) -> pd.DataFrame:
+    df = carregar(caminho)
+    extra = Path(caminho).parent / "medidas_alternativas.csv"
+    if extra.exists():
+        alt = pd.read_csv(extra).drop(columns=["cfr_a"])
+        df = df.merge(alt, on=["owner", "repo"], how="left")
+    return df
+
+
+def resumo_alternativas(df: pd.DataFrame) -> pd.DataFrame:
+    linhas = []
+    for coluna, rotulo, unidade in ALTERNATIVAS:
+        v = df[coluna].dropna()
+        linhas.append({
+            "medida": rotulo, "coluna": coluna, "unidade": unidade, "n": len(v),
+            "mediana": v.median(), "q1": v.quantile(0.25), "q3": v.quantile(0.75),
+            "prop_elite": (v <= 0.15).mean() if coluna.startswith("cfr") else None,
+        })
+    linhas.append({"medida": "Adotam Conventional Commits", "coluna": "adota_convencional", "unidade": "proporção",
+                   "n": len(df), "mediana": (df["adota_convencional"] == True).mean(),  # noqa: E712
+                   "q1": None, "q3": None, "prop_elite": None})
+    return pd.DataFrame(linhas)
 
 
 def resumo(df: pd.DataFrame) -> pd.DataFrame:
