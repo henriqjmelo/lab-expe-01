@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import gzip
+import io
 import os
 import re
 import statistics
@@ -29,7 +30,9 @@ CAMPOS_LEAD_TIME = (
 CAMPOS_COMMITS = ("owner", "repo", "tag_name", "sha", "data", "mensagem", "reverte_sha")
 
 _REVERTE = re.compile(r"This reverts commit ([0-9a-f]{7,40})")
-CAMPOS_RUNS = ("owner", "repo", "workflow_id", "conclusion", "classe", "run_started_at", "updated_at")
+CAMPOS_RUNS = (
+    "owner", "repo", "workflow_id", "conclusion", "classe", "run_started_at", "updated_at", "run_attempt", "head_sha",
+)
 
 
 def _parse(data: str) -> datetime:
@@ -38,11 +41,19 @@ def _parse(data: str) -> datetime:
 
 def _gravar(caminho: Path, linhas: list[dict], campos: tuple[str, ...]) -> None:
     caminho.parent.mkdir(parents=True, exist_ok=True)
-    abrir = gzip.open if caminho.suffix == ".gz" else open
-    with abrir(caminho, "wt", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=campos, extrasaction="ignore")
-        w.writeheader()
-        w.writerows(linhas)
+    if caminho.suffix == ".gz":
+        with open(caminho, "wb") as bruto, gzip.GzipFile(filename="", fileobj=bruto, mode="wb", mtime=0) as comprimido, \
+                io.TextIOWrapper(comprimido, encoding="utf-8", newline="") as f:
+            _escrever(f, linhas, campos)
+    else:
+        with open(caminho, "w", newline="", encoding="utf-8") as f:
+            _escrever(f, linhas, campos)
+
+
+def _escrever(f, linhas: list[dict], campos: tuple[str, ...]) -> None:
+    w = csv.DictWriter(f, fieldnames=campos, extrasaction="ignore")
+    w.writeheader()
+    w.writerows(linhas)
 
 
 def linhas_lead_time(owner: str, repo: str, montadas) -> list[dict]:
@@ -136,6 +147,7 @@ def exportar(caminho_config: Path, destino: Path, candidatos_csv: Path | None, l
                 "owner": owner, "repo": repo, "workflow_id": run.workflow_id, "conclusion": run.conclusion or "",
                 "classe": classe if classe in (SUCESSO, FALHA) else "ignorado",
                 "run_started_at": run.run_started_at, "updated_at": run.updated_at,
+                "run_attempt": run.run_attempt, "head_sha": run.head_sha,
             })
         log(f"[{i}/{len(repos)}] {owner}/{repo}")
 

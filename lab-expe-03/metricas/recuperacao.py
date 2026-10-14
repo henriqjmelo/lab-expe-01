@@ -14,6 +14,8 @@ class Run:
     conclusion: str | None
     run_started_at: str
     updated_at: str
+    run_attempt: int = 1
+    head_sha: str = ""
 
 
 def _parse(data: str) -> datetime:
