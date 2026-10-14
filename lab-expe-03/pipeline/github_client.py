@@ -58,6 +58,19 @@ def proxima_pagina(link: str | None) -> str | None:
     return achado.group(1) if achado else None
 
 
+def pagina_menor(url: str) -> str | None:
+    partes = urllib.parse.urlsplit(url)
+    consulta = dict(urllib.parse.parse_qsl(partes.query))
+    por_pagina = int(consulta.get("per_page", 30))
+    novo = {100: 25, 25: 5}.get(por_pagina)
+    if novo is None:
+        return None
+    pagina = int(consulta.get("page", 1))
+    consulta["per_page"] = str(novo)
+    consulta["page"] = str((pagina - 1) * por_pagina // novo + 1)
+    return urllib.parse.urlunsplit(partes._replace(query=urllib.parse.urlencode(consulta)))
+
+
 class GitHubClient:
     def __init__(
         self,
@@ -188,7 +201,14 @@ class GitHubClient:
         params = {"per_page": POR_PAGINA, **(params or {})}
         url: str | None = self.montar_url(caminho, params)
         while url:
-            dados, headers = self.requisitar(url)
+            try:
+                dados, headers = self.requisitar(url)
+            except GitHubAPIError as erro:
+                menor = pagina_menor(url) if erro.status in (502, 503, 504) else None
+                if menor is None:
+                    raise
+                url = menor
+                continue
             itens = dados.get(chave, []) if chave else dados
             yield from itens or []
             url = proxima_pagina(headers.get("Link"))

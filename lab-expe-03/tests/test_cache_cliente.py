@@ -230,3 +230,28 @@ def test_json_truncado_persistente_vira_erro_transitorio():
         novo_cliente(abrir, None).get("/x")
     assert erro.value.status == 0
     assert "truncada" in str(erro.value)
+
+
+def test_pagina_menor_preserva_o_deslocamento():
+    from pipeline.github_client import pagina_menor
+
+    assert pagina_menor("https://x/r?per_page=100&page=3") == "https://x/r?per_page=25&page=9"
+    assert pagina_menor("https://x/r?per_page=100") == "https://x/r?per_page=25&page=1"
+    assert pagina_menor("https://x/r?per_page=25&page=2") == "https://x/r?per_page=5&page=6"
+    assert pagina_menor("https://x/r?per_page=5&page=2") is None
+
+
+def test_pagina_que_sempre_da_504_e_refeita_em_paginas_menores():
+    abrir = AbrirFalso(
+        *[erro_http(504, {"message": "We couldn't respond to your request in time."})] * 5,
+        RespostaFalsa([1, 2], {"Link": '<https://api.github.com/x?per_page=25&page=2>; rel="next"'}),
+        RespostaFalsa([3]),
+    )
+    c = novo_cliente(abrir, None)
+    assert list(c.paginar("/x")) == [1, 2, 3]
+    assert "per_page=25" in abrir.requisicoes[5].full_url
+
+
+def test_404_na_paginacao_continua_propagando():
+    with pytest.raises(GitHubAPIError):
+        list(novo_cliente(AbrirFalso(erro_http(404)), None).paginar("/x"))
