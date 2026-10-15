@@ -74,12 +74,34 @@ Para a discussão: release publicada é um proxy conservador de deploy. Projetos
 - É uma curva acumulada. Para cada valor de CFR no eixo horizontal, a altura da curva é a % de repositórios com CFR até aquele valor.
 - Quanto mais cedo a curva sobe, mais repositórios têm taxa de falha baixa.
 - As linhas verticais são as fronteiras DORA (15%, 30% e 45%). O ponto marca quantos repositórios são Elite (≤ 15%).
+- Há três proxies de falha, e a faixa azul clara vai do CFR (a) ao CFR (a+).
 
-**Resultado.** Os dois proxies contam histórias opostas, e isso se repete nas duas amostras:
-- Pela **falha de CI**, CFR (a), **84% dos repositórios são Elite** com 300 (83% com 600), com mediana de 5,6% (5,0%).
-- Pela **release corrigida em até 7 dias**, CFR (b), só **37%** são Elite (38%), com mediana de 25% (24%). Cerca de 23% dos repositórios têm CFR (b) igual a zero, o degrau vertical no início da curva laranja.
+| Proxy | O que conta como falha |
+| :--- | :--- |
+| **CFR (a)** · CI | run do GitHub Actions que falhou (última tentativa) |
+| **CFR (a+)** · CI com reexecuções | também os runs que só passaram depois de reexecutados (limite pessimista do CI) |
+| **CFR (b)** · entrega [PRELIMINAR] | release seguida, em até 7 dias, de uma release corretiva (heurística v0) |
+| **CFR (c)** · revert | release com algum commit desfeito por um revert em até 30 dias |
 
-Para a discussão: o CFR (a) mede a falha do *pipeline*, não a falha em produção. Testes instáveis e falhas corrigidas antes do merge entram como falha. O CFR (b) depende da heurística de corretiva, e a v0 provavelmente o infla.
+**Tabela 6 — CFR por proxy, 300 × 600.**
+
+| Proxy | Mediana 300 | Mediana 600 | % Elite 300 | % Elite 600 |
+| :--- | ---: | ---: | ---: | ---: |
+| CFR (a) | 5,6% | 5,0% | 84% | 84% |
+| CFR (a+) | 6,2% | 5,9% | 82% | 81% |
+| CFR (b) [PRELIMINAR] | 25,0% | 23,8% | 37% | 38% |
+| CFR (c) | 0% | 0% | 99% | 99% |
+
+**Resultado: o mesmo repositório parece Elite ou Low dependendo do proxy.**
+- **Pelo CI**, 84% são Elite, e a instabilidade escondida (a → a+) quase não muda isso.
+- **Pela release corretiva**, só 37–38% são Elite.
+- **Pelo revert**, 99% são Elite, porque reverter uma release é raro: 1,3% das releases.
+- Os proxies **quase não se correlacionam**: Spearman entre CFR (a), (b) e (c) de 0,03 a 0,16 com 600 (`analise/saida/600/tabelas/correlacao_proxies_falha.csv`). A exceção óbvia é (a) × (a+) = 0,96, porque são a mesma medida.
+
+Para a discussão:
+- Cada proxy mede um fenômeno diferente: o CFR (a) a falha do *pipeline*, o (b) o ritmo de patches, e o (c) só as falhas resolvidas desfazendo a mudança.
+- Nenhum mede "falha em produção" diretamente.
+- A conclusão sobre a estabilidade dos projetos open-source **depende inteiramente da escolha do proxy**, e o artigo precisa dizer isso explicitamente. A validação formal fica na #156, e o CFR (b) final depende da heurística da #138.
 
 ## 3.4 RQ 04 — Tempo de recuperação
 
@@ -127,20 +149,28 @@ Para a discussão: o CFR (a) mede a falha do *pipeline*, não a falha em produç
 | ![RQ05, 300](../analise/saida/figuras/fig07_rq05_velocidade_estabilidade.png) | ![RQ05, 600](../analise/saida/600/figuras/fig07_rq05_velocidade_estabilidade.png) |
 
 **Como ler.**
-- Cada ponto é um repositório, com a frequência de deploy no eixo horizontal (escala log) e o CFR no vertical.
-- O ρ de Spearman vai de −1 a 1: perto de 0 indica ausência de relação monotônica, e valores positivos indicam que o CFR sobe junto com a frequência.
+- Cada ponto é um repositório, com a frequência de deploy no eixo horizontal (escala log) e o CFR no vertical, com um painel por proxy de falha.
+- O ρ de Spearman vai de −1 a 1: perto de 0 indica ausência de relação monotônica, e valores positivos indicam que a falha sobe junto com a frequência.
+
+**Tabela 7 — Spearman entre frequência de deploy e CFR.**
+
+| Proxy de falha | 300 | 600 |
+| :--- | :--- | :--- |
+| CFR (a) · CI | ρ = 0,18 (p = 0,002) | ρ = 0,12 (p = 0,004) |
+| CFR (a+) · CI com reexecuções | ρ = 0,15 (p = 0,008) | ρ = 0,08 (p = 0,057) |
+| CFR (b) · release corretiva [PRELIMINAR] | ρ = 0,60 (p < 0,001) | ρ = 0,56 (p < 0,001) |
+| CFR (c) · revert | ρ = 0,36 (p < 0,001) | ρ = 0,34 (p < 0,001) |
 
 **Resultado.**
+- **Pelo CI**, a correlação é **fraca** e cai com mais dados. Com a+ deixa de ser significativa em 600. Publicar mais não se associa a quebrar mais o pipeline.
+- **Pelos dois proxies de entrega**, a correlação é positiva (moderada no revert, forte na corretiva), mas **os dois têm um efeito mecânico da granularidade das releases**:
+  - **CFR (b):** quem publica muitas releases tem, por construção, mais chance de que uma delas seja uma "corretiva" em até 7 dias.
+  - **CFR (c):** quem publica mais tem mais commits, e mais chance de que **algum** seja revertido. Só 85 dos 580 repositórios têm alguma release revertida, e eles publicam muito mais: mediana de 0,98 contra 0,29 releases/semana. Controlando o volume de commits, a correlação cai de 0,34 para 0,24 (parcial de Spearman). **Entre os 85 que têm revert, a relação se inverte** (ρ = −0,66): quem publica mais tem uma proporção **menor** de releases revertidas, porque os reverts se diluem entre mais releases (`analise/saida/600/tabelas/rq05_revert_detalhe.csv`).
 
-| Correlação de Spearman com a frequência | 300 | 600 |
-| :--- | :--- | :--- |
-| CFR (a), proxy de CI | ρ = 0,18 (p = 0,002) | ρ = 0,12 (p = 0,004) |
-| CFR (b), proxy de entrega [PRELIMINAR] | ρ = 0,60 (p < 0,001) | ρ = 0,56 (p < 0,001) |
-
-- **Pelo CI**, a correlação é significativa mas **fraca**, e fica ainda menor com 600. Na prática, publicar mais não se associa a quebrar mais o CI.
-- **Pela entrega**, a correlação é **forte** nas duas, mas em boa parte é um artefato da definição: quem publica muitas releases tem, por construção, mais chance de que uma delas seja uma "corretiva" publicada em até 7 dias.
-
-Para a discussão: o resultado com o proxy de CI é coerente com a afirmação do DORA de que velocidade e estabilidade não são *trade-off*. O resultado com o proxy de entrega não deve ser lido como evidência do contrário antes da heurística validada (#138). Em nenhum dos dois casos a correlação implica causalidade.
+Para a discussão:
+- O único proxy que não depende da contagem de releases (o CI) **não mostra trade-off**, o que é coerente com a afirmação do DORA de que velocidade e estabilidade andam juntas.
+- Os proxies de entrega mostram correlação positiva, mas ela é **parcialmente um artefato da forma de medir**, em direções diferentes conforme o recorte. Não sustentam a conclusão de que velocidade reduz a estabilidade.
+- Em nenhum caso a correlação implica causalidade.
 
 ## 3.7 RQ 06 — Características associadas ao desempenho
 
@@ -311,15 +341,7 @@ Uma release R conta como falha se algum commit dela foi desfeito (`This reverts 
 - **Revert é raro:** 223 de 17.726 releases avaliadas (1,3%). Em 82% dos repositórios nenhuma release foi revertida, e 99% são Elite por esse proxy.
 - O CFR (c) é um **limite inferior** de falha: só capta falhas resolvidas por revert. Correções por novo commit (*fix forward*) ficam de fora.
 
-![Proxies de falha](../analise/saida/600/figuras/fig13_cfr_proxies.png)
-
-**Como ler.** É a mesma curva acumulada da RQ03, agora com três proxies:
-- a faixa azul clara vai do CFR (a) ao CFR (a+);
-- os pontos marcam a % Elite de cada proxy.
-
-A versão com 300 está em `analise/saida/figuras/fig13_cfr_proxies.png`.
-
-**Resultado:** o mesmo conjunto de repositórios aparece como **99% Elite** (revert), **84% Elite** (CI) ou **38% Elite** (release corretiva v0), conforme o proxy. Os três também quase não se correlacionam entre si (Spearman de 0,03 a 0,16 com 600). É um primeiro indício, a ser formalizado na #156, de que **"falha" depende inteiramente do proxy** e de que cada um mede um fenômeno diferente.
+A comparação dos três proxies de falha (figura, % Elite e correlações) está na **RQ03 (seção 3.3)**, e o efeito sobre o *trade-off* velocidade × estabilidade, na **RQ05 (seção 3.6)**.
 
 ### Ciclo de feedback do CI
 
