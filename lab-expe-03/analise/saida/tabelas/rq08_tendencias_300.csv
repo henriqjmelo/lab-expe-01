@@ -1,0 +1,1201 @@
+owner,repo,metrica,coluna,status,p,tendencia,n,p_fdr,p_holm
+aakarim,OpenLore,Frequência,frequencia,melhora,0.0023017493687813584,increasing,12,0.15643812297993165,0.6859213118968448
+aakarim,OpenLore,Lead time (a),lead_time_a,insuficiente,,,3,,
+aakarim,OpenLore,CFR (a),cfr_a,insuficiente,,,4,,
+aakarim,OpenLore,Recuperação,recuperacao,insuficiente,,,2,,
+acepanel,panel,Frequência,frequencia,sem_tendencia,0.44269546155966144,no trend,12,0.7953005034956121,1.0
+acepanel,panel,Lead time (a),lead_time_a,sem_tendencia,0.2514521865080219,no trend,9,0.6617162802842682,1.0
+acepanel,panel,CFR (a),cfr_a,sem_tendencia,0.7317017232242102,no trend,12,0.964515907886459,1.0
+acepanel,panel,Recuperação,recuperacao,sem_tendencia,0.14986074751304912,no trend,12,0.4826198991963727,1.0
+actions,checkout,Frequência,frequencia,sem_tendencia,0.6991071107180751,no trend,12,0.9321428142907667,1.0
+actions,checkout,Lead time (a),lead_time_a,insuficiente,,,5,,
+actions,checkout,CFR (a),cfr_a,insuficiente,,,6,,
+actions,checkout,Recuperação,recuperacao,insuficiente,,,0,,
+AGenUI,AGenUI,Frequência,frequencia,melhora,0.004232500309261367,increasing,12,0.1580229124971509,1.0
+AGenUI,AGenUI,Lead time (a),lead_time_a,insuficiente,,,5,,
+AGenUI,AGenUI,CFR (a),cfr_a,insuficiente,,,5,,
+AGenUI,AGenUI,Recuperação,recuperacao,insuficiente,,,3,,
+alibaba,nacos,Frequência,frequencia,sem_tendencia,0.7099004712741832,no trend,12,0.9402794124283058,1.0
+alibaba,nacos,Lead time (a),lead_time_a,insuficiente,,,6,,
+alibaba,nacos,CFR (a),cfr_a,melhora,0.004931500366306407,decreasing,12,0.17315693950504274,1.0
+alibaba,nacos,Recuperação,recuperacao,melhora,0.046744941053711075,decreasing,12,0.2544168137934672,1.0
+alibaba,skill-up,Frequência,frequencia,melhora,0.013647579043218672,increasing,12,0.18226838682601754,1.0
+alibaba,skill-up,Lead time (a),lead_time_a,insuficiente,,,5,,
+alibaba,skill-up,CFR (a),cfr_a,insuficiente,,,5,,
+alibaba,skill-up,Recuperação,recuperacao,insuficiente,,,2,,
+AlistGo,alist,Frequência,frequencia,sem_tendencia,0.7177466181536067,no trend,12,0.9402794124283058,1.0
+AlistGo,alist,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,10,1.0,1.0
+AlistGo,alist,CFR (a),cfr_a,sem_tendencia,0.2661301533399756,no trend,11,0.6907077044771099,1.0
+AlistGo,alist,Recuperação,recuperacao,insuficiente,,,4,,
+anchore,syft,Frequência,frequencia,sem_tendencia,0.21090292605661043,no trend,12,0.5599192727166649,1.0
+anchore,syft,Lead time (a),lead_time_a,sem_tendencia,0.303673214899419,no trend,12,0.7007843420755823,1.0
+anchore,syft,CFR (a),cfr_a,sem_tendencia,0.6312218204782534,no trend,12,0.9268573566516126,1.0
+anchore,syft,Recuperação,recuperacao,sem_tendencia,1.0,no trend,11,1.0,1.0
+anghunk,linuxdo-scripts,Frequência,frequencia,piora,0.04790038312251532,decreasing,12,0.2817669595442078,1.0
+anghunk,linuxdo-scripts,Lead time (a),lead_time_a,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+anghunk,linuxdo-scripts,CFR (a),cfr_a,sem_tendencia,0.19701250201244092,no trend,8,0.6021061856730007,1.0
+anghunk,linuxdo-scripts,Recuperação,recuperacao,insuficiente,,,2,,
+ankitects,anki,Frequência,frequencia,melhora,0.013138671481419673,increasing,12,0.18226838682601754,1.0
+ankitects,anki,Lead time (a),lead_time_a,insuficiente,,,4,,
+ankitects,anki,CFR (a),cfr_a,insuficiente,,,7,,
+ankitects,anki,Recuperação,recuperacao,insuficiente,,,7,,
+antfu,node-modules-inspector,Frequência,frequencia,melhora,0.037335285412746444,increasing,12,0.28046964632226645,1.0
+antfu,node-modules-inspector,Lead time (a),lead_time_a,insuficiente,,,7,,
+antfu,node-modules-inspector,CFR (a),cfr_a,insuficiente,,,7,,
+antfu,node-modules-inspector,Recuperação,recuperacao,insuficiente,,,7,,
+aseprite,aseprite,Frequência,frequencia,melhora,0.046143077186677095,increasing,12,0.28046964632226645,1.0
+aseprite,aseprite,Lead time (a),lead_time_a,insuficiente,,,6,,
+aseprite,aseprite,CFR (a),cfr_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+aseprite,aseprite,Recuperação,recuperacao,insuficiente,,,0,,
+astral-sh,uv,Frequência,frequencia,sem_tendencia,0.3305198718755016,no trend,12,0.7237661427930692,1.0
+astral-sh,uv,Lead time (a),lead_time_a,sem_tendencia,0.7317017232242102,no trend,12,0.9523069852044742,1.0
+astral-sh,uv,CFR (a),cfr_a,sem_tendencia,0.303673214899419,no trend,12,0.6907077044771099,1.0
+astral-sh,uv,Recuperação,recuperacao,melhora,0.023642218909198487,decreasing,12,0.2544168137934672,1.0
+AstroNvim,AstroNvim,Frequência,frequencia,sem_tendencia,0.5210247198358609,no trend,12,0.8335848933587184,1.0
+AstroNvim,AstroNvim,Lead time (a),lead_time_a,sem_tendencia,0.7544541774940892,no trend,9,0.9523069852044742,1.0
+AstroNvim,AstroNvim,CFR (a),cfr_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+AstroNvim,AstroNvim,Recuperação,recuperacao,insuficiente,,,1,,
+Automattic,mongoose,Frequência,frequencia,sem_tendencia,0.889442555596055,no trend,12,0.9983148403186323,1.0
+Automattic,mongoose,Lead time (a),lead_time_a,sem_tendencia,0.4506702853141802,no trend,12,0.8557030733813549,1.0
+Automattic,mongoose,CFR (a),cfr_a,sem_tendencia,0.5371338571769022,no trend,12,0.8369085142735705,1.0
+Automattic,mongoose,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+awesome-spectral-indices,awesome-spectral-indices,Frequência,frequencia,sem_tendencia,0.6166669448070672,no trend,12,0.8785205050672198,1.0
+awesome-spectral-indices,awesome-spectral-indices,Lead time (a),lead_time_a,insuficiente,,,4,,
+awesome-spectral-indices,awesome-spectral-indices,CFR (a),cfr_a,sem_tendencia,0.08394975920485348,no trend,9,0.417943784241351,1.0
+awesome-spectral-indices,awesome-spectral-indices,Recuperação,recuperacao,insuficiente,,,4,,
+aws-amplify,amplify-cli,Frequência,frequencia,piora,0.046143077186677095,decreasing,12,0.28046964632226645,1.0
+aws-amplify,amplify-cli,Lead time (a),lead_time_a,insuficiente,,,6,,
+aws-amplify,amplify-cli,CFR (a),cfr_a,sem_tendencia,0.24656588363440912,no trend,12,0.657509023025091,1.0
+aws-amplify,amplify-cli,Recuperação,recuperacao,insuficiente,,,1,,
+ax-llm,ax,Frequência,frequencia,sem_tendencia,0.9450713821683052,no trend,12,0.9983148403186323,1.0
+ax-llm,ax,Lead time (a),lead_time_a,piora,0.046744941053711075,increasing,12,0.3400282480562249,1.0
+ax-llm,ax,CFR (a),cfr_a,sem_tendencia,0.7317017232242102,no trend,12,0.964515907886459,1.0
+ax-llm,ax,Recuperação,recuperacao,sem_tendencia,0.4362749288405292,no trend,11,0.8154986115208974,1.0
+axios,axios,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+axios,axios,Lead time (a),lead_time_a,sem_tendencia,0.27575784782750934,no trend,11,0.6671560834536516,1.0
+axios,axios,CFR (a),cfr_a,sem_tendencia,0.7956976522687824,no trend,10,0.9924830931524597,1.0
+axios,axios,Recuperação,recuperacao,insuficiente,,,0,,
+Azure,Enterprise-Scale,Frequência,frequencia,sem_tendencia,0.9378848092843295,no trend,12,0.9983148403186323,1.0
+Azure,Enterprise-Scale,Lead time (a),lead_time_a,insuficiente,,,5,,
+Azure,Enterprise-Scale,CFR (a),cfr_a,sem_tendencia,1.0,no trend,10,1.0,1.0
+Azure,Enterprise-Scale,Recuperação,recuperacao,insuficiente,,,0,,
+basecamp,once,Frequência,frequencia,sem_tendencia,0.12319393022771674,no trend,12,0.4421135521252014,1.0
+basecamp,once,Lead time (a),lead_time_a,insuficiente,,,5,,
+basecamp,once,CFR (a),cfr_a,insuficiente,,,7,,
+basecamp,once,Recuperação,recuperacao,insuficiente,,,1,,
+bazelbuild,bazel,Frequência,frequencia,sem_tendencia,0.1695678618598917,no trend,12,0.5411740272124202,1.0
+bazelbuild,bazel,Lead time (a),lead_time_a,sem_tendencia,0.7105230229164894,no trend,8,0.9523069852044742,1.0
+bazelbuild,bazel,CFR (a),cfr_a,sem_tendencia,0.7262861488788048,no trend,12,0.964515907886459,1.0
+bazelbuild,bazel,Recuperação,recuperacao,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+BEDOLAGA-DEV,remnawave-bedolaga-telegram-bot,Frequência,frequencia,sem_tendencia,0.5371338571769022,no trend,12,0.8392716518389097,1.0
+BEDOLAGA-DEV,remnawave-bedolaga-telegram-bot,Lead time (a),lead_time_a,sem_tendencia,0.5371338571769022,no trend,12,0.8757617236579928,1.0
+BEDOLAGA-DEV,remnawave-bedolaga-telegram-bot,CFR (a),cfr_a,melhora,0.002130371286855448,decreasing,12,0.16474871285015466,0.48998539597675306
+BEDOLAGA-DEV,remnawave-bedolaga-telegram-bot,Recuperação,recuperacao,insuficiente,,,6,,
+BerriAI,litellm,Frequência,frequencia,sem_tendencia,0.07392248595953888,no trend,12,0.34118070442864096,1.0
+BerriAI,litellm,Lead time (a),lead_time_a,insuficiente,,,0,,
+BerriAI,litellm,CFR (a),cfr_a,sem_tendencia,0.08647112777407262,no trend,12,0.417943784241351,1.0
+BerriAI,litellm,Recuperação,recuperacao,sem_tendencia,1.0,no trend,8,1.0,1.0
+bghira,SimpleTuner,Frequência,frequencia,sem_tendencia,0.19261627432960227,no trend,12,0.5599192727166649,1.0
+bghira,SimpleTuner,Lead time (a),lead_time_a,piora,0.003191966353548681,increasing,12,0.14794501098919222,0.47241102032520477
+bghira,SimpleTuner,CFR (a),cfr_a,sem_tendencia,0.16653338573117038,no trend,12,0.568172727788699,1.0
+bghira,SimpleTuner,Recuperação,recuperacao,sem_tendencia,0.2514521865080219,no trend,9,0.6514897559526023,1.0
+bigskysoftware,htmx,Frequência,frequencia,melhora,0.02497099648837975,increasing,12,0.2203323219562919,1.0
+bigskysoftware,htmx,Lead time (a),lead_time_a,insuficiente,,,5,,
+bigskysoftware,htmx,CFR (a),cfr_a,sem_tendencia,0.1720901298989963,no trend,12,0.5726290835605825,1.0
+bigskysoftware,htmx,Recuperação,recuperacao,insuficiente,,,2,,
+bindhosts,bindhosts,Frequência,frequencia,sem_tendencia,0.5578328106499548,no trend,12,0.854607514192042,1.0
+bindhosts,bindhosts,Lead time (a),lead_time_a,insuficiente,,,7,,
+bindhosts,bindhosts,CFR (a),cfr_a,sem_tendencia,0.18491348621540382,no trend,12,0.5876702575612834,1.0
+bindhosts,bindhosts,Recuperação,recuperacao,insuficiente,,,6,,
+block,buzz,Frequência,frequencia,melhora,0.02076349837426328,increasing,12,0.20763498374263278,1.0
+block,buzz,Lead time (a),lead_time_a,insuficiente,,,5,,
+block,buzz,CFR (a),cfr_a,insuficiente,,,7,,
+block,buzz,Recuperação,recuperacao,insuficiente,,,7,,
+blockscout,blockscout,Frequência,frequencia,sem_tendencia,0.40947828967066413,no trend,12,0.7925386251690273,1.0
+blockscout,blockscout,Lead time (a),lead_time_a,sem_tendencia,0.7554968749288828,no trend,11,0.9523069852044742,1.0
+blockscout,blockscout,CFR (a),cfr_a,piora,0.011174811327380407,increasing,12,0.2237205598943356,1.0
+blockscout,blockscout,Recuperação,recuperacao,sem_tendencia,0.19261627432960227,no trend,12,0.5630321865019143,1.0
+Blueturboguy07,cue,Frequência,frequencia,melhora,0.02285413675254966,increasing,12,0.21425753205515305,1.0
+Blueturboguy07,cue,Lead time (a),lead_time_a,insuficiente,,,3,,
+Blueturboguy07,cue,CFR (a),cfr_a,insuficiente,,,3,,
+Blueturboguy07,cue,Recuperação,recuperacao,insuficiente,,,2,,
+bmad-code-org,BMAD-METHOD,Frequência,frequencia,sem_tendencia,0.7809976057010768,no trend,12,0.968856168420097,1.0
+bmad-code-org,BMAD-METHOD,Lead time (a),lead_time_a,piora,0.01648865672767008,increasing,9,0.20610820909587602,1.0
+bmad-code-org,BMAD-METHOD,CFR (a),cfr_a,sem_tendencia,0.4116059258177689,no trend,11,0.7639405983177789,1.0
+bmad-code-org,BMAD-METHOD,Recuperação,recuperacao,insuficiente,,,4,,
+bobthecow,psysh,Frequência,frequencia,piora,0.00877580613396245,decreasing,12,0.1688236776748675,1.0
+bobthecow,psysh,Lead time (a),lead_time_a,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+bobthecow,psysh,CFR (a),cfr_a,sem_tendencia,0.535208057336304,no trend,12,0.8369085142735705,1.0
+bobthecow,psysh,Recuperação,recuperacao,sem_tendencia,0.4742743507673295,no trend,10,0.8318042459611625,1.0
+bookwyrm-social,bookwyrm,Frequência,frequencia,sem_tendencia,0.9419624652878842,no trend,12,0.9983148403186323,1.0
+bookwyrm-social,bookwyrm,Lead time (a),lead_time_a,insuficiente,,,7,,
+bookwyrm-social,bookwyrm,CFR (a),cfr_a,sem_tendencia,0.22463863892378044,no trend,12,0.6434094349421859,1.0
+bookwyrm-social,bookwyrm,Recuperação,recuperacao,insuficiente,,,7,,
+bottlesdevs,Bottles,Frequência,frequencia,sem_tendencia,0.6257530643945326,no trend,12,0.8785205050672198,1.0
+bottlesdevs,Bottles,Lead time (a),lead_time_a,sem_tendencia,0.9169652366288645,no trend,9,1.0,1.0
+bottlesdevs,Bottles,CFR (a),cfr_a,sem_tendencia,0.5478383165397469,no trend,11,0.8473232629148085,1.0
+bottlesdevs,Bottles,Recuperação,recuperacao,insuficiente,,,3,,
+bpmn-io,diagram-js,Frequência,frequencia,melhora,0.009583156647451796,increasing,12,0.16911452907267877,1.0
+bpmn-io,diagram-js,Lead time (a),lead_time_a,sem_tendencia,0.1735462217878534,no trend,8,0.5784874059595113,1.0
+bpmn-io,diagram-js,CFR (a),cfr_a,sem_tendencia,0.680041838299495,no trend,12,0.9340312585528859,1.0
+bpmn-io,diagram-js,Recuperação,recuperacao,sem_tendencia,1.0,no trend,9,1.0,1.0
+brandonyoungdev,tldx,Frequência,frequencia,sem_tendencia,0.5084005793227551,no trend,12,0.8334435726602543,1.0
+brandonyoungdev,tldx,Lead time (a),lead_time_a,insuficiente,,,4,,
+brandonyoungdev,tldx,CFR (a),cfr_a,sem_tendencia,0.6352562959972483,no trend,11,0.9269148469896957,1.0
+brandonyoungdev,tldx,Recuperação,recuperacao,insuficiente,,,0,,
+bytedance,flowgram.ai,Frequência,frequencia,sem_tendencia,0.25908645318157575,no trend,12,0.6218074876357818,1.0
+bytedance,flowgram.ai,Lead time (a),lead_time_a,sem_tendencia,0.38647623077123283,no trend,8,0.7833977650768232,1.0
+bytedance,flowgram.ai,CFR (a),cfr_a,sem_tendencia,0.9443637390474902,no trend,12,1.0,1.0
+bytedance,flowgram.ai,Recuperação,recuperacao,sem_tendencia,0.2514521865080219,no trend,9,0.6514897559526023,1.0
+C4illin,ConvertX,Frequência,frequencia,sem_tendencia,0.43811962159332696,no trend,12,0.7953005034956121,1.0
+C4illin,ConvertX,Lead time (a),lead_time_a,insuficiente,,,5,,
+C4illin,ConvertX,CFR (a),cfr_a,sem_tendencia,0.1394271876464157,no trend,11,0.5348875911234985,1.0
+C4illin,ConvertX,Recuperação,recuperacao,insuficiente,,,6,,
+c4spar,cliffy,Frequência,frequencia,sem_tendencia,0.07540059504954422,no trend,12,0.3427299774979283,1.0
+c4spar,cliffy,Lead time (a),lead_time_a,insuficiente,,,5,,
+c4spar,cliffy,CFR (a),cfr_a,piora,0.020911579104989197,increasing,11,0.24257431761787468,1.0
+c4spar,cliffy,Recuperação,recuperacao,insuficiente,,,5,,
+callstack,agent-device,Frequência,frequencia,sem_tendencia,0.18343061898217816,no trend,12,0.5520595208460853,1.0
+callstack,agent-device,Lead time (a),lead_time_a,sem_tendencia,0.06348653056076747,no trend,8,0.4006473544527239,1.0
+callstack,agent-device,CFR (a),cfr_a,piora,0.018741136789596657,increasing,8,0.24155242973257912,1.0
+callstack,agent-device,Recuperação,recuperacao,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+Canner,WrenAI,Frequência,frequencia,melhora,0.03917726226887552,increasing,12,0.28046964632226645,1.0
+Canner,WrenAI,Lead time (a),lead_time_a,insuficiente,,,6,,
+Canner,WrenAI,CFR (a),cfr_a,melhora,0.015904841115396362,decreasing,11,0.2237205598943356,1.0
+Canner,WrenAI,Recuperação,recuperacao,insuficiente,,,2,,
+ccusage,ccusage,Frequência,frequencia,sem_tendencia,0.7833643646826536,no trend,12,0.968856168420097,1.0
+ccusage,ccusage,Lead time (a),lead_time_a,sem_tendencia,0.37269149047151817,no trend,12,0.7764406051489963,1.0
+ccusage,ccusage,CFR (a),cfr_a,sem_tendencia,0.40947828967066413,no trend,12,0.7639405983177789,1.0
+ccusage,ccusage,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+ccxt,ccxt,Frequência,frequencia,sem_tendencia,0.8901433851357767,no trend,12,0.9983148403186323,1.0
+ccxt,ccxt,Lead time (a),lead_time_a,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+ccxt,ccxt,CFR (a),cfr_a,melhora,0.0208625823327655,decreasing,12,0.24257431761787468,1.0
+ccxt,ccxt,Recuperação,recuperacao,melhora,0.035447892552460836,decreasing,8,0.2544168137934672,1.0
+chaitin,MonkeyCode,Frequência,frequencia,sem_tendencia,0.6803934598941281,no trend,12,0.9153275245212487,1.0
+chaitin,MonkeyCode,Lead time (a),lead_time_a,insuficiente,,,4,,
+chaitin,MonkeyCode,CFR (a),cfr_a,insuficiente,,,7,,
+chaitin,MonkeyCode,Recuperação,recuperacao,insuficiente,,,4,,
+charmbracelet,crush,Frequência,frequencia,piora,0.006847659541543205,decreasing,12,0.1580229124971509,1.0
+charmbracelet,crush,Lead time (a),lead_time_a,piora,0.0007792699724176178,increasing,12,0.09616378063539988,0.11689049586264266
+charmbracelet,crush,CFR (a),cfr_a,sem_tendencia,0.08647112777407262,no trend,12,0.417943784241351,1.0
+charmbracelet,crush,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+ChrisTitusTech,winutil,Frequência,frequencia,sem_tendencia,0.9444536924990754,no trend,12,0.9983148403186323,1.0
+ChrisTitusTech,winutil,Lead time (a),lead_time_a,sem_tendencia,0.16112494928905186,no trend,11,0.5784874059595113,1.0
+ChrisTitusTech,winutil,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+ChrisTitusTech,winutil,Recuperação,recuperacao,insuficiente,,,6,,
+chrysb,alphaclaw,Frequência,frequencia,sem_tendencia,0.1407278888037049,no trend,12,0.4797541663762667,1.0
+chrysb,alphaclaw,Lead time (a),lead_time_a,insuficiente,,,6,,
+chrysb,alphaclaw,CFR (a),cfr_a,insuficiente,,,6,,
+chrysb,alphaclaw,Recuperação,recuperacao,insuficiente,,,3,,
+clash-verge-rev,clash-verge-rev,Frequência,frequencia,sem_tendencia,0.8300393674478821,no trend,12,0.9847193824769954,1.0
+clash-verge-rev,clash-verge-rev,Lead time (a),lead_time_a,sem_tendencia,0.536186771900174,no trend,8,0.8757617236579928,1.0
+clash-verge-rev,clash-verge-rev,CFR (a),cfr_a,insuficiente,,,4,,
+clash-verge-rev,clash-verge-rev,Recuperação,recuperacao,insuficiente,,,1,,
+cline,cline,Frequência,frequencia,melhora,0.016393316888809073,increasing,12,0.20217967318223293,1.0
+cline,cline,Lead time (a),lead_time_a,sem_tendencia,0.08647112777407262,no trend,12,0.4323556388703631,1.0
+cline,cline,CFR (a),cfr_a,sem_tendencia,0.6312218204782534,no trend,12,0.9268573566516126,1.0
+cline,cline,Recuperação,recuperacao,piora,0.046744941053711075,increasing,12,0.2544168137934672,1.0
+clojure,clojurescript,Frequência,frequencia,sem_tendencia,0.20061617542234167,no trend,12,0.5599192727166649,1.0
+clojure,clojurescript,Lead time (a),lead_time_a,insuficiente,,,3,,
+clojure,clojurescript,CFR (a),cfr_a,sem_tendencia,0.3848207735230651,no trend,9,0.7439868288112591,1.0
+clojure,clojurescript,Recuperação,recuperacao,insuficiente,,,2,,
+cockpit-project,cockpit,Frequência,frequencia,sem_tendencia,0.4042484947394711,no trend,12,0.7925386251690273,1.0
+cockpit-project,cockpit,Lead time (a),lead_time_a,sem_tendencia,0.24372228477217428,no trend,12,0.6617162802842682,1.0
+cockpit-project,cockpit,CFR (a),cfr_a,sem_tendencia,0.23663108836099145,no trend,12,0.6574833728737725,1.0
+cockpit-project,cockpit,Recuperação,recuperacao,insuficiente,,,3,,
+coder,coder,Frequência,frequencia,sem_tendencia,0.5824053064021051,no trend,12,0.8649583758447105,1.0
+coder,coder,Lead time (a),lead_time_a,sem_tendencia,0.5371338571769022,no trend,12,0.8757617236579928,1.0
+coder,coder,CFR (a),cfr_a,sem_tendencia,0.9453298708327,no trend,12,1.0,1.0
+coder,coder,Recuperação,recuperacao,sem_tendencia,0.06410357671243583,no trend,12,0.29231230980870737,1.0
+com-lihaoyi,mill,Frequência,frequencia,sem_tendencia,0.5640409593667477,no trend,12,0.854607514192042,1.0
+com-lihaoyi,mill,Lead time (a),lead_time_a,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+com-lihaoyi,mill,CFR (a),cfr_a,sem_tendencia,0.6312218204782534,no trend,12,0.9268573566516126,1.0
+com-lihaoyi,mill,Recuperação,recuperacao,sem_tendencia,0.4742743507673295,no trend,10,0.8318042459611625,1.0
+conductor-oss,conductor,Frequência,frequencia,sem_tendencia,0.3273842415785917,no trend,12,0.7221711211292464,1.0
+conductor-oss,conductor,Lead time (a),lead_time_a,melhora,0.04760395472787149,decreasing,9,0.3400282480562249,1.0
+conductor-oss,conductor,CFR (a),cfr_a,sem_tendencia,0.07392248595953888,no trend,12,0.417943784241351,1.0
+conductor-oss,conductor,Recuperação,recuperacao,melhora,0.02927250918630464,decreasing,11,0.2544168137934672,1.0
+conorbronsdon,avoid-ai-writing,Frequência,frequencia,melhora,0.02285413675254966,increasing,12,0.21425753205515305,1.0
+conorbronsdon,avoid-ai-writing,Lead time (a),lead_time_a,insuficiente,,,3,,
+conorbronsdon,avoid-ai-writing,CFR (a),cfr_a,insuficiente,,,5,,
+conorbronsdon,avoid-ai-writing,Recuperação,recuperacao,insuficiente,,,3,,
+context-labs,HALO,Frequência,frequencia,sem_tendencia,0.5623426051791451,no trend,12,0.854607514192042,1.0
+context-labs,HALO,Lead time (a),lead_time_a,insuficiente,,,1,,
+context-labs,HALO,CFR (a),cfr_a,insuficiente,,,5,,
+context-labs,HALO,Recuperação,recuperacao,insuficiente,,,2,,
+coollabsio,coolify,Frequência,frequencia,sem_tendencia,0.491866357909307,no trend,12,0.8152481070320005,1.0
+coollabsio,coolify,Lead time (a),lead_time_a,sem_tendencia,0.8762696636277618,no trend,11,1.0,1.0
+coollabsio,coolify,CFR (a),cfr_a,insuficiente,,,2,,
+coollabsio,coolify,Recuperação,recuperacao,insuficiente,,,2,,
+coredevices,PebbleOS,Frequência,frequencia,sem_tendencia,0.3704318883675959,no trend,12,0.7764406051489963,1.0
+coredevices,PebbleOS,Lead time (a),lead_time_a,sem_tendencia,0.24372228477217428,no trend,12,0.6617162802842682,1.0
+coredevices,PebbleOS,CFR (a),cfr_a,sem_tendencia,0.8336348830246822,no trend,12,1.0,1.0
+coredevices,PebbleOS,Recuperação,recuperacao,sem_tendencia,1.0,no trend,8,1.0,1.0
+cucumber,cucumber-jvm,Frequência,frequencia,sem_tendencia,0.9440912337176337,no trend,12,0.9983148403186323,1.0
+cucumber,cucumber-jvm,Lead time (a),lead_time_a,sem_tendencia,0.9169652366288645,no trend,9,1.0,1.0
+cucumber,cucumber-jvm,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+cucumber,cucumber-jvm,Recuperação,recuperacao,insuficiente,,,6,,
+cunarist,rinf,Frequência,frequencia,sem_tendencia,0.17443584875644724,no trend,12,0.5451120273638976,1.0
+cunarist,rinf,Lead time (a),lead_time_a,insuficiente,,,6,,
+cunarist,rinf,CFR (a),cfr_a,sem_tendencia,0.5623426051791451,no trend,9,0.8583123973786952,1.0
+cunarist,rinf,Recuperação,recuperacao,insuficiente,,,2,,
+daangn,seed-design,Frequência,frequencia,sem_tendencia,0.11475673431864908,no trend,12,0.43578506703284464,1.0
+daangn,seed-design,Lead time (a),lead_time_a,insuficiente,,,0,,
+daangn,seed-design,CFR (a),cfr_a,sem_tendencia,0.271441309374989,no trend,12,0.6907077044771099,1.0
+daangn,seed-design,Recuperação,recuperacao,sem_tendencia,0.7205147871362552,no trend,10,1.0,1.0
+databasus,databasus,Frequência,frequencia,sem_tendencia,0.07392248595953888,no trend,12,0.34118070442864096,1.0
+databasus,databasus,Lead time (a),lead_time_a,sem_tendencia,0.11475673431864908,no trend,12,0.4652300039945233,1.0
+databasus,databasus,CFR (a),cfr_a,sem_tendencia,0.40650635561717285,no trend,12,0.7639405983177789,1.0
+databasus,databasus,Recuperação,recuperacao,sem_tendencia,0.06170669002831275,no trend,11,0.29231230980870737,1.0
+decentraland,marketplace,Frequência,frequencia,sem_tendencia,0.40947828967066413,no trend,12,0.7925386251690273,1.0
+decentraland,marketplace,Lead time (a),lead_time_a,sem_tendencia,0.7317017232242102,no trend,12,0.9523069852044742,1.0
+decentraland,marketplace,CFR (a),cfr_a,sem_tendencia,0.8166035426001967,no trend,12,1.0,1.0
+decentraland,marketplace,Recuperação,recuperacao,insuficiente,,,5,,
+deretame,Breeze,Frequência,frequencia,sem_tendencia,0.16720893987809782,no trend,12,0.539383677026122,1.0
+deretame,Breeze,Lead time (a),lead_time_a,piora,0.004931500366306407,increasing,12,0.14794501098919222,0.7199990534807355
+deretame,Breeze,CFR (a),cfr_a,melhora,0.0012293849189448647,decreasing,9,0.1426086505976043,0.28398791627626374
+deretame,Breeze,Recuperação,recuperacao,sem_tendencia,0.2655103889538737,no trend,8,0.6580040074074262,1.0
+dexie,Dexie.js,Frequência,frequencia,sem_tendencia,0.3050748813375779,no trend,12,0.7038883142443216,1.0
+dexie,Dexie.js,Lead time (a),lead_time_a,insuficiente,,,7,,
+dexie,Dexie.js,CFR (a),cfr_a,sem_tendencia,0.33366648508297114,no trend,12,0.7101892159564156,1.0
+dexie,Dexie.js,Recuperação,recuperacao,insuficiente,,,2,,
+dgraph-io,badger,Frequência,frequencia,sem_tendencia,0.39512645793548673,no trend,12,0.7925386251690273,1.0
+dgraph-io,badger,Lead time (a),lead_time_a,insuficiente,,,5,,
+dgraph-io,badger,CFR (a),cfr_a,melhora,0.011841419964459643,decreasing,11,0.2237205598943356,1.0
+dgraph-io,badger,Recuperação,recuperacao,insuficiente,,,1,,
+digego,extempore,Frequência,frequencia,sem_tendencia,0.06896361630469405,no trend,12,0.33369491760335834,1.0
+digego,extempore,Lead time (a),lead_time_a,insuficiente,,,4,,
+digego,extempore,CFR (a),cfr_a,insuficiente,,,6,,
+digego,extempore,Recuperação,recuperacao,insuficiente,,,2,,
+dimensionalOS,dimos,Frequência,frequencia,sem_tendencia,0.7741606665019851,no trend,12,0.968856168420097,1.0
+dimensionalOS,dimos,Lead time (a),lead_time_a,insuficiente,,,7,,
+dimensionalOS,dimos,CFR (a),cfr_a,sem_tendencia,0.10034824646229068,no trend,9,0.45648614076963606,1.0
+dimensionalOS,dimos,Recuperação,recuperacao,insuficiente,,,5,,
+DioxusLabs,dioxus,Frequência,frequencia,sem_tendencia,0.2731084007027216,no trend,12,0.6502580969112419,1.0
+DioxusLabs,dioxus,Lead time (a),lead_time_a,sem_tendencia,0.1735462217878534,no trend,8,0.5784874059595113,1.0
+DioxusLabs,dioxus,CFR (a),cfr_a,piora,0.023642218909198487,increasing,12,0.2493179448606386,1.0
+DioxusLabs,dioxus,Recuperação,recuperacao,piora,0.04760395472787149,increasing,9,0.2544168137934672,1.0
+django-commons,django-debug-toolbar,Frequência,frequencia,sem_tendencia,0.17930928724403739,no trend,12,0.5520595208460853,1.0
+django-commons,django-debug-toolbar,Lead time (a),lead_time_a,insuficiente,,,6,,
+django-commons,django-debug-toolbar,CFR (a),cfr_a,sem_tendencia,0.36480999434195294,no trend,12,0.7390121862341216,1.0
+django-commons,django-debug-toolbar,Recuperação,recuperacao,insuficiente,,,3,,
+dmno-dev,varlock,Frequência,frequencia,melhora,0.03352416523500468,increasing,12,0.27181755595949736,1.0
+dmno-dev,varlock,Lead time (a),lead_time_a,insuficiente,,,0,,
+dmno-dev,varlock,CFR (a),cfr_a,sem_tendencia,0.5326028129364739,no trend,12,0.8369085142735705,1.0
+dmno-dev,varlock,Recuperação,recuperacao,sem_tendencia,0.11785089502136503,no trend,9,0.4393449190959318,1.0
+doronz88,pymobiledevice3,Frequência,frequencia,melhora,0.046744941053711075,increasing,12,0.28046964632226645,1.0
+doronz88,pymobiledevice3,Lead time (a),lead_time_a,sem_tendencia,0.4506702853141802,no trend,12,0.8557030733813549,1.0
+doronz88,pymobiledevice3,CFR (a),cfr_a,insuficiente,,,4,,
+doronz88,pymobiledevice3,Recuperação,recuperacao,insuficiente,,,2,,
+dotnetcore,BootstrapBlazor,Frequência,frequencia,sem_tendencia,0.3965371573058931,no trend,12,0.7925386251690273,1.0
+dotnetcore,BootstrapBlazor,Lead time (a),lead_time_a,sem_tendencia,0.5371338571769022,no trend,12,0.8757617236579928,1.0
+dotnetcore,BootstrapBlazor,CFR (a),cfr_a,sem_tendencia,0.33284451496282186,no trend,12,0.7101892159564156,1.0
+dotnetcore,BootstrapBlazor,Recuperação,recuperacao,sem_tendencia,0.9169652366288645,no trend,9,1.0,1.0
+dpgaspar,Flask-AppBuilder,Frequência,frequencia,sem_tendencia,0.882252572373893,no trend,12,0.9983148403186323,1.0
+dpgaspar,Flask-AppBuilder,Lead time (a),lead_time_a,insuficiente,,,6,,
+dpgaspar,Flask-AppBuilder,CFR (a),cfr_a,sem_tendencia,0.17524424540000583,no trend,9,0.5726290835605825,1.0
+dpgaspar,Flask-AppBuilder,Recuperação,recuperacao,insuficiente,,,0,,
+ducktors,turborepo-remote-cache,Frequência,frequencia,melhora,0.01887010283034174,increasing,12,0.20217967318223293,1.0
+ducktors,turborepo-remote-cache,Lead time (a),lead_time_a,sem_tendencia,0.7205147871362552,no trend,10,0.9523069852044742,1.0
+ducktors,turborepo-remote-cache,CFR (a),cfr_a,sem_tendencia,0.21310012686843538,no trend,12,0.6179903679184625,1.0
+ducktors,turborepo-remote-cache,Recuperação,recuperacao,melhora,0.028567681801513034,decreasing,9,0.2544168137934672,1.0
+earthtojake,text-to-cad,Frequência,frequencia,melhora,0.0034020819150499815,increasing,12,0.1580229124971509,1.0
+earthtojake,text-to-cad,Lead time (a),lead_time_a,insuficiente,,,5,,
+earthtojake,text-to-cad,CFR (a),cfr_a,insuficiente,,,2,,
+earthtojake,text-to-cad,Recuperação,recuperacao,insuficiente,,,1,,
+Egonex-AI,Understand-Anything,Frequência,frequencia,sem_tendencia,0.8047876767779976,no trend,12,0.9847193824769954,1.0
+Egonex-AI,Understand-Anything,Lead time (a),lead_time_a,insuficiente,,,4,,
+Egonex-AI,Understand-Anything,CFR (a),cfr_a,insuficiente,,,7,,
+Egonex-AI,Understand-Anything,Recuperação,recuperacao,insuficiente,,,4,,
+elabftw,elabftw,Frequência,frequencia,sem_tendencia,0.9450713821683052,no trend,12,0.9983148403186323,1.0
+elabftw,elabftw,Lead time (a),lead_time_a,sem_tendencia,0.27575784782750934,no trend,11,0.6671560834536516,1.0
+elabftw,elabftw,CFR (a),cfr_a,sem_tendencia,0.17473582321524717,no trend,12,0.5726290835605825,1.0
+elabftw,elabftw,Recuperação,recuperacao,insuficiente,,,7,,
+elixir-nx,nx,Frequência,frequencia,melhora,0.020631782333250248,increasing,12,0.20763498374263278,1.0
+elixir-nx,nx,Lead time (a),lead_time_a,insuficiente,,,4,,
+elixir-nx,nx,CFR (a),cfr_a,sem_tendencia,0.5623426051791451,no trend,12,0.8583123973786952,1.0
+elixir-nx,nx,Recuperação,recuperacao,insuficiente,,,1,,
+emqx,emqx,Frequência,frequencia,sem_tendencia,0.5757147917277115,no trend,12,0.8649583758447105,1.0
+emqx,emqx,Lead time (a),lead_time_a,melhora,0.009374768459434968,decreasing,8,0.17577690861440565,1.0
+emqx,emqx,CFR (a),cfr_a,sem_tendencia,0.6781209092299321,no trend,12,0.9340312585528859,1.0
+emqx,emqx,Recuperação,recuperacao,sem_tendencia,0.7544541774940892,no trend,9,1.0,1.0
+emscripten-core,emscripten,Frequência,frequencia,melhora,0.013138671481419673,increasing,12,0.18226838682601754,1.0
+emscripten-core,emscripten,Lead time (a),lead_time_a,insuficiente,,,4,,
+emscripten-core,emscripten,CFR (a),cfr_a,sem_tendencia,0.6312218204782534,no trend,12,0.9268573566516126,1.0
+emscripten-core,emscripten,Recuperação,recuperacao,sem_tendencia,1.0,no trend,11,1.0,1.0
+envoyproxy,envoy,Frequência,frequencia,sem_tendencia,0.5265783710669814,no trend,12,0.8335848933587184,1.0
+envoyproxy,envoy,Lead time (a),lead_time_a,sem_tendencia,0.536186771900174,no trend,8,0.8757617236579928,1.0
+envoyproxy,envoy,CFR (a),cfr_a,sem_tendencia,0.4506702853141802,no trend,12,0.792087168127953,1.0
+envoyproxy,envoy,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+ESPresense,ESPresense,Frequência,frequencia,sem_tendencia,0.7720589697507347,no trend,12,0.968856168420097,1.0
+ESPresense,ESPresense,Lead time (a),lead_time_a,insuficiente,,,1,,
+ESPresense,ESPresense,CFR (a),cfr_a,sem_tendencia,0.13418886540774277,no trend,9,0.5348875911234985,1.0
+ESPresense,ESPresense,Recuperação,recuperacao,insuficiente,,,4,,
+Fabulously-Optimized,fabulously-optimized,Frequência,frequencia,sem_tendencia,0.21090292605661043,no trend,12,0.5599192727166649,1.0
+Fabulously-Optimized,fabulously-optimized,Lead time (a),lead_time_a,sem_tendencia,0.5371338571769022,no trend,12,0.8757617236579928,1.0
+Fabulously-Optimized,fabulously-optimized,CFR (a),cfr_a,sem_tendencia,0.6692254223014649,no trend,12,0.9340312585528859,1.0
+Fabulously-Optimized,fabulously-optimized,Recuperação,recuperacao,insuficiente,,,1,,
+faker-js,faker,Frequência,frequencia,sem_tendencia,0.7628066099122217,no trend,12,0.968856168420097,1.0
+faker-js,faker,Lead time (a),lead_time_a,insuficiente,,,6,,
+faker-js,faker,CFR (a),cfr_a,sem_tendencia,0.6692254223014649,no trend,12,0.9340312585528859,1.0
+faker-js,faker,Recuperação,recuperacao,insuficiente,,,2,,
+fastapi,full-stack-fastapi-template,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+fastapi,full-stack-fastapi-template,Lead time (a),lead_time_a,insuficiente,,,3,,
+fastapi,full-stack-fastapi-template,CFR (a),cfr_a,sem_tendencia,0.8047876767779976,no trend,12,0.9931422394281673,1.0
+fastapi,full-stack-fastapi-template,Recuperação,recuperacao,insuficiente,,,4,,
+fastfetch-cli,fastfetch,Frequência,frequencia,sem_tendencia,0.4389560432414523,no trend,12,0.7953005034956121,1.0
+fastfetch-cli,fastfetch,Lead time (a),lead_time_a,sem_tendencia,0.4506702853141802,no trend,12,0.8557030733813549,1.0
+fastfetch-cli,fastfetch,CFR (a),cfr_a,piora,0.046744941053711075,increasing,12,0.3539293473815903,1.0
+fastfetch-cli,fastfetch,Recuperação,recuperacao,sem_tendencia,0.6312218204782534,no trend,12,0.9994345490905678,1.0
+fastrepl,anarlog,Frequência,frequencia,melhora,0.009003929475992933,increasing,12,0.1688236776748675,1.0
+fastrepl,anarlog,Lead time (a),lead_time_a,sem_tendencia,0.07363827012030266,no trend,10,0.424070779868651,1.0
+fastrepl,anarlog,CFR (a),cfr_a,sem_tendencia,0.08647112777407262,no trend,12,0.417943784241351,1.0
+fastrepl,anarlog,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+favonia,cloudflare-ddns,Frequência,frequencia,sem_tendencia,0.13675275397576914,no trend,12,0.4782805878216055,1.0
+favonia,cloudflare-ddns,Lead time (a),lead_time_a,insuficiente,,,4,,
+favonia,cloudflare-ddns,CFR (a),cfr_a,sem_tendencia,0.08417681836879942,no trend,8,0.417943784241351,1.0
+favonia,cloudflare-ddns,Recuperação,recuperacao,insuficiente,,,3,,
+fcakyon,claude-codex-settings,Frequência,frequencia,sem_tendencia,0.9430566709670429,no trend,12,0.9983148403186323,1.0
+fcakyon,claude-codex-settings,Lead time (a),lead_time_a,insuficiente,,,7,,
+fcakyon,claude-codex-settings,CFR (a),cfr_a,sem_tendencia,1.0,no trend,8,1.0,1.0
+fcakyon,claude-codex-settings,Recuperação,recuperacao,insuficiente,,,0,,
+Fincept-Corporation,FinceptTerminal,Frequência,frequencia,sem_tendencia,0.40119861739803175,no trend,12,0.7925386251690273,1.0
+Fincept-Corporation,FinceptTerminal,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+Fincept-Corporation,FinceptTerminal,CFR (a),cfr_a,sem_tendencia,0.19701250201244092,no trend,8,0.6021061856730007,1.0
+Fincept-Corporation,FinceptTerminal,Recuperação,recuperacao,insuficiente,,,2,,
+firezone,firezone,Frequência,frequencia,sem_tendencia,0.7823594714286246,no trend,12,0.968856168420097,1.0
+firezone,firezone,Lead time (a),lead_time_a,sem_tendencia,0.5915050369949166,no trend,10,0.92168499145132,1.0
+firezone,firezone,CFR (a),cfr_a,sem_tendencia,0.37269149047151817,no trend,12,0.7390121862341216,1.0
+firezone,firezone,Recuperação,recuperacao,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+flipt-io,flipt,Frequência,frequencia,sem_tendencia,0.40119861739803175,no trend,12,0.7925386251690273,1.0
+flipt-io,flipt,Lead time (a),lead_time_a,sem_tendencia,0.6021675277481957,no trend,9,0.92168499145132,1.0
+flipt-io,flipt,CFR (a),cfr_a,melhora,0.003191966353548681,decreasing,12,0.17315693950504274,0.7309602949626479
+flipt-io,flipt,Recuperação,recuperacao,sem_tendencia,0.8762696636277618,no trend,11,1.0,1.0
+fruitcake,laravel-debugbar,Frequência,frequencia,sem_tendencia,0.7823594714286246,no trend,12,0.968856168420097,1.0
+fruitcake,laravel-debugbar,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,10,1.0,1.0
+fruitcake,laravel-debugbar,CFR (a),cfr_a,piora,0.02686413780134389,increasing,12,0.27097738999616444,1.0
+fruitcake,laravel-debugbar,Recuperação,recuperacao,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+FuelLabs,sway,Frequência,frequencia,sem_tendencia,0.31021214697609834,no trend,12,0.7038883142443216,1.0
+FuelLabs,sway,Lead time (a),lead_time_a,insuficiente,,,7,,
+FuelLabs,sway,CFR (a),cfr_a,sem_tendencia,0.3024657509187063,no trend,12,0.6907077044771099,1.0
+FuelLabs,sway,Recuperação,recuperacao,insuficiente,,,4,,
+funstory-ai,BabelDOC,Frequência,frequencia,sem_tendencia,0.05337682472433691,no trend,12,0.2891966546331404,1.0
+funstory-ai,BabelDOC,Lead time (a),lead_time_a,sem_tendencia,0.2655103889538737,no trend,8,0.6671560834536516,1.0
+funstory-ai,BabelDOC,CFR (a),cfr_a,sem_tendencia,0.6045711477247826,no trend,10,0.9107825082607114,1.0
+funstory-ai,BabelDOC,Recuperação,recuperacao,insuficiente,,,2,,
+getfider,fider,Frequência,frequencia,sem_tendencia,0.6103144300361156,no trend,12,0.8785205050672198,1.0
+getfider,fider,Lead time (a),lead_time_a,sem_tendencia,0.6021675277481957,no trend,9,0.92168499145132,1.0
+getfider,fider,CFR (a),cfr_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+getfider,fider,Recuperação,recuperacao,insuficiente,,,7,,
+getnao,nao,Frequência,frequencia,melhora,0.039972215637945396,increasing,12,0.28046964632226645,1.0
+getnao,nao,Lead time (a),lead_time_a,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+getnao,nao,CFR (a),cfr_a,sem_tendencia,0.9169652366288645,no trend,9,1.0,1.0
+getnao,nao,Recuperação,recuperacao,sem_tendencia,0.7544541774940892,no trend,9,1.0,1.0
+getsentry,sentry,Frequência,frequencia,sem_tendencia,0.6234966032027147,no trend,12,0.8785205050672198,1.0
+getsentry,sentry,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,9,1.0,1.0
+getsentry,sentry,CFR (a),cfr_a,sem_tendencia,0.5371338571769022,no trend,12,0.8369085142735705,1.0
+getsentry,sentry,Recuperação,recuperacao,sem_tendencia,0.11475673431864908,no trend,12,0.4393449190959318,1.0
+gitbucket,gitbucket,Frequência,frequencia,sem_tendencia,0.13870137046826558,no trend,12,0.4782805878216055,1.0
+gitbucket,gitbucket,Lead time (a),lead_time_a,insuficiente,,,5,,
+gitbucket,gitbucket,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+gitbucket,gitbucket,Recuperação,recuperacao,insuficiente,,,0,,
+gliderlabs,herokuish,Frequência,frequencia,sem_tendencia,0.47163844581132874,no trend,12,0.8152481070320005,1.0
+gliderlabs,herokuish,Lead time (a),lead_time_a,insuficiente,,,7,,
+gliderlabs,herokuish,CFR (a),cfr_a,sem_tendencia,0.4614003551078514,no trend,12,0.7984028968909013,1.0
+gliderlabs,herokuish,Recuperação,recuperacao,insuficiente,,,6,,
+gohugoio,hugo,Frequência,frequencia,sem_tendencia,0.08499128280623891,no trend,12,0.36952731654886484,1.0
+gohugoio,hugo,Lead time (a),lead_time_a,piora,0.04296014602842502,increasing,11,0.33915904759282905,1.0
+gohugoio,hugo,CFR (a),cfr_a,sem_tendencia,0.9453298708327,no trend,12,1.0,1.0
+gohugoio,hugo,Recuperação,recuperacao,sem_tendencia,0.06410357671243583,no trend,12,0.29231230980870737,1.0
+googleapis,mcp-toolbox,Frequência,frequencia,sem_tendencia,0.6223530015591523,no trend,12,0.8785205050672198,1.0
+googleapis,mcp-toolbox,Lead time (a),lead_time_a,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+googleapis,mcp-toolbox,CFR (a),cfr_a,piora,0.016393316888809073,increasing,12,0.2237205598943356,1.0
+googleapis,mcp-toolbox,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+gotify,server,Frequência,frequencia,sem_tendencia,0.13870137046826558,no trend,12,0.4782805878216055,1.0
+gotify,server,Lead time (a),lead_time_a,insuficiente,,,5,,
+gotify,server,CFR (a),cfr_a,sem_tendencia,0.14750139990263267,no trend,12,0.5348875911234985,1.0
+gotify,server,Recuperação,recuperacao,insuficiente,,,0,,
+grafana,k6,Frequência,frequencia,sem_tendencia,0.9439073231042583,no trend,12,0.9983148403186323,1.0
+grafana,k6,Lead time (a),lead_time_a,piora,0.035447892552460836,increasing,8,0.29539910460384033,1.0
+grafana,k6,CFR (a),cfr_a,melhora,0.03352416523500468,decreasing,12,0.3240669306050452,1.0
+grafana,k6,Recuperação,recuperacao,sem_tendencia,0.37269149047151817,no trend,12,0.8016383002594919,1.0
+graph-gophers,graphql-go,Frequência,frequencia,sem_tendencia,0.41260892737888666,no trend,12,0.7934787064978589,1.0
+graph-gophers,graphql-go,Lead time (a),lead_time_a,insuficiente,,,3,,
+graph-gophers,graphql-go,CFR (a),cfr_a,sem_tendencia,1.0,no trend,9,1.0,1.0
+graph-gophers,graphql-go,Recuperação,recuperacao,insuficiente,,,1,,
+Graphify-Labs,graphify,Frequência,frequencia,sem_tendencia,0.1051475749178028,no trend,12,0.41685586309192413,1.0
+Graphify-Labs,graphify,Lead time (a),lead_time_a,insuficiente,,,6,,
+Graphify-Labs,graphify,CFR (a),cfr_a,insuficiente,,,5,,
+Graphify-Labs,graphify,Recuperação,recuperacao,insuficiente,,,3,,
+gridex,gridex,Frequência,frequencia,sem_tendencia,0.8308545880730229,no trend,12,0.9847193824769954,1.0
+gridex,gridex,Lead time (a),lead_time_a,insuficiente,,,2,,
+gridex,gridex,CFR (a),cfr_a,insuficiente,,,6,,
+gridex,gridex,Recuperação,recuperacao,insuficiente,,,0,,
+grpc,grpc,Frequência,frequencia,sem_tendencia,0.05582769351590233,no trend,12,0.2891966546331404,1.0
+grpc,grpc,Lead time (a),lead_time_a,sem_tendencia,0.7105230229164894,no trend,8,0.9523069852044742,1.0
+grpc,grpc,CFR (a),cfr_a,piora,0.03917726226887552,increasing,12,0.3246116016563972,1.0
+grpc,grpc,Recuperação,recuperacao,insuficiente,,,6,,
+gruntwork-io,terragrunt,Frequência,frequencia,piora,0.0009166061974068551,decreasing,12,0.15643812297993165,0.27498185922205653
+gruntwork-io,terragrunt,Lead time (a),lead_time_a,piora,0.016393316888809073,increasing,12,0.20610820909587602,1.0
+gruntwork-io,terragrunt,CFR (a),cfr_a,sem_tendencia,0.14986074751304912,no trend,12,0.5348875911234985,1.0
+gruntwork-io,terragrunt,Recuperação,recuperacao,melhora,0.0020302944356094255,decreasing,12,0.17632661139739025,0.2314535656594745
+HakanSeven12,OpenCADStudio,Frequência,frequencia,melhora,0.01841616057630402,increasing,12,0.20217967318223293,1.0
+HakanSeven12,OpenCADStudio,Lead time (a),lead_time_a,insuficiente,,,7,,
+HakanSeven12,OpenCADStudio,CFR (a),cfr_a,insuficiente,,,1,,
+HakanSeven12,OpenCADStudio,Recuperação,recuperacao,insuficiente,,,1,,
+happier-dev,happier,Frequência,frequencia,sem_tendencia,0.19997108902828353,no trend,12,0.5599192727166649,1.0
+happier-dev,happier,Lead time (a),lead_time_a,insuficiente,,,2,,
+happier-dev,happier,CFR (a),cfr_a,sem_tendencia,0.29976906256917935,no trend,9,0.6907077044771099,1.0
+happier-dev,happier,Recuperação,recuperacao,insuficiente,,,4,,
+hardbeat920,monocode,Frequência,frequencia,melhora,0.03267480364954989,increasing,12,0.27181755595949736,1.0
+hardbeat920,monocode,Lead time (a),lead_time_a,insuficiente,,,2,,
+hardbeat920,monocode,CFR (a),cfr_a,insuficiente,,,2,,
+hardbeat920,monocode,Recuperação,recuperacao,insuficiente,,,2,,
+harrisiirak,cron-parser,Frequência,frequencia,melhora,0.02497099648837975,increasing,12,0.2203323219562919,1.0
+harrisiirak,cron-parser,Lead time (a),lead_time_a,insuficiente,,,5,,
+harrisiirak,cron-parser,CFR (a),cfr_a,insuficiente,,,6,,
+harrisiirak,cron-parser,Recuperação,recuperacao,insuficiente,,,0,,
+hashicorp,consul-template,Frequência,frequencia,sem_tendencia,0.7545348588028058,no trend,12,0.968856168420097,1.0
+hashicorp,consul-template,Lead time (a),lead_time_a,insuficiente,,,5,,
+hashicorp,consul-template,CFR (a),cfr_a,sem_tendencia,0.31604695316944054,no trend,9,0.6983132679553353,1.0
+hashicorp,consul-template,Recuperação,recuperacao,insuficiente,,,3,,
+hashicorp,terraform-provider-azurerm,Frequência,frequencia,sem_tendencia,0.889442555596055,no trend,12,0.9983148403186323,1.0
+hashicorp,terraform-provider-azurerm,Lead time (a),lead_time_a,sem_tendencia,0.19261627432960227,no trend,12,0.5896416561110274,1.0
+hashicorp,terraform-provider-azurerm,CFR (a),cfr_a,sem_tendencia,0.05378408886239838,no trend,12,0.38133409736628493,1.0
+hashicorp,terraform-provider-azurerm,Recuperação,recuperacao,insuficiente,,,6,,
+hmlongco,Factory,Frequência,frequencia,melhora,0.04380328888306284,increasing,12,0.28046964632226645,1.0
+hmlongco,Factory,Lead time (a),lead_time_a,insuficiente,,,5,,
+hmlongco,Factory,CFR (a),cfr_a,insuficiente,,,6,,
+hmlongco,Factory,Recuperação,recuperacao,insuficiente,,,1,,
+hrydgard,ppsspp,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+hrydgard,ppsspp,Lead time (a),lead_time_a,insuficiente,,,2,,
+hrydgard,ppsspp,CFR (a),cfr_a,sem_tendencia,0.40947828967066413,no trend,12,0.7639405983177789,1.0
+hrydgard,ppsspp,Recuperação,recuperacao,melhora,0.049097981609265595,decreasing,10,0.2544168137934672,1.0
+hydralauncher,hydra,Frequência,frequencia,sem_tendencia,0.5806119258901599,no trend,12,0.8649583758447105,1.0
+hydralauncher,hydra,Lead time (a),lead_time_a,sem_tendencia,0.7317017232242102,no trend,12,0.9523069852044742,1.0
+hydralauncher,hydra,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+hydralauncher,hydra,Recuperação,recuperacao,sem_tendencia,0.6021675277481957,no trend,9,0.9806728309042044,1.0
+iflytek,astron-agent,Frequência,frequencia,sem_tendencia,0.1617717649774142,no trend,12,0.5333135109145523,1.0
+iflytek,astron-agent,Lead time (a),lead_time_a,sem_tendencia,0.07633274037635718,no trend,9,0.424070779868651,1.0
+iflytek,astron-agent,CFR (a),cfr_a,sem_tendencia,0.11475673431864908,no trend,12,0.4757711962281005,1.0
+iflytek,astron-agent,Recuperação,recuperacao,sem_tendencia,1.0,no trend,11,1.0,1.0
+iii-hq,iii,Frequência,frequencia,sem_tendencia,0.37269149047151817,no trend,12,0.7764406051489963,1.0
+iii-hq,iii,Lead time (a),lead_time_a,sem_tendencia,0.9453298708327,no trend,12,1.0,1.0
+iii-hq,iii,CFR (a),cfr_a,piora,0.00597092894844975,increasing,12,0.17315693950504274,1.0
+iii-hq,iii,Recuperação,recuperacao,sem_tendencia,0.5915050369949166,no trend,10,0.9772691915568188,1.0
+Imbad0202,academic-research-skills,Frequência,frequencia,melhora,0.031686388539793775,increasing,12,0.2715976160553752,1.0
+Imbad0202,academic-research-skills,Lead time (a),lead_time_a,insuficiente,,,7,,
+Imbad0202,academic-research-skills,CFR (a),cfr_a,insuficiente,,,6,,
+Imbad0202,academic-research-skills,Recuperação,recuperacao,insuficiente,,,2,,
+iOfficeAI,AionUi,Frequência,frequencia,sem_tendencia,0.4485287515174601,no trend,12,0.7953005034956121,1.0
+iOfficeAI,AionUi,Lead time (a),lead_time_a,melhora,0.03352416523500468,decreasing,12,0.29539910460384033,1.0
+iOfficeAI,AionUi,CFR (a),cfr_a,insuficiente,,,6,,
+iOfficeAI,AionUi,Recuperação,recuperacao,insuficiente,,,5,,
+janhq,jan,Frequência,frequencia,sem_tendencia,0.1237917945950564,no trend,12,0.4421135521252014,1.0
+janhq,jan,Lead time (a),lead_time_a,sem_tendencia,0.7544541774940892,no trend,9,0.9523069852044742,1.0
+janhq,jan,CFR (a),cfr_a,sem_tendencia,0.29450739368011014,no trend,9,0.6907077044771099,1.0
+janhq,jan,Recuperação,recuperacao,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+jarrodwatts,claude-hud,Frequência,frequencia,sem_tendencia,0.0643415180961755,no trend,12,0.3271602615059771,1.0
+jarrodwatts,claude-hud,Lead time (a),lead_time_a,insuficiente,,,5,,
+jarrodwatts,claude-hud,CFR (a),cfr_a,sem_tendencia,1.0,no trend,8,1.0,1.0
+jarrodwatts,claude-hud,Recuperação,recuperacao,insuficiente,,,7,,
+jasmine,jasmine,Frequência,frequencia,sem_tendencia,0.4264748134950582,no trend,12,0.7953005034956121,1.0
+jasmine,jasmine,Lead time (a),lead_time_a,insuficiente,,,7,,
+jasmine,jasmine,CFR (a),cfr_a,sem_tendencia,1.0,no trend,10,1.0,1.0
+jasmine,jasmine,Recuperação,recuperacao,insuficiente,,,0,,
+javascript-obfuscator,javascript-obfuscator,Frequência,frequencia,sem_tendencia,0.36738215572089583,no trend,12,0.7761594839173855,1.0
+javascript-obfuscator,javascript-obfuscator,Lead time (a),lead_time_a,sem_tendencia,0.9169652366288645,no trend,9,1.0,1.0
+javascript-obfuscator,javascript-obfuscator,CFR (a),cfr_a,sem_tendencia,0.3024657509187063,no trend,12,0.6907077044771099,1.0
+javascript-obfuscator,javascript-obfuscator,Recuperação,recuperacao,insuficiente,,,4,,
+jekalmin,extended_openai_conversation,Frequência,frequencia,sem_tendencia,0.28550775455866795,no trend,12,0.669158799746878,1.0
+jekalmin,extended_openai_conversation,Lead time (a),lead_time_a,insuficiente,,,2,,
+jekalmin,extended_openai_conversation,CFR (a),cfr_a,insuficiente,,,5,,
+jekalmin,extended_openai_conversation,Recuperação,recuperacao,insuficiente,,,1,,
+jely2002,youtube-dl-gui,Frequência,frequencia,sem_tendencia,0.31102555629194084,no trend,12,0.7038883142443216,1.0
+jely2002,youtube-dl-gui,Lead time (a),lead_time_a,insuficiente,,,5,,
+jely2002,youtube-dl-gui,CFR (a),cfr_a,sem_tendencia,1.0,no trend,9,1.0,1.0
+jely2002,youtube-dl-gui,Recuperação,recuperacao,insuficiente,,,3,,
+jenkinsci,configuration-as-code-plugin,Frequência,frequencia,sem_tendencia,0.10904819577557401,no trend,12,0.42486310042431435,1.0
+jenkinsci,configuration-as-code-plugin,Lead time (a),lead_time_a,sem_tendencia,0.7544541774940892,no trend,9,0.9523069852044742,1.0
+jenkinsci,configuration-as-code-plugin,CFR (a),cfr_a,sem_tendencia,0.7720589697507347,no trend,12,0.9841483847000251,1.0
+jenkinsci,configuration-as-code-plugin,Recuperação,recuperacao,insuficiente,,,1,,
+JetBrains,koog,Frequência,frequencia,sem_tendencia,0.12010329539858722,no trend,12,0.4421135521252014,1.0
+JetBrains,koog,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+JetBrains,koog,CFR (a),cfr_a,sem_tendencia,0.8906603479582313,no trend,12,1.0,1.0
+JetBrains,koog,Recuperação,recuperacao,piora,0.0030934493227612325,increasing,11,0.17632661139739025,0.3495597734720193
+jgm,pandoc,Frequência,frequencia,sem_tendencia,0.6700765413856125,no trend,12,0.9096061647768494,1.0
+jgm,pandoc,Lead time (a),lead_time_a,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+jgm,pandoc,CFR (a),cfr_a,sem_tendencia,0.303673214899419,no trend,12,0.6907077044771099,1.0
+jgm,pandoc,Recuperação,recuperacao,sem_tendencia,0.303673214899419,no trend,12,0.7212238853861201,1.0
+jitsi,jitsi-meet,Frequência,frequencia,sem_tendencia,0.9419624652878842,no trend,12,0.9983148403186323,1.0
+jitsi,jitsi-meet,Lead time (a),lead_time_a,sem_tendencia,0.46551216987418664,no trend,9,0.8675750318914565,1.0
+jitsi,jitsi-meet,CFR (a),cfr_a,insuficiente,,,5,,
+jitsi,jitsi-meet,Recuperação,recuperacao,insuficiente,,,3,,
+JKorf,Binance.Net,Frequência,frequencia,sem_tendencia,0.9439073231042583,no trend,12,0.9983148403186323,1.0
+JKorf,Binance.Net,Lead time (a),lead_time_a,sem_tendencia,0.9453298708327,no trend,12,1.0,1.0
+JKorf,Binance.Net,CFR (a),cfr_a,sem_tendencia,0.05591135322907381,no trend,12,0.38133409736628493,1.0
+JKorf,Binance.Net,Recuperação,recuperacao,insuficiente,,,3,,
+juanfont,headscale,Frequência,frequencia,sem_tendencia,0.7119231506921901,no trend,12,0.9402794124283058,1.0
+juanfont,headscale,Lead time (a),lead_time_a,insuficiente,,,6,,
+juanfont,headscale,CFR (a),cfr_a,melhora,0.013344664289344221,decreasing,12,0.2237205598943356,1.0
+juanfont,headscale,Recuperação,recuperacao,sem_tendencia,0.37109336952269745,no trend,10,0.8016383002594919,1.0
+JuliaLang,julia,Frequência,frequencia,sem_tendencia,0.5279370991271883,no trend,12,0.8335848933587184,1.0
+JuliaLang,julia,Lead time (a),lead_time_a,sem_tendencia,0.1735462217878534,no trend,8,0.5784874059595113,1.0
+JuliaLang,julia,CFR (a),cfr_a,sem_tendencia,0.19997108902828353,no trend,12,0.6021061856730007,1.0
+JuliaLang,julia,Recuperação,recuperacao,insuficiente,,,2,,
+junegunn,fzf,Frequência,frequencia,sem_tendencia,0.6200342739259654,no trend,12,0.8785205050672198,1.0
+junegunn,fzf,Lead time (a),lead_time_a,sem_tendencia,0.6021675277481957,no trend,9,0.92168499145132,1.0
+junegunn,fzf,CFR (a),cfr_a,sem_tendencia,0.7847734964202786,no trend,12,0.9841483847000251,1.0
+junegunn,fzf,Recuperação,recuperacao,insuficiente,,,3,,
+Kaliiiiiiiiii-Vinyzu,patchright,Frequência,frequencia,sem_tendencia,0.6674364917098825,no trend,12,0.9096061647768494,1.0
+Kaliiiiiiiiii-Vinyzu,patchright,Lead time (a),lead_time_a,insuficiente,,,7,,
+Kaliiiiiiiiii-Vinyzu,patchright,CFR (a),cfr_a,sem_tendencia,0.34673621494997553,no trend,11,0.7312981988035847,1.0
+Kaliiiiiiiiii-Vinyzu,patchright,Recuperação,recuperacao,insuficiente,,,4,,
+karust,openserp,Frequência,frequencia,sem_tendencia,0.8166035426001967,no trend,12,0.9847193824769954,1.0
+karust,openserp,Lead time (a),lead_time_a,insuficiente,,,5,,
+karust,openserp,CFR (a),cfr_a,insuficiente,,,5,,
+karust,openserp,Recuperação,recuperacao,insuficiente,,,3,,
+kepano,defuddle,Frequência,frequencia,sem_tendencia,0.1973957318444992,no trend,12,0.5599192727166649,1.0
+kepano,defuddle,Lead time (a),lead_time_a,insuficiente,,,7,,
+kepano,defuddle,CFR (a),cfr_a,insuficiente,,,7,,
+kepano,defuddle,Recuperação,recuperacao,insuficiente,,,1,,
+keras-team,keras,Frequência,frequencia,sem_tendencia,0.9427644026876507,no trend,12,0.9983148403186323,1.0
+keras-team,keras,Lead time (a),lead_time_a,insuficiente,,,7,,
+keras-team,keras,CFR (a),cfr_a,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+keras-team,keras,Recuperação,recuperacao,sem_tendencia,0.11947098677170076,no trend,11,0.4393449190959318,1.0
+kovidgoyal,kitty,Frequência,frequencia,sem_tendencia,0.4389560432414523,no trend,12,0.7953005034956121,1.0
+kovidgoyal,kitty,Lead time (a),lead_time_a,sem_tendencia,0.536186771900174,no trend,8,0.8757617236579928,1.0
+kovidgoyal,kitty,CFR (a),cfr_a,sem_tendencia,0.11475673431864908,no trend,12,0.4757711962281005,1.0
+kovidgoyal,kitty,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+Kozea,WeasyPrint,Frequência,frequencia,sem_tendencia,0.7564476728885277,no trend,12,0.968856168420097,1.0
+Kozea,WeasyPrint,Lead time (a),lead_time_a,insuficiente,,,5,,
+Kozea,WeasyPrint,CFR (a),cfr_a,sem_tendencia,0.7789060199126654,no trend,12,0.9841483847000251,1.0
+Kozea,WeasyPrint,Recuperação,recuperacao,insuficiente,,,5,,
+kubecolor,kubecolor,Frequência,frequencia,sem_tendencia,0.3167497414099447,no trend,12,0.7038883142443216,1.0
+kubecolor,kubecolor,Lead time (a),lead_time_a,insuficiente,,,4,,
+kubecolor,kubecolor,CFR (a),cfr_a,sem_tendencia,0.6886643247682933,no trend,11,0.9398242549779062,1.0
+kubecolor,kubecolor,Recuperação,recuperacao,insuficiente,,,1,,
+kubernetes-sigs,kubebuilder,Frequência,frequencia,sem_tendencia,0.5640409593667477,no trend,12,0.854607514192042,1.0
+kubernetes-sigs,kubebuilder,Lead time (a),lead_time_a,insuficiente,,,7,,
+kubernetes-sigs,kubebuilder,CFR (a),cfr_a,melhora,0.037973247231988916,decreasing,12,0.3246116016563972,1.0
+kubernetes-sigs,kubebuilder,Recuperação,recuperacao,sem_tendencia,0.7544541774940892,no trend,9,1.0,1.0
+kvcache-ai,ktransformers,Frequência,frequencia,sem_tendencia,0.7177466181536067,no trend,12,0.9402794124283058,1.0
+kvcache-ai,ktransformers,Lead time (a),lead_time_a,sem_tendencia,0.37109336952269745,no trend,10,0.7764406051489963,1.0
+kvcache-ai,ktransformers,CFR (a),cfr_a,sem_tendencia,0.09689137754637667,no trend,12,0.44957599181518776,1.0
+kvcache-ai,ktransformers,Recuperação,recuperacao,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+lance0,ttl,Frequência,frequencia,sem_tendencia,0.3160728059506712,no trend,12,0.7038883142443216,1.0
+lance0,ttl,Lead time (a),lead_time_a,insuficiente,,,7,,
+lance0,ttl,CFR (a),cfr_a,sem_tendencia,0.29450739368011014,no trend,9,0.6907077044771099,1.0
+lance0,ttl,Recuperação,recuperacao,insuficiente,,,7,,
+langwatch,langwatch,Frequência,frequencia,sem_tendencia,0.08647112777407262,no trend,12,0.3696321894957027,1.0
+langwatch,langwatch,Lead time (a),lead_time_a,sem_tendencia,0.14986074751304912,no trend,12,0.5763874904348043,1.0
+langwatch,langwatch,CFR (a),cfr_a,melhora,0.004931500366306407,decreasing,12,0.17315693950504274,1.0
+langwatch,langwatch,Recuperação,recuperacao,melhora,0.03352416523500468,decreasing,12,0.2544168137934672,1.0
+laravel,dusk,Frequência,frequencia,sem_tendencia,0.9378848092843295,no trend,12,0.9983148403186323,1.0
+laravel,dusk,Lead time (a),lead_time_a,insuficiente,,,5,,
+laravel,dusk,CFR (a),cfr_a,sem_tendencia,0.47848006035463064,no trend,9,0.8162306911931935,1.0
+laravel,dusk,Recuperação,recuperacao,insuficiente,,,4,,
+lerna,lerna,Frequência,frequencia,sem_tendencia,0.8166035426001967,no trend,12,0.9847193824769954,1.0
+lerna,lerna,Lead time (a),lead_time_a,insuficiente,,,5,,
+lerna,lerna,CFR (a),cfr_a,insuficiente,,,7,,
+lerna,lerna,Recuperação,recuperacao,insuficiente,,,5,,
+librepods-org,librepods,Frequência,frequencia,sem_tendencia,0.6489848935408573,no trend,12,0.8972141385357474,1.0
+librepods-org,librepods,Lead time (a),lead_time_a,insuficiente,,,3,,
+librepods-org,librepods,CFR (a),cfr_a,sem_tendencia,0.6671689926066982,no trend,8,0.9340312585528859,1.0
+librepods-org,librepods,Recuperação,recuperacao,insuficiente,,,1,,
+Loongphy,codex-auth,Frequência,frequencia,sem_tendencia,0.5062461994287335,no trend,12,0.8334435726602543,1.0
+Loongphy,codex-auth,Lead time (a),lead_time_a,insuficiente,,,6,,
+Loongphy,codex-auth,CFR (a),cfr_a,insuficiente,,,7,,
+Loongphy,codex-auth,Recuperação,recuperacao,insuficiente,,,3,,
+lovell,sharp,Frequência,frequencia,sem_tendencia,0.12096283949797848,no trend,12,0.4421135521252014,1.0
+lovell,sharp,Lead time (a),lead_time_a,insuficiente,,,5,,
+lovell,sharp,CFR (a),cfr_a,insuficiente,,,7,,
+lovell,sharp,Recuperação,recuperacao,insuficiente,,,3,,
+lra,mackup,Frequência,frequencia,sem_tendencia,0.416559943276791,no trend,12,0.7953005034956121,1.0
+lra,mackup,Lead time (a),lead_time_a,insuficiente,,,6,,
+lra,mackup,CFR (a),cfr_a,sem_tendencia,1.0,no trend,10,1.0,1.0
+lra,mackup,Recuperação,recuperacao,insuficiente,,,0,,
+lucemia,typed-ffmpeg,Frequência,frequencia,sem_tendencia,0.6128139489903801,no trend,12,0.8785205050672198,1.0
+lucemia,typed-ffmpeg,Lead time (a),lead_time_a,insuficiente,,,7,,
+lucemia,typed-ffmpeg,CFR (a),cfr_a,sem_tendencia,0.08868330153663861,no trend,9,0.41988828482653384,1.0
+lucemia,typed-ffmpeg,Recuperação,recuperacao,insuficiente,,,6,,
+MAA1999,M9A,Frequência,frequencia,sem_tendencia,0.18770023708766903,no trend,12,0.5520595208460853,1.0
+MAA1999,M9A,Lead time (a),lead_time_a,sem_tendencia,0.19261627432960227,no trend,12,0.5896416561110274,1.0
+MAA1999,M9A,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+MAA1999,M9A,Recuperação,recuperacao,sem_tendencia,1.0,no trend,9,1.0,1.0
+major,MySQLTuner-perl,Frequência,frequencia,sem_tendencia,0.39512645793548673,no trend,12,0.7925386251690273,1.0
+major,MySQLTuner-perl,Lead time (a),lead_time_a,insuficiente,,,5,,
+major,MySQLTuner-perl,CFR (a),cfr_a,melhora,0.010733416102997273,decreasing,11,0.2237205598943356,1.0
+major,MySQLTuner-perl,Recuperação,recuperacao,insuficiente,,,0,,
+MarlinFirmware,Marlin,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+MarlinFirmware,Marlin,Lead time (a),lead_time_a,insuficiente,,,3,,
+MarlinFirmware,Marlin,CFR (a),cfr_a,sem_tendencia,0.5371338571769022,no trend,12,0.8369085142735705,1.0
+MarlinFirmware,Marlin,Recuperação,recuperacao,sem_tendencia,1.0,no trend,11,1.0,1.0
+mastodon,mastodon,Frequência,frequencia,sem_tendencia,0.48980822045220496,no trend,12,0.8152481070320005,1.0
+mastodon,mastodon,Lead time (a),lead_time_a,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+mastodon,mastodon,CFR (a),cfr_a,sem_tendencia,0.37269149047151817,no trend,12,0.7390121862341216,1.0
+mastodon,mastodon,Recuperação,recuperacao,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+maximhq,bifrost,Frequência,frequencia,piora,0.007487886815149114,decreasing,12,0.160454717467481,1.0
+maximhq,bifrost,Lead time (a),lead_time_a,insuficiente,,,0,,
+maximhq,bifrost,CFR (a),cfr_a,insuficiente,,,5,,
+maximhq,bifrost,Recuperação,recuperacao,insuficiente,,,5,,
+medialab,xan,Frequência,frequencia,sem_tendencia,0.8233846321530804,no trend,12,0.9847193824769954,1.0
+medialab,xan,Lead time (a),lead_time_a,insuficiente,,,6,,
+medialab,xan,CFR (a),cfr_a,sem_tendencia,0.9274651227146293,no trend,11,1.0,1.0
+medialab,xan,Recuperação,recuperacao,insuficiente,,,4,,
+MemoriLabs,Memori,Frequência,frequencia,sem_tendencia,0.1973957318444992,no trend,12,0.5599192727166649,1.0
+MemoriLabs,Memori,Lead time (a),lead_time_a,insuficiente,,,7,,
+MemoriLabs,Memori,CFR (a),cfr_a,sem_tendencia,0.16040081075525126,no trend,12,0.5638331529578529,1.0
+MemoriLabs,Memori,Recuperação,recuperacao,insuficiente,,,6,,
+MemPalace,mempalace,Frequência,frequencia,melhora,0.03917726226887552,increasing,12,0.28046964632226645,1.0
+MemPalace,mempalace,Lead time (a),lead_time_a,insuficiente,,,6,,
+MemPalace,mempalace,CFR (a),cfr_a,insuficiente,,,6,,
+MemPalace,mempalace,Recuperação,recuperacao,insuficiente,,,6,,
+microsoft,fluentui-blazor,Frequência,frequencia,sem_tendencia,0.9435339906388123,no trend,12,0.9983148403186323,1.0
+microsoft,fluentui-blazor,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,8,1.0,1.0
+microsoft,fluentui-blazor,CFR (a),cfr_a,sem_tendencia,0.7847734964202786,no trend,12,0.9841483847000251,1.0
+microsoft,fluentui-blazor,Recuperação,recuperacao,insuficiente,,,2,,
+microsoft,graphrag,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+microsoft,graphrag,Lead time (a),lead_time_a,sem_tendencia,0.2514521865080219,no trend,9,0.6617162802842682,1.0
+microsoft,graphrag,CFR (a),cfr_a,sem_tendencia,0.06256691631696598,no trend,9,0.38133409736628493,1.0
+microsoft,graphrag,Recuperação,recuperacao,insuficiente,,,5,,
+microsoft,TypeScript,Frequência,frequencia,sem_tendencia,0.6417714416872791,no trend,12,0.8913492245656655,1.0
+microsoft,TypeScript,Lead time (a),lead_time_a,insuficiente,,,4,,
+microsoft,TypeScript,CFR (a),cfr_a,sem_tendencia,0.3627265064850982,no trend,12,0.7390121862341216,1.0
+microsoft,TypeScript,Recuperação,recuperacao,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+microsoft,winget-cli,Frequência,frequencia,sem_tendencia,0.6647321388663945,no trend,12,0.9096061647768494,1.0
+microsoft,winget-cli,Lead time (a),lead_time_a,insuficiente,,,7,,
+microsoft,winget-cli,CFR (a),cfr_a,sem_tendencia,0.28550775455866795,no trend,12,0.6907077044771099,1.0
+microsoft,winget-cli,Recuperação,recuperacao,insuficiente,,,2,,
+mikefarah,yq,Frequência,frequencia,sem_tendencia,0.6234966032027147,no trend,12,0.8785205050672198,1.0
+mikefarah,yq,Lead time (a),lead_time_a,sem_tendencia,0.28313087066234655,no trend,10,0.6741211206246347,1.0
+mikefarah,yq,CFR (a),cfr_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+mikefarah,yq,Recuperação,recuperacao,insuficiente,,,4,,
+ministackorg,ministack,Frequência,frequencia,sem_tendencia,0.10041249398610286,no trend,12,0.4070776783220386,1.0
+ministackorg,ministack,Lead time (a),lead_time_a,insuficiente,,,7,,
+ministackorg,ministack,CFR (a),cfr_a,insuficiente,,,6,,
+ministackorg,ministack,Recuperação,recuperacao,insuficiente,,,6,,
+Mintplex-Labs,anything-llm,Frequência,frequencia,sem_tendencia,0.1812763924126699,no trend,12,0.5520595208460853,1.0
+Mintplex-Labs,anything-llm,Lead time (a),lead_time_a,sem_tendencia,0.10740463633025366,no trend,10,0.4652300039945233,1.0
+Mintplex-Labs,anything-llm,CFR (a),cfr_a,sem_tendencia,0.6585429331528818,no trend,12,0.9340312585528859,1.0
+Mintplex-Labs,anything-llm,Recuperação,recuperacao,insuficiente,,,6,,
+Mithril-mine,libmdbx,Frequência,frequencia,sem_tendencia,0.25638585085648957,no trend,12,0.6202883488463458,1.0
+Mithril-mine,libmdbx,Lead time (a),lead_time_a,insuficiente,,,4,,
+Mithril-mine,libmdbx,CFR (a),cfr_a,insuficiente,,,6,,
+Mithril-mine,libmdbx,Recuperação,recuperacao,insuficiente,,,0,,
+mlc-ai,xgrammar,Frequência,frequencia,sem_tendencia,0.1725296433586836,no trend,12,0.5448304527116324,1.0
+mlc-ai,xgrammar,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,10,1.0,1.0
+mlc-ai,xgrammar,CFR (a),cfr_a,sem_tendencia,0.5286121252556879,no trend,12,0.8369085142735705,1.0
+mlc-ai,xgrammar,Recuperação,recuperacao,insuficiente,,,7,,
+moeru-ai,airi,Frequência,frequencia,sem_tendencia,0.5265783710669814,no trend,12,0.8335848933587184,1.0
+moeru-ai,airi,Lead time (a),lead_time_a,sem_tendencia,0.38647623077123283,no trend,8,0.7833977650768232,1.0
+moeru-ai,airi,CFR (a),cfr_a,sem_tendencia,0.08647112777407262,no trend,12,0.417943784241351,1.0
+moeru-ai,airi,Recuperação,recuperacao,sem_tendencia,0.24372228477217428,no trend,12,0.6514897559526023,1.0
+monoscope-tech,monoscope,Frequência,frequencia,sem_tendencia,0.20646258713596,no trend,12,0.5599192727166649,1.0
+monoscope-tech,monoscope,Lead time (a),lead_time_a,insuficiente,,,7,,
+monoscope-tech,monoscope,CFR (a),cfr_a,sem_tendencia,0.08647112777407262,no trend,12,0.417943784241351,1.0
+monoscope-tech,monoscope,Recuperação,recuperacao,sem_tendencia,0.11475673431864908,no trend,12,0.4393449190959318,1.0
+mr-karan,doggo,Frequência,frequencia,sem_tendencia,0.8322791697540461,no trend,12,0.9847193824769954,1.0
+mr-karan,doggo,Lead time (a),lead_time_a,sem_tendencia,0.6021675277481957,no trend,9,0.92168499145132,1.0
+mr-karan,doggo,CFR (a),cfr_a,insuficiente,,,5,,
+mr-karan,doggo,Recuperação,recuperacao,insuficiente,,,3,,
+mvanhorn,last30days-skill,Frequência,frequencia,melhora,0.0026073020496655275,increasing,12,0.15643812297993165,0.7717614067009961
+mvanhorn,last30days-skill,Lead time (a),lead_time_a,insuficiente,,,7,,
+mvanhorn,last30days-skill,CFR (a),cfr_a,insuficiente,,,6,,
+mvanhorn,last30days-skill,Recuperação,recuperacao,insuficiente,,,3,,
+n42-gateway,n42-gateway,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+n42-gateway,n42-gateway,Lead time (a),lead_time_a,insuficiente,,,5,,
+n42-gateway,n42-gateway,CFR (a),cfr_a,sem_tendencia,0.24183542123691049,no trend,11,0.6574833728737725,1.0
+n42-gateway,n42-gateway,Recuperação,recuperacao,insuficiente,,,2,,
+nautechsystems,nautilus_trader,Frequência,frequencia,sem_tendencia,0.82650480173121,no trend,12,0.9847193824769954,1.0
+nautechsystems,nautilus_trader,Lead time (a),lead_time_a,sem_tendencia,0.2655103889538737,no trend,8,0.6671560834536516,1.0
+nautechsystems,nautilus_trader,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+nautechsystems,nautilus_trader,Recuperação,recuperacao,sem_tendencia,0.37269149047151817,no trend,12,0.8016383002594919,1.0
+nekomangaorg,Neko,Frequência,frequencia,sem_tendencia,0.835219149785029,no trend,12,0.9847193824769954,1.0
+nekomangaorg,Neko,Lead time (a),lead_time_a,sem_tendencia,0.6312218204782534,no trend,12,0.9418070403129278,1.0
+nekomangaorg,Neko,CFR (a),cfr_a,sem_tendencia,0.303673214899419,no trend,12,0.6907077044771099,1.0
+nekomangaorg,Neko,Recuperação,recuperacao,sem_tendencia,0.27575784782750934,no trend,11,0.6688594606880014,1.0
+nesquena,hermes-webui,Frequência,frequencia,sem_tendencia,0.1653336956971918,no trend,12,0.5391316164038864,1.0
+nesquena,hermes-webui,Lead time (a),lead_time_a,insuficiente,,,0,,
+nesquena,hermes-webui,CFR (a),cfr_a,insuficiente,,,6,,
+nesquena,hermes-webui,Recuperação,recuperacao,insuficiente,,,6,,
+netbirdio,netbird,Frequência,frequencia,sem_tendencia,0.6274191063660997,no trend,12,0.8785205050672198,1.0
+netbirdio,netbird,Lead time (a),lead_time_a,piora,0.007487886815149114,increasing,12,0.17407335652014672,1.0
+netbirdio,netbird,CFR (a),cfr_a,piora,0.023642218909198487,increasing,12,0.2493179448606386,1.0
+netbirdio,netbird,Recuperação,recuperacao,melhora,0.023642218909198487,decreasing,12,0.2544168137934672,1.0
+netdata,netdata,Frequência,frequencia,sem_tendencia,0.4841966752199429,no trend,12,0.8152481070320005,1.0
+netdata,netdata,Lead time (a),lead_time_a,sem_tendencia,0.536186771900174,no trend,8,0.8757617236579928,1.0
+netdata,netdata,CFR (a),cfr_a,sem_tendencia,0.4506702853141802,no trend,12,0.792087168127953,1.0
+netdata,netdata,Recuperação,recuperacao,sem_tendencia,0.08647112777407262,no trend,12,0.37914263716324154,1.0
+nextcloud,server,Frequência,frequencia,sem_tendencia,0.20346804759609594,no trend,12,0.5599192727166649,1.0
+nextcloud,server,Lead time (a),lead_time_a,insuficiente,,,6,,
+nextcloud,server,CFR (a),cfr_a,melhora,0.011174811327380407,decreasing,12,0.2237205598943356,1.0
+nextcloud,server,Recuperação,recuperacao,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+nginx,nginx-gateway-fabric,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+nginx,nginx-gateway-fabric,Lead time (a),lead_time_a,sem_tendencia,0.8762696636277618,no trend,11,1.0,1.0
+nginx,nginx-gateway-fabric,CFR (a),cfr_a,sem_tendencia,0.24372228477217428,no trend,12,0.6574833728737725,1.0
+nginx,nginx-gateway-fabric,Recuperação,recuperacao,sem_tendencia,0.6312218204782534,no trend,12,0.9994345490905678,1.0
+nicholas-fedor,watchtower,Frequência,frequencia,melhora,0.04434783184809432,increasing,12,0.28046964632226645,1.0
+nicholas-fedor,watchtower,Lead time (a),lead_time_a,sem_tendencia,0.11475673431864908,no trend,12,0.4652300039945233,1.0
+nicholas-fedor,watchtower,CFR (a),cfr_a,sem_tendencia,0.37269149047151817,no trend,12,0.7390121862341216,1.0
+nicholas-fedor,watchtower,Recuperação,recuperacao,sem_tendencia,0.14986074751304912,no trend,12,0.4826198991963727,1.0
+nilbuild,driver.js,Frequência,frequencia,sem_tendencia,0.7847734964202786,no trend,12,0.968856168420097,1.0
+nilbuild,driver.js,Lead time (a),lead_time_a,insuficiente,,,3,,
+nilbuild,driver.js,CFR (a),cfr_a,insuficiente,,,2,,
+nilbuild,driver.js,Recuperação,recuperacao,insuficiente,,,2,,
+NLnetLabs,unbound,Frequência,frequencia,sem_tendencia,0.46058831430299785,no trend,12,0.8080496742157858,1.0
+NLnetLabs,unbound,Lead time (a),lead_time_a,insuficiente,,,7,,
+NLnetLabs,unbound,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+NLnetLabs,unbound,Recuperação,recuperacao,insuficiente,,,3,,
+nowsecure,r2frida,Frequência,frequencia,sem_tendencia,0.4264748134950582,no trend,12,0.7953005034956121,1.0
+nowsecure,r2frida,Lead time (a),lead_time_a,insuficiente,,,7,,
+nowsecure,r2frida,CFR (a),cfr_a,sem_tendencia,0.31004412387652436,no trend,11,0.6916368917245543,1.0
+nowsecure,r2frida,Recuperação,recuperacao,insuficiente,,,7,,
+NVIDIA,Megatron-LM,Frequência,frequencia,sem_tendencia,0.8317275289742834,no trend,12,0.9847193824769954,1.0
+NVIDIA,Megatron-LM,Lead time (a),lead_time_a,sem_tendencia,0.640428787412791,no trend,11,0.9418070403129278,1.0
+NVIDIA,Megatron-LM,CFR (a),cfr_a,sem_tendencia,0.06410357671243583,no trend,12,0.38133409736628493,1.0
+NVIDIA,Megatron-LM,Recuperação,recuperacao,melhora,0.046744941053711075,decreasing,12,0.2544168137934672,1.0
+octobox,octobox,Frequência,frequencia,sem_tendencia,0.8742370790117615,no trend,12,0.9983148403186323,1.0
+octobox,octobox,Lead time (a),lead_time_a,sem_tendencia,0.5371338571769022,no trend,12,0.8757617236579928,1.0
+octobox,octobox,CFR (a),cfr_a,sem_tendencia,0.8943181533601761,no trend,8,1.0,1.0
+octobox,octobox,Recuperação,recuperacao,insuficiente,,,4,,
+onyx-dot-app,onyx,Frequência,frequencia,melhora,0.0015680818590886325,increasing,12,0.15643812297993165,0.4688564758675011
+onyx-dot-app,onyx,Lead time (a),lead_time_a,sem_tendencia,0.37269149047151817,no trend,12,0.7764406051489963,1.0
+onyx-dot-app,onyx,CFR (a),cfr_a,sem_tendencia,0.14986074751304912,no trend,12,0.5348875911234985,1.0
+onyx-dot-app,onyx,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+openai,codex,Frequência,frequencia,sem_tendencia,0.7833643646826536,no trend,12,0.968856168420097,1.0
+openai,codex,Lead time (a),lead_time_a,sem_tendencia,0.5371338571769022,no trend,12,0.8757617236579928,1.0
+openai,codex,CFR (a),cfr_a,piora,6.702922845969184e-05,increasing,12,0.015550781002648506,0.015550781002648506
+openai,codex,Recuperação,recuperacao,sem_tendencia,0.15240628395674927,no trend,10,0.4826198991963727,1.0
+openfoodfacts,openfoodfacts-server,Frequência,frequencia,sem_tendencia,0.08499128280623891,no trend,12,0.36952731654886484,1.0
+openfoodfacts,openfoodfacts-server,Lead time (a),lead_time_a,melhora,0.012731364269923606,decreasing,11,0.20610820909587602,1.0
+openfoodfacts,openfoodfacts-server,CFR (a),cfr_a,sem_tendencia,0.24372228477217428,no trend,12,0.6574833728737725,1.0
+openfoodfacts,openfoodfacts-server,Recuperação,recuperacao,melhora,0.03352416523500468,decreasing,12,0.2544168137934672,1.0
+OpenMind,OM1,Frequência,frequencia,sem_tendencia,0.2462205963924462,no trend,12,0.6005380399815762,1.0
+OpenMind,OM1,Lead time (a),lead_time_a,insuficiente,,,5,,
+OpenMind,OM1,CFR (a),cfr_a,sem_tendencia,0.16653338573117038,no trend,12,0.568172727788699,1.0
+OpenMind,OM1,Recuperação,recuperacao,sem_tendencia,0.2655103889538737,no trend,8,0.6580040074074262,1.0
+OpenRCT2,OpenRCT2,Frequência,frequencia,sem_tendencia,0.9406937378815914,no trend,12,0.9983148403186323,1.0
+OpenRCT2,OpenRCT2,Lead time (a),lead_time_a,sem_tendencia,0.640428787412791,no trend,11,0.9418070403129278,1.0
+OpenRCT2,OpenRCT2,CFR (a),cfr_a,sem_tendencia,0.07392248595953888,no trend,12,0.417943784241351,1.0
+OpenRCT2,OpenRCT2,Recuperação,recuperacao,sem_tendencia,0.5915050369949166,no trend,10,0.9772691915568188,1.0
+openwrt,openwrt,Frequência,frequencia,sem_tendencia,0.6991071107180751,no trend,12,0.9321428142907667,1.0
+openwrt,openwrt,Lead time (a),lead_time_a,insuficiente,,,3,,
+openwrt,openwrt,CFR (a),cfr_a,sem_tendencia,0.06410357671243583,no trend,12,0.38133409736628493,1.0
+openwrt,openwrt,Recuperação,recuperacao,sem_tendencia,0.14986074751304912,no trend,12,0.4826198991963727,1.0
+osprey-oss,migrate-to-uv,Frequência,frequencia,piora,0.03811647017612607,decreasing,12,0.28046964632226645,1.0
+osprey-oss,migrate-to-uv,Lead time (a),lead_time_a,insuficiente,,,6,,
+osprey-oss,migrate-to-uv,CFR (a),cfr_a,sem_tendencia,0.6803934598941281,no trend,12,0.9340312585528859,1.0
+osprey-oss,migrate-to-uv,Recuperação,recuperacao,insuficiente,,,4,,
+owasp-modsecurity,ModSecurity,Frequência,frequencia,sem_tendencia,0.06896361630469405,no trend,12,0.33369491760335834,1.0
+owasp-modsecurity,ModSecurity,Lead time (a),lead_time_a,insuficiente,,,3,,
+owasp-modsecurity,ModSecurity,CFR (a),cfr_a,sem_tendencia,0.8020819405815862,no trend,9,0.9931422394281673,1.0
+owasp-modsecurity,ModSecurity,Recuperação,recuperacao,insuficiente,,,2,,
+palmier-io,palmier-pro,Frequência,frequencia,sem_tendencia,0.05549102390353711,no trend,12,0.2891966546331404,1.0
+palmier-io,palmier-pro,Lead time (a),lead_time_a,insuficiente,,,6,,
+palmier-io,palmier-pro,CFR (a),cfr_a,insuficiente,,,3,,
+palmier-io,palmier-pro,Recuperação,recuperacao,insuficiente,,,3,,
+pandas-dev,pandas,Frequência,frequencia,sem_tendencia,0.1872884962268888,no trend,12,0.5520595208460853,1.0
+pandas-dev,pandas,Lead time (a),lead_time_a,insuficiente,,,6,,
+pandas-dev,pandas,CFR (a),cfr_a,sem_tendencia,0.37269149047151817,no trend,12,0.7390121862341216,1.0
+pandas-dev,pandas,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+pathwaycom,pathway,Frequência,frequencia,piora,0.013174803182939954,decreasing,12,0.18226838682601754,1.0
+pathwaycom,pathway,Lead time (a),lead_time_a,sem_tendencia,0.10740463633025366,no trend,10,0.4652300039945233,1.0
+pathwaycom,pathway,CFR (a),cfr_a,piora,0.037973247231988916,increasing,12,0.3246116016563972,1.0
+pathwaycom,pathway,Recuperação,recuperacao,sem_tendencia,0.17530808080827365,no trend,9,0.5259242424248209,1.0
+perber,leafwiki,Frequência,frequencia,sem_tendencia,0.535208057336304,no trend,12,0.8392716518389097,1.0
+perber,leafwiki,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+perber,leafwiki,CFR (a),cfr_a,sem_tendencia,0.205027537362789,no trend,9,0.6021061856730007,1.0
+perber,leafwiki,Recuperação,recuperacao,insuficiente,,,4,,
+plotly,plotly.js,Frequência,frequencia,sem_tendencia,0.9435339906388123,no trend,12,0.9983148403186323,1.0
+plotly,plotly.js,Lead time (a),lead_time_a,sem_tendencia,0.8580276569875211,no trend,10,1.0,1.0
+plotly,plotly.js,CFR (a),cfr_a,insuficiente,,,2,,
+plotly,plotly.js,Recuperação,recuperacao,insuficiente,,,2,,
+plutoprint,plutoprint,Frequência,frequencia,sem_tendencia,0.07660717221735935,no trend,12,0.34301718903295236,1.0
+plutoprint,plutoprint,Lead time (a),lead_time_a,sem_tendencia,0.9169652366288645,no trend,9,1.0,1.0
+plutoprint,plutoprint,CFR (a),cfr_a,sem_tendencia,0.42919530044034926,no trend,11,0.7902643627155637,1.0
+plutoprint,plutoprint,Recuperação,recuperacao,insuficiente,,,1,,
+pointfreeco,sqlite-data,Frequência,frequencia,sem_tendencia,0.9444536924990754,no trend,12,0.9983148403186323,1.0
+pointfreeco,sqlite-data,Lead time (a),lead_time_a,sem_tendencia,0.2514521865080219,no trend,9,0.6617162802842682,1.0
+pointfreeco,sqlite-data,CFR (a),cfr_a,sem_tendencia,0.7847734964202786,no trend,12,0.9841483847000251,1.0
+pointfreeco,sqlite-data,Recuperação,recuperacao,insuficiente,,,3,,
+pterodactyl,panel,Frequência,frequencia,sem_tendencia,0.23605132624241243,no trend,12,0.5993170937020679,1.0
+pterodactyl,panel,Lead time (a),lead_time_a,insuficiente,,,6,,
+pterodactyl,panel,CFR (a),cfr_a,sem_tendencia,0.8516262084243986,no trend,10,1.0,1.0
+pterodactyl,panel,Recuperação,recuperacao,insuficiente,,,6,,
+pythops,impala,Frequência,frequencia,sem_tendencia,0.20928526081921062,no trend,12,0.5599192727166649,1.0
+pythops,impala,Lead time (a),lead_time_a,insuficiente,,,6,,
+pythops,impala,CFR (a),cfr_a,sem_tendencia,0.38273308888522584,no trend,8,0.7439868288112591,1.0
+pythops,impala,Recuperação,recuperacao,insuficiente,,,1,,
+qgis,QGIS,Frequência,frequencia,sem_tendencia,0.4685497616174161,no trend,12,0.8152481070320005,1.0
+qgis,QGIS,Lead time (a),lead_time_a,piora,0.018741136789596657,increasing,8,0.2162438860338076,1.0
+qgis,QGIS,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+qgis,QGIS,Recuperação,recuperacao,sem_tendencia,0.37269149047151817,no trend,12,0.8016383002594919,1.0
+QL-Win,QuickLook,Frequência,frequencia,sem_tendencia,0.06896361630469405,no trend,12,0.33369491760335834,1.0
+QL-Win,QuickLook,Lead time (a),lead_time_a,insuficiente,,,4,,
+QL-Win,QuickLook,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+QL-Win,QuickLook,Recuperação,recuperacao,sem_tendencia,0.9015386266571279,no trend,8,1.0,1.0
+questdb,questdb,Frequência,frequencia,sem_tendencia,0.18557189221115555,no trend,12,0.5520595208460853,1.0
+questdb,questdb,Lead time (a),lead_time_a,sem_tendencia,0.5915050369949166,no trend,10,0.92168499145132,1.0
+questdb,questdb,CFR (a),cfr_a,insuficiente,,,7,,
+questdb,questdb,Recuperação,recuperacao,insuficiente,,,0,,
+react,react,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+react,react,Lead time (a),lead_time_a,piora,0.035447892552460836,increasing,8,0.29539910460384033,1.0
+react,react,CFR (a),cfr_a,sem_tendencia,0.7833643646826536,no trend,12,0.9841483847000251,1.0
+react,react,Recuperação,recuperacao,sem_tendencia,1.0,no trend,10,1.0,1.0
+react-hook-form,react-hook-form,Frequência,frequencia,sem_tendencia,0.36506664603773453,no trend,12,0.7761594839173855,1.0
+react-hook-form,react-hook-form,Lead time (a),lead_time_a,sem_tendencia,0.4506702853141802,no trend,12,0.8557030733813549,1.0
+react-hook-form,react-hook-form,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+react-hook-form,react-hook-form,Recuperação,recuperacao,insuficiente,,,0,,
+readest,readest,Frequência,frequencia,sem_tendencia,0.39965648920804897,no trend,12,0.7925386251690273,1.0
+readest,readest,Lead time (a),lead_time_a,sem_tendencia,0.37269149047151817,no trend,12,0.7764406051489963,1.0
+readest,readest,CFR (a),cfr_a,sem_tendencia,0.2839767717509116,no trend,12,0.6907077044771099,1.0
+readest,readest,Recuperação,recuperacao,insuficiente,,,7,,
+realm,SwiftLint,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+realm,SwiftLint,Lead time (a),lead_time_a,insuficiente,,,5,,
+realm,SwiftLint,CFR (a),cfr_a,sem_tendencia,0.7317017232242102,no trend,12,0.964515907886459,1.0
+realm,SwiftLint,Recuperação,recuperacao,sem_tendencia,0.640428787412791,no trend,11,1.0,1.0
+refined-github,refined-github,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+refined-github,refined-github,Lead time (a),lead_time_a,sem_tendencia,0.24372228477217428,no trend,12,0.6617162802842682,1.0
+refined-github,refined-github,CFR (a),cfr_a,sem_tendencia,0.5374972785636294,no trend,12,0.8369085142735705,1.0
+refined-github,refined-github,Recuperação,recuperacao,insuficiente,,,5,,
+reflex-dev,reflex,Frequência,frequencia,melhora,0.046744941053711075,increasing,12,0.28046964632226645,1.0
+reflex-dev,reflex,Lead time (a),lead_time_a,melhora,0.03352416523500468,decreasing,12,0.29539910460384033,1.0
+reflex-dev,reflex,CFR (a),cfr_a,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+reflex-dev,reflex,Recuperação,recuperacao,melhora,0.03352416523500468,decreasing,12,0.2544168137934672,1.0
+resque,resque,Frequência,frequencia,sem_tendencia,0.12172159971705532,no trend,12,0.4421135521252014,1.0
+resque,resque,Lead time (a),lead_time_a,insuficiente,,,3,,
+resque,resque,CFR (a),cfr_a,insuficiente,,,6,,
+resque,resque,Recuperação,recuperacao,insuficiente,,,4,,
+rnmapbox,maps,Frequência,frequencia,sem_tendencia,0.08938277872078904,no trend,12,0.37242824466995433,1.0
+rnmapbox,maps,Lead time (a),lead_time_a,insuficiente,,,6,,
+rnmapbox,maps,CFR (a),cfr_a,melhora,0.047292283486333186,decreasing,10,0.3539293473815903,1.0
+rnmapbox,maps,Recuperação,recuperacao,sem_tendencia,0.536186771900174,no trend,8,0.9139292495248783,1.0
+roadrunner-server,roadrunner,Frequência,frequencia,sem_tendencia,0.22542593666666777,no trend,12,0.5829981120689683,1.0
+roadrunner-server,roadrunner,Lead time (a),lead_time_a,sem_tendencia,0.7105230229164894,no trend,8,0.9523069852044742,1.0
+roadrunner-server,roadrunner,CFR (a),cfr_a,sem_tendencia,0.7682863445435852,no trend,12,0.9841483847000251,1.0
+roadrunner-server,roadrunner,Recuperação,recuperacao,insuficiente,,,6,,
+rockbenben,ChatGPT-Shortcut,Frequência,frequencia,sem_tendencia,0.31524414815863033,no trend,12,0.7038883142443216,1.0
+rockbenben,ChatGPT-Shortcut,Lead time (a),lead_time_a,sem_tendencia,0.06348653056076747,no trend,8,0.4006473544527239,1.0
+rockbenben,ChatGPT-Shortcut,CFR (a),cfr_a,sem_tendencia,0.5374972785636294,no trend,12,0.8369085142735705,1.0
+rockbenben,ChatGPT-Shortcut,Recuperação,recuperacao,insuficiente,,,5,,
+ROCm,FastFlowLM,Frequência,frequencia,sem_tendencia,0.23395283347058982,no trend,12,0.5993170937020679,1.0
+ROCm,FastFlowLM,Lead time (a),lead_time_a,sem_tendencia,0.27575784782750934,no trend,11,0.6671560834536516,1.0
+ROCm,FastFlowLM,CFR (a),cfr_a,sem_tendencia,0.20286582377474893,no trend,8,0.6021061856730007,1.0
+ROCm,FastFlowLM,Recuperação,recuperacao,insuficiente,,,5,,
+rollup,rollup,Frequência,frequencia,sem_tendencia,0.8901433851357767,no trend,12,0.9983148403186323,1.0
+rollup,rollup,Lead time (a),lead_time_a,sem_tendencia,0.6312218204782534,no trend,12,0.9418070403129278,1.0
+rollup,rollup,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+rollup,rollup,Recuperação,recuperacao,sem_tendencia,0.8762696636277618,no trend,11,1.0,1.0
+router-for-me,Cli-Proxy-API-Management-Center,Frequência,frequencia,sem_tendencia,0.303673214899419,no trend,12,0.7038883142443216,1.0
+router-for-me,Cli-Proxy-API-Management-Center,Lead time (a),lead_time_a,piora,0.016393316888809073,increasing,12,0.20610820909587602,1.0
+router-for-me,Cli-Proxy-API-Management-Center,CFR (a),cfr_a,insuficiente,,,3,,
+router-for-me,Cli-Proxy-API-Management-Center,Recuperação,recuperacao,insuficiente,,,0,,
+rudderlabs,rudder-server,Frequência,frequencia,sem_tendencia,0.21600611845484874,no trend,12,0.5684371538285493,1.0
+rudderlabs,rudder-server,Lead time (a),lead_time_a,sem_tendencia,0.7317017232242102,no trend,12,0.9523069852044742,1.0
+rudderlabs,rudder-server,CFR (a),cfr_a,sem_tendencia,0.7317017232242102,no trend,12,0.964515907886459,1.0
+rudderlabs,rudder-server,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+rustsec,rustsec,Frequência,frequencia,sem_tendencia,0.8876300645140318,no trend,12,0.9983148403186323,1.0
+rustsec,rustsec,Lead time (a),lead_time_a,melhora,0.035447892552460836,decreasing,8,0.29539910460384033,1.0
+rustsec,rustsec,CFR (a),cfr_a,sem_tendencia,0.40650635561717285,no trend,12,0.7639405983177789,1.0
+rustsec,rustsec,Recuperação,recuperacao,sem_tendencia,0.34808262363292397,no trend,9,0.8016383002594919,1.0
+SakanaAI,ShinkaEvolve,Frequência,frequencia,sem_tendencia,0.6803934598941281,no trend,12,0.9153275245212487,1.0
+SakanaAI,ShinkaEvolve,Lead time (a),lead_time_a,insuficiente,,,4,,
+SakanaAI,ShinkaEvolve,CFR (a),cfr_a,insuficiente,,,7,,
+SakanaAI,ShinkaEvolve,Recuperação,recuperacao,insuficiente,,,2,,
+scalameta,scalafmt,Frequência,frequencia,sem_tendencia,0.10560348531662078,no trend,12,0.41685586309192413,1.0
+scalameta,scalafmt,Lead time (a),lead_time_a,sem_tendencia,0.1735462217878534,no trend,8,0.5784874059595113,1.0
+scalameta,scalafmt,CFR (a),cfr_a,sem_tendencia,0.9453298708327,no trend,12,1.0,1.0
+scalameta,scalafmt,Recuperação,recuperacao,sem_tendencia,1.0,no trend,10,1.0,1.0
+SeaQL,sea-orm,Frequência,frequencia,melhora,0.01887010283034174,increasing,12,0.20217967318223293,1.0
+SeaQL,sea-orm,Lead time (a),lead_time_a,sem_tendencia,0.7205147871362552,no trend,10,0.9523069852044742,1.0
+SeaQL,sea-orm,CFR (a),cfr_a,melhora,0.016393316888809073,decreasing,12,0.2237205598943356,1.0
+SeaQL,sea-orm,Recuperação,recuperacao,piora,0.04296014602842502,increasing,11,0.2544168137934672,1.0
+SeleniumHQ,docker-selenium,Frequência,frequencia,sem_tendencia,0.4827649755253569,no trend,12,0.8152481070320005,1.0
+SeleniumHQ,docker-selenium,Lead time (a),lead_time_a,sem_tendencia,0.4362749288405292,no trend,11,0.8557030733813549,1.0
+SeleniumHQ,docker-selenium,CFR (a),cfr_a,sem_tendencia,0.3704318883675959,no trend,12,0.7390121862341216,1.0
+SeleniumHQ,docker-selenium,Recuperação,recuperacao,sem_tendencia,0.8580276569875211,no trend,10,1.0,1.0
+sipeed,picoclaw,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+sipeed,picoclaw,Lead time (a),lead_time_a,insuficiente,,,5,,
+sipeed,picoclaw,CFR (a),cfr_a,insuficiente,,,7,,
+sipeed,picoclaw,Recuperação,recuperacao,insuficiente,,,6,,
+slackapi,bolt-js,Frequência,frequencia,sem_tendencia,0.5884135185327466,no trend,12,0.8653139978422744,1.0
+slackapi,bolt-js,Lead time (a),lead_time_a,insuficiente,,,5,,
+slackapi,bolt-js,CFR (a),cfr_a,sem_tendencia,0.14750139990263267,no trend,12,0.5348875911234985,1.0
+slackapi,bolt-js,Recuperação,recuperacao,insuficiente,,,1,,
+Smaug6739,Alexandrie,Frequência,frequencia,sem_tendencia,0.6223530015591523,no trend,12,0.8785205050672198,1.0
+Smaug6739,Alexandrie,Lead time (a),lead_time_a,sem_tendencia,0.07363827012030266,no trend,10,0.424070779868651,1.0
+Smaug6739,Alexandrie,CFR (a),cfr_a,sem_tendencia,0.05591135322907381,no trend,11,0.38133409736628493,1.0
+Smaug6739,Alexandrie,Recuperação,recuperacao,insuficiente,,,2,,
+softwaremill,tapir,Frequência,frequencia,sem_tendencia,0.23925400743578584,no trend,12,0.5993170937020679,1.0
+softwaremill,tapir,Lead time (a),lead_time_a,sem_tendencia,0.303673214899419,no trend,12,0.7007843420755823,1.0
+softwaremill,tapir,CFR (a),cfr_a,melhora,0.016393316888809073,decreasing,12,0.2237205598943356,1.0
+softwaremill,tapir,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+spicetify,cli,Frequência,frequencia,sem_tendencia,0.4389560432414523,no trend,12,0.7953005034956121,1.0
+spicetify,cli,Lead time (a),lead_time_a,sem_tendencia,0.10776229039192153,no trend,8,0.4652300039945233,1.0
+spicetify,cli,CFR (a),cfr_a,sem_tendencia,0.3848207735230651,no trend,12,0.7439868288112591,1.0
+spicetify,cli,Recuperação,recuperacao,insuficiente,,,1,,
+spotify,luigi,Frequência,frequencia,sem_tendencia,0.40842824139705947,no trend,12,0.7925386251690273,1.0
+spotify,luigi,Lead time (a),lead_time_a,insuficiente,,,4,,
+spotify,luigi,CFR (a),cfr_a,sem_tendencia,1.0,no trend,8,1.0,1.0
+spotify,luigi,Recuperação,recuperacao,insuficiente,,,1,,
+spring-projects,spring-batch,Frequência,frequencia,sem_tendencia,0.3422098216760219,no trend,12,0.7385823489410545,1.0
+spring-projects,spring-batch,Lead time (a),lead_time_a,insuficiente,,,7,,
+spring-projects,spring-batch,CFR (a),cfr_a,sem_tendencia,0.3244841021877942,no trend,11,0.7101892159564156,1.0
+spring-projects,spring-batch,Recuperação,recuperacao,insuficiente,,,6,,
+stamparm,maltrail,Frequência,frequencia,sem_tendencia,0.05419185158195172,no trend,12,0.2891966546331404,1.0
+stamparm,maltrail,Lead time (a),lead_time_a,insuficiente,,,7,,
+stamparm,maltrail,CFR (a),cfr_a,insuficiente,,,4,,
+stamparm,maltrail,Recuperação,recuperacao,insuficiente,,,2,,
+starkware-libs,cairo,Frequência,frequencia,sem_tendencia,0.4456347132069438,no trend,12,0.7953005034956121,1.0
+starkware-libs,cairo,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,9,1.0,1.0
+starkware-libs,cairo,CFR (a),cfr_a,sem_tendencia,0.9274651227146293,no trend,12,1.0,1.0
+starkware-libs,cairo,Recuperação,recuperacao,insuficiente,,,3,,
+StevenBlack,hosts,Frequência,frequencia,sem_tendencia,0.9450713821683052,no trend,12,0.9983148403186323,1.0
+StevenBlack,hosts,Lead time (a),lead_time_a,sem_tendencia,0.7317017232242102,no trend,12,0.9523069852044742,1.0
+StevenBlack,hosts,CFR (a),cfr_a,sem_tendencia,0.46458789258737787,no trend,12,0.7984028968909013,1.0
+StevenBlack,hosts,Recuperação,recuperacao,insuficiente,,,3,,
+strapi,strapi,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+strapi,strapi,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+strapi,strapi,CFR (a),cfr_a,sem_tendencia,0.14986074751304912,no trend,12,0.5348875911234985,1.0
+strapi,strapi,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+SubtitleEdit,subtitleedit,Frequência,frequencia,sem_tendencia,0.48658735030599143,no trend,12,0.8152481070320005,1.0
+SubtitleEdit,subtitleedit,Lead time (a),lead_time_a,insuficiente,,,3,,
+SubtitleEdit,subtitleedit,CFR (a),cfr_a,insuficiente,,,2,,
+SubtitleEdit,subtitleedit,Recuperação,recuperacao,insuficiente,,,2,,
+suitenumerique,docs,Frequência,frequencia,sem_tendencia,0.7275649524594205,no trend,12,0.948997764077505,1.0
+suitenumerique,docs,Lead time (a),lead_time_a,sem_tendencia,0.35020138917929566,no trend,11,0.7725030643660934,1.0
+suitenumerique,docs,CFR (a),cfr_a,sem_tendencia,0.303673214899419,no trend,12,0.6907077044771099,1.0
+suitenumerique,docs,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+supercorp-ai,supergateway,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+supercorp-ai,supergateway,Lead time (a),lead_time_a,insuficiente,,,2,,
+supercorp-ai,supergateway,CFR (a),cfr_a,insuficiente,,,1,,
+supercorp-ai,supergateway,Recuperação,recuperacao,insuficiente,,,1,,
+superset-sh,superset,Frequência,frequencia,sem_tendencia,0.4485287515174601,no trend,12,0.7953005034956121,1.0
+superset-sh,superset,Lead time (a),lead_time_a,piora,0.0012821837418053317,increasing,10,0.09616378063539988,0.19104537752899442
+superset-sh,superset,CFR (a),cfr_a,sem_tendencia,0.11475673431864908,no trend,12,0.4757711962281005,1.0
+superset-sh,superset,Recuperação,recuperacao,sem_tendencia,1.0,no trend,11,1.0,1.0
+swoole,swoole-src,Frequência,frequencia,sem_tendencia,0.5238256330285562,no trend,12,0.8335848933587184,1.0
+swoole,swoole-src,Lead time (a),lead_time_a,sem_tendencia,0.10776229039192153,no trend,8,0.4652300039945233,1.0
+swoole,swoole-src,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+swoole,swoole-src,Recuperação,recuperacao,sem_tendencia,1.0,no trend,10,1.0,1.0
+sxyazi,yazi,Frequência,frequencia,sem_tendencia,0.3913259910874385,no trend,12,0.7925386251690273,1.0
+sxyazi,yazi,Lead time (a),lead_time_a,insuficiente,,,5,,
+sxyazi,yazi,CFR (a),cfr_a,sem_tendencia,0.33284451496282186,no trend,12,0.7101892159564156,1.0
+sxyazi,yazi,Recuperação,recuperacao,sem_tendencia,0.17530808080827365,no trend,9,0.5259242424248209,1.0
+syncthing,syncthing,Frequência,frequencia,sem_tendencia,0.5461132399142077,no trend,12,0.8488806838044679,1.0
+syncthing,syncthing,Lead time (a),lead_time_a,sem_tendencia,0.35020138917929566,no trend,11,0.7725030643660934,1.0
+syncthing,syncthing,CFR (a),cfr_a,sem_tendencia,0.48911666191921865,no trend,12,0.8222830838062226,1.0
+syncthing,syncthing,Recuperação,recuperacao,sem_tendencia,0.11785089502136503,no trend,9,0.4393449190959318,1.0
+systemd,systemd,Frequência,frequencia,sem_tendencia,0.5781845785844002,no trend,12,0.8649583758447105,1.0
+systemd,systemd,Lead time (a),lead_time_a,insuficiente,,,7,,
+systemd,systemd,CFR (a),cfr_a,sem_tendencia,0.4506702853141802,no trend,12,0.792087168127953,1.0
+systemd,systemd,Recuperação,recuperacao,sem_tendencia,0.5371338571769022,no trend,12,0.9139292495248783,1.0
+taglib,taglib,Frequência,frequencia,sem_tendencia,0.24243193599830226,no trend,12,0.5993170937020679,1.0
+taglib,taglib,Lead time (a),lead_time_a,insuficiente,,,5,,
+taglib,taglib,CFR (a),cfr_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+taglib,taglib,Recuperação,recuperacao,insuficiente,,,0,,
+Taiko2k,Tauon,Frequência,frequencia,sem_tendencia,0.889442555596055,no trend,12,0.9983148403186323,1.0
+Taiko2k,Tauon,Lead time (a),lead_time_a,sem_tendencia,0.4742743507673295,no trend,10,0.8675750318914565,1.0
+Taiko2k,Tauon,CFR (a),cfr_a,sem_tendencia,0.5371338571769022,no trend,12,0.8369085142735705,1.0
+Taiko2k,Tauon,Recuperação,recuperacao,sem_tendencia,0.7317017232242102,no trend,12,1.0,1.0
+tailscale,tailcat,Frequência,frequencia,sem_tendencia,0.054549045242143546,no trend,12,0.2891966546331404,1.0
+tailscale,tailcat,Lead time (a),lead_time_a,insuficiente,,,2,,
+tailscale,tailcat,CFR (a),cfr_a,insuficiente,,,4,,
+tailscale,tailcat,Recuperação,recuperacao,insuficiente,,,2,,
+TanStack,router,Frequência,frequencia,sem_tendencia,0.24372228477217428,no trend,12,0.5993170937020679,1.0
+TanStack,router,Lead time (a),lead_time_a,insuficiente,,,0,,
+TanStack,router,CFR (a),cfr_a,melhora,0.046744941053711075,decreasing,12,0.3539293473815903,1.0
+TanStack,router,Recuperação,recuperacao,piora,0.011174811327380407,increasing,12,0.2544168137934672,1.0
+tashfeenahmed,freellmapi,Frequência,frequencia,melhora,0.0023017493687813584,increasing,12,0.15643812297993165,0.6859213118968448
+tashfeenahmed,freellmapi,Lead time (a),lead_time_a,insuficiente,,,4,,
+tashfeenahmed,freellmapi,CFR (a),cfr_a,insuficiente,,,6,,
+tashfeenahmed,freellmapi,Recuperação,recuperacao,insuficiente,,,5,,
+tc39,test262,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+tc39,test262,Lead time (a),lead_time_a,sem_tendencia,0.7205147871362552,no trend,10,0.9523069852044742,1.0
+tc39,test262,CFR (a),cfr_a,sem_tendencia,0.6692254223014649,no trend,12,0.9340312585528859,1.0
+tc39,test262,Recuperação,recuperacao,insuficiente,,,2,,
+teamhanko,hanko,Frequência,frequencia,sem_tendencia,0.15595551237944894,no trend,12,0.5198517079314965,1.0
+teamhanko,hanko,Lead time (a),lead_time_a,insuficiente,,,7,,
+teamhanko,hanko,CFR (a),cfr_a,sem_tendencia,0.1090067898154421,no trend,11,0.4757711962281005,1.0
+teamhanko,hanko,Recuperação,recuperacao,insuficiente,,,3,,
+Tencent,BrowserSkill,Frequência,frequencia,melhora,0.003933027001353784,increasing,12,0.1580229124971509,1.0
+Tencent,BrowserSkill,Lead time (a),lead_time_a,insuficiente,,,4,,
+Tencent,BrowserSkill,CFR (a),cfr_a,insuficiente,,,3,,
+Tencent,BrowserSkill,Recuperação,recuperacao,insuficiente,,,2,,
+thedotmack,claude-mem,Frequência,frequencia,sem_tendencia,0.24372228477217428,no trend,12,0.5993170937020679,1.0
+thedotmack,claude-mem,Lead time (a),lead_time_a,insuficiente,,,0,,
+thedotmack,claude-mem,CFR (a),cfr_a,insuficiente,,,7,,
+thedotmack,claude-mem,Recuperação,recuperacao,insuficiente,,,4,,
+thu-pacman,chitu,Frequência,frequencia,sem_tendencia,0.8853327201609549,no trend,12,0.9983148403186323,1.0
+thu-pacman,chitu,Lead time (a),lead_time_a,insuficiente,,,7,,
+thu-pacman,chitu,CFR (a),cfr_a,sem_tendencia,1.0,no trend,12,1.0,1.0
+thu-pacman,chitu,Recuperação,recuperacao,insuficiente,,,0,,
+tiann,KernelSU,Frequência,frequencia,sem_tendencia,0.5557040845177039,no trend,12,0.854607514192042,1.0
+tiann,KernelSU,Lead time (a),lead_time_a,insuficiente,,,6,,
+tiann,KernelSU,CFR (a),cfr_a,sem_tendencia,0.18491348621540382,no trend,12,0.5876702575612834,1.0
+tiann,KernelSU,Recuperação,recuperacao,insuficiente,,,6,,
+timothymiller,cloudflare-ddns,Frequência,frequencia,sem_tendencia,0.7847734964202786,no trend,12,0.968856168420097,1.0
+timothymiller,cloudflare-ddns,Lead time (a),lead_time_a,insuficiente,,,3,,
+timothymiller,cloudflare-ddns,CFR (a),cfr_a,insuficiente,,,5,,
+timothymiller,cloudflare-ddns,Recuperação,recuperacao,insuficiente,,,2,,
+toeverything,AFFiNE,Frequência,frequencia,sem_tendencia,0.3369980295417063,no trend,12,0.7326044120471876,1.0
+toeverything,AFFiNE,Lead time (a),lead_time_a,insuficiente,,,6,,
+toeverything,AFFiNE,CFR (a),cfr_a,sem_tendencia,0.24372228477217428,no trend,12,0.6574833728737725,1.0
+toeverything,AFFiNE,Recuperação,recuperacao,sem_tendencia,0.9453298708327,no trend,12,1.0,1.0
+tree-sitter,tree-sitter,Frequência,frequencia,sem_tendencia,0.5181742243171907,no trend,12,0.8335848933587184,1.0
+tree-sitter,tree-sitter,Lead time (a),lead_time_a,insuficiente,,,7,,
+tree-sitter,tree-sitter,CFR (a),cfr_a,melhora,0.005340992525067145,decreasing,12,0.17315693950504274,1.0
+tree-sitter,tree-sitter,Recuperação,recuperacao,insuficiente,,,6,,
+treeverse,dvc,Frequência,frequencia,sem_tendencia,0.09826463689254217,no trend,12,0.4038272749008582,1.0
+treeverse,dvc,Lead time (a),lead_time_a,insuficiente,,,4,,
+treeverse,dvc,CFR (a),cfr_a,sem_tendencia,0.20066515929601692,no trend,11,0.6021061856730007,1.0
+treeverse,dvc,Recuperação,recuperacao,insuficiente,,,7,,
+TryGhost,Ghost,Frequência,frequencia,sem_tendencia,0.6296063619648409,no trend,12,0.8785205050672198,1.0
+TryGhost,Ghost,Lead time (a),lead_time_a,sem_tendencia,0.19261627432960227,no trend,12,0.5896416561110274,1.0
+TryGhost,Ghost,CFR (a),cfr_a,sem_tendencia,0.5371338571769022,no trend,12,0.8369085142735705,1.0
+TryGhost,Ghost,Recuperação,recuperacao,melhora,0.011174811327380407,decreasing,12,0.2544168137934672,1.0
+tubearchivist,tubearchivist,Frequência,frequencia,sem_tendencia,0.9343403606303604,no trend,12,0.9983148403186323,1.0
+tubearchivist,tubearchivist,Lead time (a),lead_time_a,insuficiente,,,4,,
+tubearchivist,tubearchivist,CFR (a),cfr_a,sem_tendencia,0.4413835188572923,no trend,11,0.792087168127953,1.0
+tubearchivist,tubearchivist,Recuperação,recuperacao,insuficiente,,,5,,
+tympanix,Electorrent,Frequência,frequencia,melhora,0.0068164207349799,increasing,12,0.1580229124971509,1.0
+tympanix,Electorrent,Lead time (a),lead_time_a,insuficiente,,,5,,
+tympanix,Electorrent,CFR (a),cfr_a,insuficiente,,,7,,
+tympanix,Electorrent,Recuperação,recuperacao,insuficiente,,,7,,
+tyron12233,CodeAssist,Frequência,frequencia,melhora,0.006553635978638894,increasing,12,0.1580229124971509,1.0
+tyron12233,CodeAssist,Lead time (a),lead_time_a,insuficiente,,,4,,
+tyron12233,CodeAssist,CFR (a),cfr_a,insuficiente,,,4,,
+tyron12233,CodeAssist,Recuperação,recuperacao,insuficiente,,,3,,
+umijs,umi,Frequência,frequencia,sem_tendencia,0.14536829022541586,no trend,12,0.4900054726699411,1.0
+umijs,umi,Lead time (a),lead_time_a,sem_tendencia,0.11947098677170076,no trend,11,0.4715960004146082,1.0
+umijs,umi,CFR (a),cfr_a,sem_tendencia,0.303673214899419,no trend,12,0.6907077044771099,1.0
+umijs,umi,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+v2fly,v2ray-core,Frequência,frequencia,piora,0.0406384020573165,decreasing,12,0.28046964632226645,1.0
+v2fly,v2ray-core,Lead time (a),lead_time_a,sem_tendencia,0.7544541774940892,no trend,9,0.9523069852044742,1.0
+v2fly,v2ray-core,CFR (a),cfr_a,sem_tendencia,0.06410357671243583,no trend,12,0.38133409736628493,1.0
+v2fly,v2ray-core,Recuperação,recuperacao,melhora,0.011174811327380407,decreasing,12,0.2544168137934672,1.0
+valkey-io,valkey,Frequência,frequencia,sem_tendencia,0.4827649755253569,no trend,12,0.8152481070320005,1.0
+valkey-io,valkey,Lead time (a),lead_time_a,sem_tendencia,0.1735462217878534,no trend,8,0.5784874059595113,1.0
+valkey-io,valkey,CFR (a),cfr_a,sem_tendencia,0.06410357671243583,no trend,12,0.38133409736628493,1.0
+valkey-io,valkey,Recuperação,recuperacao,sem_tendencia,0.4362749288405292,no trend,11,0.8154986115208974,1.0
+video-dev,hls.js,Frequência,frequencia,sem_tendencia,0.5884135185327466,no trend,12,0.8653139978422744,1.0
+video-dev,hls.js,Lead time (a),lead_time_a,insuficiente,,,5,,
+video-dev,hls.js,CFR (a),cfr_a,melhora,0.038318763149413515,decreasing,12,0.3246116016563972,1.0
+video-dev,hls.js,Recuperação,recuperacao,insuficiente,,,7,,
+visgl,deck.gl,Frequência,frequencia,sem_tendencia,0.9448091919700323,no trend,12,0.9983148403186323,1.0
+visgl,deck.gl,Lead time (a),lead_time_a,sem_tendencia,0.4742743507673295,no trend,10,0.8675750318914565,1.0
+visgl,deck.gl,CFR (a),cfr_a,sem_tendencia,0.4584101521775037,no trend,12,0.7984028968909013,1.0
+visgl,deck.gl,Recuperação,recuperacao,insuficiente,,,4,,
+vllm-project,vllm-ascend,Frequência,frequencia,sem_tendencia,0.43811962159332696,no trend,12,0.7953005034956121,1.0
+vllm-project,vllm-ascend,Lead time (a),lead_time_a,insuficiente,,,3,,
+vllm-project,vllm-ascend,CFR (a),cfr_a,sem_tendencia,0.7820213874219097,no trend,12,0.9841483847000251,1.0
+vllm-project,vllm-ascend,Recuperação,recuperacao,piora,0.04760395472787149,increasing,9,0.2544168137934672,1.0
+VowpalWabbit,vowpal_wabbit,Frequência,frequencia,sem_tendencia,0.28550775455866795,no trend,12,0.669158799746878,1.0
+VowpalWabbit,vowpal_wabbit,Lead time (a),lead_time_a,insuficiente,,,2,,
+VowpalWabbit,vowpal_wabbit,CFR (a),cfr_a,sem_tendencia,0.3083248673116703,no trend,8,0.6916368917245543,1.0
+VowpalWabbit,vowpal_wabbit,Recuperação,recuperacao,insuficiente,,,5,,
+vue-vine,vue-vine,Frequência,frequencia,sem_tendencia,0.05591135322907381,no trend,12,0.2891966546331404,1.0
+vue-vine,vue-vine,Lead time (a),lead_time_a,insuficiente,,,3,,
+vue-vine,vue-vine,CFR (a),cfr_a,sem_tendencia,0.11484132322747254,no trend,8,0.4757711962281005,1.0
+vue-vine,vue-vine,Recuperação,recuperacao,insuficiente,,,3,,
+vuejs,pinia,Frequência,frequencia,sem_tendencia,0.523967233410632,no trend,12,0.8335848933587184,1.0
+vuejs,pinia,Lead time (a),lead_time_a,insuficiente,,,3,,
+vuejs,pinia,CFR (a),cfr_a,sem_tendencia,0.1346252678522062,no trend,8,0.5348875911234985,1.0
+vuejs,pinia,Recuperação,recuperacao,insuficiente,,,6,,
+wazuh,wazuh,Frequência,frequencia,sem_tendencia,0.8317275289742834,no trend,12,0.9847193824769954,1.0
+wazuh,wazuh,Lead time (a),lead_time_a,sem_tendencia,0.7105230229164894,no trend,8,0.9523069852044742,1.0
+wazuh,wazuh,CFR (a),cfr_a,sem_tendencia,0.14794092330044628,no trend,12,0.5348875911234985,1.0
+wazuh,wazuh,Recuperação,recuperacao,insuficiente,,,5,,
+WeakAuras,WeakAuras2,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+WeakAuras,WeakAuras2,Lead time (a),lead_time_a,sem_tendencia,0.34808262363292397,no trend,9,0.7725030643660934,1.0
+WeakAuras,WeakAuras2,CFR (a),cfr_a,sem_tendencia,0.6489848935408573,no trend,12,0.9340312585528859,1.0
+WeakAuras,WeakAuras2,Recuperação,recuperacao,insuficiente,,,3,,
+webdriverio,webdriverio,Frequência,frequencia,sem_tendencia,0.05314770207211961,no trend,12,0.2891966546331404,1.0
+webdriverio,webdriverio,Lead time (a),lead_time_a,sem_tendencia,0.08647112777407262,no trend,12,0.4323556388703631,1.0
+webdriverio,webdriverio,CFR (a),cfr_a,sem_tendencia,0.9453298708327,no trend,12,1.0,1.0
+webdriverio,webdriverio,Recuperação,recuperacao,sem_tendencia,0.21291190281150452,no trend,11,0.5919989492807687,1.0
+Wei-Shaw,sub2api,Frequência,frequencia,melhora,0.01065107159162415,increasing,12,0.17751785986040253,1.0
+Wei-Shaw,sub2api,Lead time (a),lead_time_a,insuficiente,,,4,,
+Wei-Shaw,sub2api,CFR (a),cfr_a,sem_tendencia,0.7205147871362552,no trend,10,0.964515907886459,1.0
+Wei-Shaw,sub2api,Recuperação,recuperacao,sem_tendencia,0.2104977000553374,no trend,10,0.5919989492807687,1.0
+WinMerge,winmerge,Frequência,frequencia,sem_tendencia,0.11453052687154752,no trend,12,0.43578506703284464,1.0
+WinMerge,winmerge,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,8,1.0,1.0
+WinMerge,winmerge,CFR (a),cfr_a,sem_tendencia,0.523967233410632,no trend,12,0.8369085142735705,1.0
+WinMerge,winmerge,Recuperação,recuperacao,insuficiente,,,3,,
+wireapp,wire-webapp,Frequência,frequencia,sem_tendencia,0.9440912337176337,no trend,12,0.9983148403186323,1.0
+wireapp,wire-webapp,Lead time (a),lead_time_a,sem_tendencia,0.2514521865080219,no trend,9,0.6617162802842682,1.0
+wireapp,wire-webapp,CFR (a),cfr_a,insuficiente,,,3,,
+wireapp,wire-webapp,Recuperação,recuperacao,insuficiente,,,3,,
+withcoral,coral,Frequência,frequencia,melhora,0.01842635493041378,increasing,12,0.20217967318223293,1.0
+withcoral,coral,Lead time (a),lead_time_a,insuficiente,,,6,,
+withcoral,coral,CFR (a),cfr_a,insuficiente,,,6,,
+withcoral,coral,Recuperação,recuperacao,insuficiente,,,6,,
+wormhole-foundation,wormhole,Frequência,frequencia,sem_tendencia,0.7809976057010768,no trend,12,0.968856168420097,1.0
+wormhole-foundation,wormhole,Lead time (a),lead_time_a,sem_tendencia,1.0,no trend,11,1.0,1.0
+wormhole-foundation,wormhole,CFR (a),cfr_a,sem_tendencia,0.4506702853141802,no trend,12,0.792087168127953,1.0
+wormhole-foundation,wormhole,Recuperação,recuperacao,sem_tendencia,0.4506702853141802,no trend,12,0.8154986115208974,1.0
+wtfutil,wtf,Frequência,frequencia,sem_tendencia,0.6602647550462684,no trend,12,0.9086212225407363,1.0
+wtfutil,wtf,Lead time (a),lead_time_a,insuficiente,,,7,,
+wtfutil,wtf,CFR (a),cfr_a,sem_tendencia,0.8464505968765905,no trend,9,1.0,1.0
+wtfutil,wtf,Recuperação,recuperacao,insuficiente,,,1,,
+wuwentao,midea_ac_lan,Frequência,frequencia,melhora,0.0068164207349799,increasing,12,0.1580229124971509,1.0
+wuwentao,midea_ac_lan,Lead time (a),lead_time_a,insuficiente,,,5,,
+wuwentao,midea_ac_lan,CFR (a),cfr_a,insuficiente,,,4,,
+wuwentao,midea_ac_lan,Recuperação,recuperacao,insuficiente,,,0,,
+x-extends,vxe-table,Frequência,frequencia,sem_tendencia,0.837011475105446,no trend,12,0.9847193824769954,1.0
+x-extends,vxe-table,Lead time (a),lead_time_a,piora,0.008123423304273514,increasing,11,0.17407335652014672,1.0
+x-extends,vxe-table,CFR (a),cfr_a,insuficiente,,,4,,
+x-extends,vxe-table,Recuperação,recuperacao,insuficiente,,,1,,
+xberg-io,xberg,Frequência,frequencia,melhora,0.013973909656661343,increasing,12,0.18226838682601754,1.0
+xberg-io,xberg,Lead time (a),lead_time_a,insuficiente,,,3,,
+xberg-io,xberg,CFR (a),cfr_a,sem_tendencia,0.4506702853141802,no trend,12,0.792087168127953,1.0
+xberg-io,xberg,Recuperação,recuperacao,sem_tendencia,1.0,no trend,12,1.0,1.0
+xdan,jodit,Frequência,frequencia,sem_tendencia,0.07392248595953888,no trend,12,0.34118070442864096,1.0
+xdan,jodit,Lead time (a),lead_time_a,sem_tendencia,0.8580276569875211,no trend,10,1.0,1.0
+xdan,jodit,CFR (a),cfr_a,sem_tendencia,0.6021675277481957,no trend,9,0.9107825082607114,1.0
+xdan,jodit,Recuperação,recuperacao,sem_tendencia,0.7544541774940892,no trend,9,1.0,1.0
+ximeiorg,Xime,Frequência,frequencia,melhora,0.006283066099389334,increasing,12,0.1580229124971509,1.0
+ximeiorg,Xime,Lead time (a),lead_time_a,insuficiente,,,6,,
+ximeiorg,Xime,CFR (a),cfr_a,insuficiente,,,7,,
+ximeiorg,Xime,Recuperação,recuperacao,insuficiente,,,7,,
+xonsh,xonsh,Frequência,frequencia,sem_tendencia,1.0,no trend,12,1.0,1.0
+xonsh,xonsh,Lead time (a),lead_time_a,sem_tendencia,0.9169652366288645,no trend,9,1.0,1.0
+xonsh,xonsh,CFR (a),cfr_a,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+xonsh,xonsh,Recuperação,recuperacao,piora,0.04296014602842502,increasing,11,0.2544168137934672,1.0
+xorbitsai,inference,Frequência,frequencia,sem_tendencia,0.22542593666666777,no trend,12,0.5829981120689683,1.0
+xorbitsai,inference,Lead time (a),lead_time_a,sem_tendencia,0.11475673431864908,no trend,12,0.4652300039945233,1.0
+xorbitsai,inference,CFR (a),cfr_a,sem_tendencia,0.48911666191921865,no trend,12,0.8222830838062226,1.0
+xorbitsai,inference,Recuperação,recuperacao,melhora,0.04760395472787149,decreasing,9,0.2544168137934672,1.0
+xpzouying,xiaohongshu-mcp,Frequência,frequencia,sem_tendencia,0.491866357909307,no trend,12,0.8152481070320005,1.0
+xpzouying,xiaohongshu-mcp,Lead time (a),lead_time_a,sem_tendencia,0.24372228477217428,no trend,12,0.6617162802842682,1.0
+xpzouying,xiaohongshu-mcp,CFR (a),cfr_a,sem_tendencia,0.7720589697507347,no trend,12,0.9841483847000251,1.0
+xpzouying,xiaohongshu-mcp,Recuperação,recuperacao,insuficiente,,,1,,
+xtclovver,RKNHardering,Frequência,frequencia,sem_tendencia,0.36480999434195294,no trend,12,0.7761594839173855,1.0
+xtclovver,RKNHardering,Lead time (a),lead_time_a,insuficiente,,,4,,
+xtclovver,RKNHardering,CFR (a),cfr_a,insuficiente,,,4,,
+xtclovver,RKNHardering,Recuperação,recuperacao,insuficiente,,,3,,
+xuxueli,xxl-job,Frequência,frequencia,sem_tendencia,0.43811962159332696,no trend,12,0.7953005034956121,1.0
+xuxueli,xxl-job,Lead time (a),lead_time_a,insuficiente,,,5,,
+xuxueli,xxl-job,CFR (a),cfr_a,sem_tendencia,0.2962698714842864,no trend,10,0.6907077044771099,1.0
+xuxueli,xxl-job,Recuperação,recuperacao,insuficiente,,,1,,
+zed-industries,zed,Frequência,frequencia,sem_tendencia,0.4506702853141802,no trend,12,0.7953005034956121,1.0
+zed-industries,zed,Lead time (a),lead_time_a,sem_tendencia,0.19261627432960227,no trend,12,0.5896416561110274,1.0
+zed-industries,zed,CFR (a),cfr_a,sem_tendencia,0.837011475105446,no trend,12,1.0,1.0
+zed-industries,zed,Recuperação,recuperacao,sem_tendencia,0.14986074751304912,no trend,12,0.4826198991963727,1.0
+zen-browser,desktop,Frequência,frequencia,sem_tendencia,0.48702519159494884,no trend,12,0.8152481070320005,1.0
+zen-browser,desktop,Lead time (a),lead_time_a,sem_tendencia,0.06410357671243583,no trend,12,0.4006473544527239,1.0
+zen-browser,desktop,CFR (a),cfr_a,insuficiente,,,6,,
+zen-browser,desktop,Recuperação,recuperacao,insuficiente,,,0,,
+zhouxiaoka,autoclip,Frequência,frequencia,sem_tendencia,0.08747961818064964,no trend,12,0.3696321894957027,1.0
+zhouxiaoka,autoclip,Lead time (a),lead_time_a,insuficiente,,,2,,
+zhouxiaoka,autoclip,CFR (a),cfr_a,insuficiente,,,3,,
+zhouxiaoka,autoclip,Recuperação,recuperacao,insuficiente,,,1,,
+ZhuLinsen,daily_stock_analysis,Frequência,frequencia,sem_tendencia,0.20646258713596,no trend,12,0.5599192727166649,1.0
+ZhuLinsen,daily_stock_analysis,Lead time (a),lead_time_a,piora,0.0044340083031007005,increasing,8,0.14794501098919222,0.651799220555803
+ZhuLinsen,daily_stock_analysis,CFR (a),cfr_a,insuficiente,,,4,,
+ZhuLinsen,daily_stock_analysis,Recuperação,recuperacao,insuficiente,,,1,,
+zitadel,zitadel,Frequência,frequencia,piora,0.045714364714747324,decreasing,12,0.28046964632226645,1.0
+zitadel,zitadel,Lead time (a),lead_time_a,sem_tendencia,0.08647112777407262,no trend,12,0.4323556388703631,1.0
+zitadel,zitadel,CFR (a),cfr_a,sem_tendencia,0.6489848935408573,no trend,12,0.9340312585528859,1.0
+zitadel,zitadel,Recuperação,recuperacao,insuficiente,,,3,,
