@@ -59,7 +59,19 @@ Métricas por repositório:
     - os *compare* com mais de 1.000 commits, ou que a API se recusa a gerar (HTTP 422, *diff* demorado demais). Esse último critério é do grupo: são quase sempre comparações entre linhas de versão diferentes ou entre pacotes distintos de um monorepo, intercalados por data, e não representam o que entrou no deploy.
 - **Change failure rate (RQ 03):**
   - (a) Proxy de CI: falhas ÷ (falhas + sucessos), com todos os workflows juntos.
-  - (b) Proxy de entrega: o deploy D falhou se um deploy **corretivo** foi publicado em até 7 dias depois dele. Deploys dos últimos 7 dias da janela ficam fora do denominador (censura). A heurística de corretiva usada nesta versão é a **v0**: a versão SemVer mantém `maior.menor` do deploy anterior e sobe só o `patch`. **[PENDENTE: substituir pela versão final da heurística (#138), com precisão, recall e F1 na amostra-ouro e o histórico das versões testadas.]**
+  - (b) Proxy de entrega: o deploy D falhou se um deploy **corretivo** foi publicado em até 7 dias depois dele. Deploys dos últimos 7 dias da janela ficam fora do denominador (censura). O dataset desta versão usa a heurística **v0** (SemVer: mantém `maior.menor` do deploy anterior e sobe só o `patch`). Três outras versões foram implementadas e comparadas de forma descritiva na amostra 1 (`validacao/comparar_versoes.py`, `validacao/heuristica_versoes.md`):
+    - **v1 mensagens:** corretiva se pelo menos metade dos commits da release tem prefixo `fix`/`revert` (Conventional Commits).
+    - **v2 patch + poucos commits:** v0 **e** a release tem no máximo 3 commits.
+    - **v3 combinada:** v0 **ou** v1 **ou** o nome da tag contém `hotfix`/`patch`.
+
+    | Versão | Mediana do CFR (b) | IQR | Releases marcadas corretivas |
+    | :--- | :---: | :---: | :---: |
+    | v0 (semver) | 25,0% | 5,2% – 56,5% | 8.186 |
+    | v1 (mensagens) | 0,0% | 0,0% – 12,6% | 1.479 |
+    | v2 (patch + poucos commits) | 2,4% | 0,0% – 21,6% | 1.903 |
+    | v3 (combinada) | 25,0% | 6,0% – 57,2% | 8.597 |
+
+    A v0 sozinha já marca um quarto das releases como corretivas, bem acima do CFR (a) (mediana 2,6%, seção 3.1); a v1, baseada só na mensagem do commit, é bem mais conservadora. **[PENDENTE: escolher a versão final (#138) a partir da precisão, recall e F1 contra a amostra-ouro, quando o consenso da #137 existir, e atualizar esta tabela e o dataset.]**
 - **Tempo de recuperação (RQ 04):** os runs são agrupados por workflow e ordenados por `run_started_at`.
   - Um episódio começa na primeira falha depois de um sucesso e termina no sucesso seguinte, com duração `updated_at(sucesso) − run_started_at(1ª falha)`. O valor do repositório é a mediana dos episódios fechados, em horas.
   - Episódios sem sucesso até o fim da janela são **censurados**: não entram na mediana, mas são contados, e a proporção é reportada por repositório.
