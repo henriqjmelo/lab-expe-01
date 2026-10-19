@@ -255,3 +255,12 @@ def test_pagina_que_sempre_da_504_e_refeita_em_paginas_menores():
 def test_404_na_paginacao_continua_propagando():
     with pytest.raises(GitHubAPIError):
         list(novo_cliente(AbrirFalso(erro_http(404)), None).paginar("/x"))
+
+
+def test_resposta_graphql_com_erro_nao_vai_pro_cache(tmp_path):
+    cache = CacheDisco(tmp_path)
+    abrir = AbrirFalso(RespostaFalsa({"errors": [{"message": "timeout"}], "data": None}), RespostaFalsa({"data": {"ok": 1}}))
+    c = novo_cliente(abrir, cache)
+    assert c.graphql("q", {})["errors"]
+    assert c.graphql("q", {}) == {"data": {"ok": 1}}
+    assert len(abrir.requisicoes) == 2
