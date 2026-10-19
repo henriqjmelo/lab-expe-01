@@ -168,11 +168,32 @@ A **Weibull** generaliza, e seu parâmetro de forma β é o que interessa ao Lab
 | β = 1 | constante | volta a ser exponencial |
 | β > 1 | crescente | desgaste — ou deterioração de arquitetura por dívida técnica |
 
-**Proposta de análise nova.** Ajustar uma Weibull aos tempos de recuperação (RQ04) por repositório e
-reportar a distribuição dos β. Um β mediano < 1 significaria que episódios de falha longos tendem a
-se resolver cada vez mais devagar — quanto mais tempo quebrado, menor a chance de consertar logo.
-Um β > 1 significaria o oposto. Isso é uma afirmação sobre **dinâmica de recuperação**, que a
-mediana do MTTR não captura, e usa dados que vocês já têm em `data/eventos/runs.csv.gz`.
+### 4.2.1 Resultado: a recuperação tem taxa decrescente
+
+Ajustando uma Weibull por repositório aos episódios de falha extraídos de
+`data/eventos/runs.csv.gz` (238 repositórios da A1 com episódios suficientes):
+
+```
+β mediano = 0,557     IQR = [0,459; 0,724]
+β < 1 em 90,3% dos repositórios
+```
+
+**A taxa de recuperação é decrescente na grande maioria dos repositórios.** A leitura em
+engenharia: quanto mais tempo um episódio de falha já dura, **menor** a probabilidade instantânea de
+ele ser resolvido no instante seguinte. Falhas curtas são corrigidas rápido; uma vez que o episódio
+se arrasta, ele tende a se arrastar muito mais.
+
+Isso é invisível na mediana do MTTR, que é o que a RQ04 reporta hoje — duas populações com a mesma
+mediana podem ter dinâmicas opostas. E tem consequência prática: a métrica de recuperação do DORA
+trata todos os episódios como equivalentes, quando os dados dizem que um episódio longo é
+qualitativamente diferente de um curto, e não apenas "mais demorado".
+
+Também explica, em parte, a assimetria de 12,9 da coluna `recuperacao_mediana_horas` — a mais
+assimétrica das cinco métricas analisadas.
+
+Resultados em `analise/saida/tabelas/distribuicoes_weibull.csv` (por repositório) e
+`distribuicoes_weibull_resumo.csv` (agregado). Figura em
+`analise/saida/figuras/distribuicoes-weibull.png`.
 
 ### 4.3 Normal, escore z e onde ela legitimamente aparece
 
@@ -190,12 +211,29 @@ Mesmo com a população assimétrica, a distribuição da *estatística* (média
 entre grupos) tende à normal conforme n cresce, com erro padrão `σ ÷ √n`. É isso que sustenta os
 intervalos de confiança e o p-valor dos testes da RQ05 e RQ06, mesmo com dados não normais.
 
-**Demonstração sugerida para o artigo.** Uma figura de dois painéis: à esquerda, o histograma de
-`df_release_semana` (assimetria 8,26, nada de sino); à direita, a distribuição de 10.000 médias de
-amostras de tamanho 50 tiradas dessa mesma população, com a curva normal sobreposta e a regra
-68–95–99,7 marcada. A mesma população gera as duas figuras. Isso ensina, numa imagem, por que
-"os dados não são normais" **não** invalida o teste — e por que a média ainda assim não serve para
-descrever o repositório típico.
+### 6.1 Resultado: a convergência existe, mas é lenta
+
+A demonstração foi construída e trouxe um achado que corrige a intuição comum. Reamostrando a
+própria população da A1 (10.000 reamostragens por tamanho):
+
+| Distribuição | Assimetria |
+| :--- | ---: |
+| População (`df_release_semana`) | **8,26** |
+| Média de amostras de n = 30 | 1,53 |
+| Média de amostras de n = 100 | 0,80 |
+| Média de amostras de n = 300 | 0,49 |
+
+A regra de bolso "n ≥ 30 basta para o TLC" **falha aqui**: com n = 30 a distribuição amostral ainda
+tem assimetria 1,53 e a curva normal ajustada não acompanha o histograma. A convergência só fica
+convincente perto de n = 300 — que é, não por acaso, o tamanho da amostra inteira.
+
+Consequência direta para o artigo: os testes da RQ05 e RQ06 que usam **toda** a amostra estão em
+terreno firme, mas os de **subgrupo** da RQ06 (quartis de estrelas, linguagens com poucos
+repositórios) operam com n muito menor, onde a aproximação normal não vale. Isso reforça a escolha
+por testes não paramétricos, que não dependem dela, e é mais um argumento para reportar tamanho de
+efeito em vez de confiar no p-valor.
+
+Figura em `analise/saida/figuras/distribuicoes-tlc.png`: os quatro painéis saem da mesma população.
 
 ---
 
@@ -311,19 +349,26 @@ A cobertura de 31,3% da API de Deployments é, ela mesma, um resultado: **a API 
 serve como proxy universal**, o que justifica a escolha de releases como unidade de entrega. As
 medidas de PR, com ~99%, podem ser medidas principais.
 
-### 7.2 Análises propostas
+### 7.2 Análises propostas e seu estado
 
-1. **Binomial negativa para contagem de releases**, substituindo a Poisson rejeitada, com o
-   parâmetro de dispersão reportado como caracterização de heterogeneidade da população.
-2. **Weibull nos tempos de recuperação**, com a distribuição dos β como medida da dinâmica de
-   recuperação (§4.2).
-3. **Poder discriminante das faixas DORA** — critério 5 da IEEE 1061, ainda não avaliado. As faixas
-   Elite/High/Medium/Low separam repositórios em alguma outra dimensão observável?
-4. **Controle de confusão por tamanho** na RQ05 e RQ06 (§6.2).
-5. **Convergência entre paradigmas**: o DORA por releases e o fluxo por PR concordam? Spearman entre
-   `lt_b_release_dias` e `lt_pr_mediana_horas` responde se as duas famílias medem a mesma coisa. Se
-   a correlação for baixa, são constructos distintos — e isso é evidência direta contra tratar DORA
-   como "a" medida de desempenho.
+Implementadas em `analise/distribuicoes.py`, com testes em `tests/test_distribuicoes.py` e saídas em
+`analise/saida/`. Nenhuma delas exigiu coleta nova.
+
+| # | Análise | Estado |
+| :-- | :--- | :--- |
+| 1 | Dispersão e rejeição da Poisson (§4.1) | **feita** — índice 493,2 |
+| 2 | Binomial negativa como substituta (§4.1) | **feita** — ajuste por momentos |
+| 3 | Weibull nos tempos de recuperação (§4.2.1) | **feita** — β mediano 0,557 |
+| 4 | Normalidade, lognormalidade e centro (§3) | **feita** — 0 de 5 métricas normais |
+| 5 | Demonstração do TLC por reamostragem (§6.1) | **feita** — figura dos quatro painéis |
+| 6 | Poder discriminante das faixas DORA | função pronta, falta rodar sobre as faixas |
+| 7 | Controle de confusão por tamanho na RQ05 e RQ06 (§6.2) | pendente |
+| 8 | Convergência entre paradigmas (DORA × fluxo por PR) | **bloqueada** — depende da #155 no `main` |
+
+Sobre a 8: o Spearman entre `lt_b_release_dias` e `lt_pr_mediana_horas` responde se as duas famílias
+medem a mesma coisa. Se a correlação for baixa, são constructos distintos, e isso é evidência direta
+contra tratar o DORA como "a" medida de desempenho. O `medidas_graphql.csv` existe só na branch da
+#155; a análise entra quando aquela PR for mergeada.
 
 ---
 
