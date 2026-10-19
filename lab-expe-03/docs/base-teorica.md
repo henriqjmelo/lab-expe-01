@@ -404,12 +404,40 @@ Implementadas em `analise/distribuicoes.py`, com testes em `tests/test_distribui
 | 5 | Demonstração do TLC por reamostragem (§6.1) | **feita** — figura dos quatro painéis |
 | 6 | Poder discriminante das faixas DORA (§6.1.1) | **feita** — ε² de 0,008 em estrelas |
 | 7 | Controle de confusão por tamanho na RQ05 e RQ06 (§6.2) | pendente, e menos urgente após a 6 |
-| 8 | Convergência entre paradigmas (DORA × fluxo por PR) | **bloqueada** — depende da #155 no `main` |
+| 8 | Convergência entre paradigmas (§7.3) | **feita** — nenhum par chega a ρ = 0,7 |
 
-Sobre a 8: o Spearman entre `lt_b_release_dias` e `lt_pr_mediana_horas` responde se as duas famílias
-medem a mesma coisa. Se a correlação for baixa, são constructos distintos, e isso é evidência direta
-contra tratar o DORA como "a" medida de desempenho. O `medidas_graphql.csv` existe só na branch da
-#155; a análise entra quando aquela PR for mergeada.
+### 7.3 Resultado: DORA e fluxo por PR são constructos distintos
+
+Spearman por repositório nos 600 (A1 + A2), p corrigido por Holm:
+
+| Par | n | ρ | ρ² | p (Holm) |
+| :--- | ---: | ---: | ---: | ---: |
+| Ritmo: releases × PRs por semana | 600 | 0,460 | 0,211 | 5,2 × 10⁻³² |
+| Lead time (a): por release × por PR | 574 | 0,343 | 0,117 | 1,2 × 10⁻¹⁶ |
+| Lead time (b): por release × por PR | 574 | 0,319 | 0,102 | 1,3 × 10⁻¹⁴ |
+| Recuperação: CI × issue de bug | 461 | 0,216 | 0,047 | 5,7 × 10⁻⁶ |
+| Falha: CFR (b) × taxa de aceitação de PR | 597 | 0,044 | 0,002 | 0,288 (n.s.) |
+
+**Nenhum par chega perto de ρ = 0,7**, o limiar convencional para tratar duas medidas como do mesmo
+constructo. O par mais direto — "quanto tempo uma mudança leva para chegar ao usuário", medido por
+release e medido por PR — compartilha **10% da variância**. Os outros 90% são coisa diferente.
+
+A leitura mais forte está no último par: o CFR por release e a taxa de aceitação de PR têm
+associação **estatisticamente nula** (ρ = 0,044, p = 0,29 após Holm), mesmo com n = 597. Qualidade
+medida na entrega e qualidade medida na revisão não são a mesma dimensão.
+
+**Consequência para o artigo.** Isto é a evidência mais direta contra tratar o DORA como *a* medida
+de desempenho de engenharia. Ele é *uma* lente — a da entrega por release — e outra lente legítima,
+a do fluxo de trabalho por PR, ordena os mesmos 600 repositórios de maneira substancialmente
+diferente. Um repositório "Elite" pela frequência de release pode ser lento na revisão, e o
+contrário também.
+
+Isso conversa diretamente com o §6.1.1: as faixas DORA separam bem o que as define, pouco além
+disso, e agora se sabe que "além disso" inclui uma família inteira de medidas de fluxo que o
+enunciado não cobre.
+
+Tabela em `analise/saida/tabelas/distribuicoes_convergencia.csv`; figura em
+`analise/saida/figuras/distribuicoes-convergencia.png`.
 
 ---
 

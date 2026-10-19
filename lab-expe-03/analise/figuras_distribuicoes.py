@@ -151,6 +151,41 @@ def fig_discriminancia(tabela: pd.DataFrame, destino: Path) -> Path:
     return salvar(fig, destino)
 
 
+def fig_convergencia(tabela: pd.DataFrame, destino: Path) -> Path:
+    t = tabela.dropna(subset=["rho"]).sort_values("rho").reset_index(drop=True)
+    fig, ax = plt.subplots(figsize=(LARGURA, 2.9))
+
+    ax.axvspan(0.7, 1.0, color=SERIE[2], alpha=0.12, zorder=1)
+    ax.axvline(0.7, color=TINTA_2, linewidth=1.0, linestyle=(0, (4, 2)), zorder=2)
+
+    for i, linha in t.iterrows():
+        ax.plot([0, linha["rho"]], [i, i], color=EIXO, linewidth=1.2, zorder=3)
+        ax.scatter(linha["rho"], i, s=58, color=SERIE[0], edgecolor=SUPERFICIE,
+                   linewidth=1.0, zorder=4)
+        marca = "" if linha["associacao"] else "  n.s."
+        ax.annotate(f"{fmt_num(linha['rho'], 3)}{marca}", xy=(linha["rho"], i),
+                    xytext=(9, 0), textcoords="offset points", va="center",
+                    fontsize=8, color=TINTA_2)
+
+    ax.set_yticks(range(len(t)))
+    ax.set_yticklabels(t["par"], fontsize=8.5)
+    ax.set_xlim(-0.08, 1.0)
+    ax.set_xlabel("Correlação de Spearman (ρ) entre a medida DORA e a medida de fluxo por PR")
+    ax.text(0.85, (len(t) - 1) / 2, "mesmo constructo\nρ ≥ 0,7", fontsize=8,
+            color=TINTA_2, ha="center", va="center")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_color(EIXO)
+    ax.spines["bottom"].set_color(EIXO)
+    ax.grid(axis="x", color=GRADE, linewidth=0.6)
+    ax.set_axisbelow(True)
+
+    cabecalho(ax, "DORA e fluxo por PR não medem a mesma coisa",
+              f"Spearman por repositório nos 600 (n varia com a cobertura de cada medida); "
+              f"p corrigido por Holm. Nenhum par alcança ρ = 0,7")
+    return salvar(fig, destino)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analise.figuras_distribuicoes")
     ap.add_argument("--dataset", type=Path, default=Path("data/dataset_dora.csv"))
@@ -167,6 +202,11 @@ def main(argv: list[str] | None = None) -> int:
     if discriminancia.exists():
         print(fig_discriminancia(pd.read_csv(discriminancia),
                                  args.saida / "distribuicoes-discriminancia.png"))
+
+    convergencia = args.tabelas / "distribuicoes_convergencia.csv"
+    if convergencia.exists():
+        print(fig_convergencia(pd.read_csv(convergencia),
+                               args.saida / "distribuicoes-convergencia.png"))
 
     if args.runs.exists():
         por_repo = tabela_weibull(duracoes_por_repositorio(pd.read_csv(args.runs)))

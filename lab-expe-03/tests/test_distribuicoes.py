@@ -8,15 +8,18 @@ from analise.distribuicoes import (
     ajuste_binomial_negativa,
     ajuste_weibull,
     centro,
+    convergencia,
     dispersao,
     duracoes_por_repositorio,
     faixas_dora,
+    juntar_medidas,
     medias_amostrais,
     normalidade,
     poder_discriminante,
     resumo_weibull,
     tabela_centro,
     tabela_contagem,
+    tabela_convergencia,
     tabela_normalidade,
     tabela_poder_discriminante,
     tabela_weibull,
@@ -216,6 +219,59 @@ def test_discriminancia_corrige_por_holm_e_deixa_o_controle_de_fora():
     independentes = tabela[tabela["tipo"] == "independente"]
     assert (independentes["p_holm"] >= independentes["p"]).all()
     assert not independentes["separa"].any()
+
+
+def test_convergencia_pareia_pelo_repositorio_e_nao_pela_posicao():
+    x = [np.nan, 1.0, 2.0, 3.0, 4.0]
+    y = [9.0, 1.0, 2.0, 3.0, 4.0]
+    r = convergencia(x, y)
+    assert r["n"] == 4
+    assert r["rho"] == pytest.approx(1.0)
+
+
+def test_convergencia_mede_variancia_compartilhada():
+    rng = np.random.default_rng(8)
+    base = rng.normal(0, 1, 200)
+    r = convergencia(base, base * 2 + rng.normal(0, 0.1, 200))
+    assert r["rho"] > 0.9
+    assert r["variancia_compartilhada"] == pytest.approx(r["rho"] ** 2)
+    assert r["mesmo_constructo"] is True
+
+
+def test_convergencia_reconhece_constructos_distintos():
+    rng = np.random.default_rng(12)
+    r = convergencia(rng.normal(0, 1, 300), rng.normal(0, 1, 300))
+    assert abs(r["rho"]) < 0.2
+    assert r["mesmo_constructo"] is False
+
+
+def test_convergencia_sem_variacao_nao_quebra():
+    assert convergencia([1, 1, 1, 1], [1, 2, 3, 4])["rho"] is None
+
+
+def test_juntar_medidas_cruza_por_owner_e_repo():
+    dora = pd.DataFrame({"owner": ["o", "o"], "repo": ["a", "b"], "lt_b_release_dias": [1.0, 2.0]})
+    graphql = pd.DataFrame({"owner": ["o", "o"], "repo": ["b", "c"], "lt_pr_mediana_horas": [9.0, 8.0]})
+    junto = juntar_medidas(dora, graphql)
+    assert len(junto) == 1
+    assert junto.iloc[0]["repo"] == "b"
+
+
+def test_tabela_convergencia_corrige_por_holm():
+    rng = np.random.default_rng(6)
+    n = 150
+    base = rng.normal(0, 1, n)
+    df = pd.DataFrame({
+        "lt_b_release_dias": base,
+        "lt_pr_mediana_horas": base + rng.normal(0, 0.2, n),
+        "df_release_semana": rng.normal(0, 1, n),
+        "prs_mergeados_semana": rng.normal(0, 1, n),
+    })
+    tabela = tabela_convergencia(df).set_index("dora")
+    assert len(tabela) == 2
+    assert (tabela["p_holm"] >= tabela["p"]).all()
+    assert bool(tabela.loc["lt_b_release_dias", "associacao"]) is True
+    assert bool(tabela.loc["df_release_semana", "associacao"]) is False
 
 
 def test_discriminancia_marca_separacao_real():

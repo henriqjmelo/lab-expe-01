@@ -33,6 +33,16 @@ ATRIBUTOS_DISCRIMINANCIA = (
 
 NOME_FAIXA = {1: "Elite", 2: "High", 3: "Medium", 4: "Low"}
 
+PARES_CONVERGENCIA = (
+    ("lt_b_release_dias", "lt_pr_mediana_horas", "Lead time (b): por release × por PR"),
+    ("lt_a_release_dias", "lt_pr_mediana_horas", "Lead time (a): por release × por PR"),
+    ("df_release_semana", "prs_mergeados_semana", "Ritmo: releases × PRs por semana"),
+    ("cfr_b_release", "taxa_aceitacao_pr", "Falha: CFR (b) × taxa de aceitação de PR"),
+    ("recuperacao_mediana_horas", "resolucao_bug_mediana_horas", "Recuperação: CI × issue de bug"),
+)
+
+LIMIAR_MESMO_CONSTRUCTO = 0.7
+
 
 def _serie(valores) -> pd.Series:
     return pd.Series(valores, dtype="float64").dropna()
@@ -227,10 +237,49 @@ def faixas_dora(classificacao: pd.DataFrame, coluna: str = "geral") -> pd.Series
     return classificacao[coluna].map(NOME_FAIXA)
 
 
+def convergencia(x, y) -> dict:
+    bruto = pd.DataFrame({"x": np.asarray(x, dtype="float64"),
+                          "y": np.asarray(y, dtype="float64")})
+    par = bruto.dropna()
+    if len(par) < 3 or np.ptp(par["x"]) == 0 or np.ptp(par["y"]) == 0:
+        return {"n": len(par), "rho": None, "p": None, "variancia_compartilhada": None,
+                "mesmo_constructo": None}
+    rho, p = stats.spearmanr(par["x"], par["y"])
+    return {"n": len(par), "rho": float(rho), "p": float(p),
+            "variancia_compartilhada": float(rho ** 2),
+            "mesmo_constructo": bool(abs(rho) >= LIMIAR_MESMO_CONSTRUCTO)}
+
+
+def juntar_medidas(dora: pd.DataFrame, graphql: pd.DataFrame) -> pd.DataFrame:
+    return dora.merge(graphql, on=["owner", "repo"], how="inner")
+
+
+def tabela_convergencia(df: pd.DataFrame,
+                        pares: tuple = PARES_CONVERGENCIA) -> pd.DataFrame:
+    linhas = []
+    for coluna_dora, coluna_fluxo, rotulo in pares:
+        if coluna_dora not in df or coluna_fluxo not in df:
+            continue
+        linhas.append({"par": rotulo, "dora": coluna_dora, "fluxo": coluna_fluxo,
+                       **convergencia(df[coluna_dora], df[coluna_fluxo])})
+    tabela = pd.DataFrame(linhas)
+    if tabela.empty:
+        return tabela
+    validos = tabela["p"].notna()
+    tabela["p_holm"] = np.nan
+    if validos.any():
+        tabela.loc[validos, "p_holm"] = multipletests(tabela.loc[validos, "p"], method="holm")[1]
+    tabela["associacao"] = pd.array(tabela["p_holm"] < ALFA, dtype="boolean")
+    tabela.loc[tabela["p_holm"].isna(), "associacao"] = pd.NA
+    return tabela
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analise.distribuicoes")
     ap.add_argument("--dataset", type=Path, default=Path("data/dataset_dora.csv"))
     ap.add_argument("--runs", type=Path, default=Path("data/eventos/runs.csv.gz"))
+    ap.add_argument("--amostras", type=Path, nargs="*",
+                    default=[Path("data"), Path("data/amostra2")])
     ap.add_argument("--saida", type=Path, default=Path("analise/saida/tabelas"))
     args = ap.parse_args(argv)
 
@@ -249,6 +298,16 @@ def main(argv: list[str] | None = None) -> int:
                           tabela_poder_discriminante(df, faixas, colunas_da_faixa))):
         tabela.to_csv(args.saida / f"{nome}.csv", index=False)
         print(f"{args.saida / nome}.csv: {len(tabela)} linha(s)")
+
+    juntadas = [juntar_medidas(pd.read_csv(p / "dataset_dora.csv"),
+                               pd.read_csv(p / "medidas_graphql.csv"))
+                for p in args.amostras
+                if (p / "dataset_dora.csv").exists() and (p / "medidas_graphql.csv").exists()]
+    if juntadas:
+        conv = tabela_convergencia(pd.concat(juntadas, ignore_index=True))
+        conv.to_csv(args.saida / "distribuicoes_convergencia.csv", index=False)
+        print(f"{args.saida}/distribuicoes_convergencia.csv: {len(conv)} par(es), "
+              f"{int(conv['n'].max())} repositorios")
 
     if args.runs.exists():
         duracoes = duracoes_por_repositorio(pd.read_csv(args.runs))
