@@ -75,6 +75,9 @@ def carregar_com_alternativas(caminho) -> pd.DataFrame:
     if extra.exists():
         alt = pd.read_csv(extra).drop(columns=["cfr_a"])
         df = df.merge(alt, on=["owner", "repo"], how="left")
+    graphql = Path(caminho).parent / "medidas_graphql.csv"
+    if graphql.exists():
+        df = df.merge(pd.read_csv(graphql), on=["owner", "repo"], how="left")
     return df
 
 

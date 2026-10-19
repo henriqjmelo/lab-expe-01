@@ -6,11 +6,22 @@ from pathlib import Path
 import pandas as pd
 
 from metricas.ci import cfr_ci_com_reexecucoes, tempo_feedback
+from metricas.colaboracao import Deployment, PullRequest, metricas_bugs, metricas_deploys, metricas_prs
 from metricas.fluxo import distribuicao_trabalho
 from metricas.recuperacao import Run
 from metricas.revert import CommitDeRelease, ReleaseAvaliavel, cfr_revert
 
 FIM_JANELA = "2026-10-01T00:00:00Z"
+SEMANAS_JANELA = 365 / 7
+
+COLUNAS_GRAPHQL = (
+    "owner", "repo",
+    "n_prs_mergeados", "prs_mergeados_semana", "lt_pr_mediana_horas", "primeira_resposta_mediana_horas",
+    "prop_prs_sem_resposta", "taxa_aceitacao_pr",
+    "n_bugs_fechados", "resolucao_bug_mediana_horas",
+    "n_deploys_producao", "usa_deployments", "df_deploy_semana", "cfr_d_deploy", "recuperacao_deploy_mediana_horas",
+    "truncado_prs", "truncado_issues", "truncado_deployments",
+)
 
 COLUNAS = (
     "owner", "repo",
@@ -75,6 +86,44 @@ def calcular(pasta_amostra: Path) -> pd.DataFrame:
     return pd.DataFrame(linhas, columns=COLUNAS)
 
 
+def _texto(valor) -> str:
+    return valor if isinstance(valor, str) else ""
+
+
+def calcular_graphql(pasta_amostra: Path) -> pd.DataFrame:
+    repos = pd.read_csv(pasta_amostra / "repositorios.csv")
+    pasta = pasta_amostra / "graphql"
+    prs = pd.read_csv(pasta / "prs.csv.gz")
+    issues = pd.read_csv(pasta / "issues.csv.gz")
+    deploys = pd.read_csv(pasta / "deployments.csv.gz")
+    resumo = pd.read_csv(pasta / "resumo.csv").set_index(["owner", "repo"])
+    grupos = {nome: dict(iter(df.groupby(["owner", "repo"]))) for nome, df in
+              (("prs", prs), ("issues", issues), ("deploys", deploys))}
+    linhas = []
+    for owner, repo in repos.itertuples(index=False):
+        g = {nome: grupos[nome].get((owner, repo)) for nome in grupos}
+        lista_prs = [] if g["prs"] is None else [
+            PullRequest(p.estado, p.created_at, _texto(p.merged_at), _texto(p.closed_at), _texto(p.primeira_resposta_at))
+            for p in g["prs"].itertuples()
+        ]
+        lista_issues = [] if g["issues"] is None else [
+            (i.created_at, i.closed_at, bool(i.eh_bug)) for i in g["issues"].itertuples()
+        ]
+        lista_deploys = [] if g["deploys"] is None else [
+            Deployment(d.created_at, _texto(d.environment), _texto(d.state), _texto(d.status))
+            for d in g["deploys"].itertuples()
+        ]
+        trunc = resumo.loc[(owner, repo)] if (owner, repo) in resumo.index else {}
+        linhas.append({
+            "owner": owner, "repo": repo,
+            **metricas_prs(lista_prs, SEMANAS_JANELA),
+            **metricas_bugs(lista_issues),
+            **metricas_deploys(lista_deploys, SEMANAS_JANELA),
+            **{k: bool(trunc[k]) if len(trunc) else None for k in ("truncado_prs", "truncado_issues", "truncado_deployments")},
+        })
+    return pd.DataFrame(linhas, columns=COLUNAS_GRAPHQL)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analise.alternativas")
     ap.add_argument("pastas", type=Path, nargs="*", default=[Path("data"), Path("data/amostra2")])
@@ -83,6 +132,10 @@ def main(argv: list[str] | None = None) -> int:
         tabela = calcular(pasta)
         tabela.to_csv(pasta / "medidas_alternativas.csv", index=False)
         print(f"{pasta / 'medidas_alternativas.csv'}: {len(tabela)} repositorios")
+        if (pasta / "graphql" / "resumo.csv").exists():
+            graphql = calcular_graphql(pasta)
+            graphql.to_csv(pasta / "medidas_graphql.csv", index=False)
+            print(f"{pasta / 'medidas_graphql.csv'}: {len(graphql)} repositorios")
     return 0
 
 
