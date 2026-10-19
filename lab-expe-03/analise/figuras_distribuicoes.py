@@ -186,6 +186,50 @@ def fig_convergencia(tabela: pd.DataFrame, destino: Path) -> Path:
     return salvar(fig, destino)
 
 
+def fig_confusao(tabela: pd.DataFrame, destino: Path, par: str | None = None) -> Path:
+    t = tabela if par is None else tabela[tabela["par"] == par]
+    agregado = float(t[t["estrato"] == "agregado"]["rho"].iloc[0])
+    controles = [c for c in t["controle"].unique() if c != "nenhum"]
+
+    fig, ax = plt.subplots(figsize=(LARGURA, 3.0))
+    ax.axhline(agregado, color=TINTA, linewidth=1.2, zorder=4)
+    ax.annotate(f"agregado  ρ = {fmt_num(agregado, 3)}", xy=(-0.45, agregado),
+                xytext=(0, 6), textcoords="offset points", fontsize=8, color=TINTA, ha="left")
+
+    for i, controle in enumerate(controles):
+        do_controle = t[t["controle"] == controle]
+        estratos = do_controle[do_controle["estrato"].isin(["Q1", "Q2", "Q3", "Q4"])]
+        ax.scatter([i] * len(estratos), estratos["rho"], s=46, color=SERIE[0],
+                   edgecolor=SUPERFICIE, linewidth=1.0, zorder=3, label="_")
+        parcial = do_controle[do_controle["estrato"] == "parcial"]["rho"]
+        if not parcial.empty:
+            ax.scatter([i], parcial, s=120, marker="D", color=SERIE[1],
+                       edgecolor=SUPERFICIE, linewidth=1.2, zorder=5)
+
+    ax.set_xticks(range(len(controles)))
+    ax.set_xticklabels(controles, fontsize=9)
+    ax.set_xlim(-0.5, len(controles) - 0.5)
+    ax.set_ylim(0, max(1.0, float(t["rho"].max()) * 1.15))
+    ax.set_ylabel("ρ de Spearman")
+    ax.set_xlabel("Variável controlada")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_color(EIXO)
+    ax.spines["bottom"].set_color(EIXO)
+    ax.grid(axis="y", color=GRADE, linewidth=0.6)
+    ax.set_axisbelow(True)
+
+    alcas = [plt.Line2D([], [], marker="o", color=SERIE[0], linestyle="", markersize=7),
+             plt.Line2D([], [], marker="D", color=SERIE[1], linestyle="", markersize=8)]
+    ax.legend(alcas, ["ρ dentro de cada quartil", "ρ parcial, controlando a variável"],
+              fontsize=7.5, loc="lower right", frameon=False)
+
+    cabecalho(ax, "A relação da RQ05 não é tamanho disfarçado: ela se mantém dentro dos quartis",
+              f"Spearman entre frequência de deploy e CFR (b) nos 600; se a associação fosse "
+              f"confusão por tamanho, os pontos cairiam para perto de zero")
+    return salvar(fig, destino)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analise.figuras_distribuicoes")
     ap.add_argument("--dataset", type=Path, default=Path("data/dataset_dora.csv"))
@@ -207,6 +251,12 @@ def main(argv: list[str] | None = None) -> int:
     if convergencia.exists():
         print(fig_convergencia(pd.read_csv(convergencia),
                                args.saida / "distribuicoes-convergencia.png"))
+
+    confusao = args.tabelas / "distribuicoes_confusao.csv"
+    if confusao.exists():
+        t = pd.read_csv(confusao)
+        print(fig_confusao(t, args.saida / "distribuicoes-confusao.png",
+                           par="df_release_semana x cfr_b_release"))
 
     if args.runs.exists():
         por_repo = tabela_weibull(duracoes_por_repositorio(pd.read_csv(args.runs)))

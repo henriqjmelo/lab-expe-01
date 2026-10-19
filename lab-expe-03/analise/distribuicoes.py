@@ -43,6 +43,19 @@ PARES_CONVERGENCIA = (
 
 LIMIAR_MESMO_CONSTRUCTO = 0.7
 
+CONTROLES_TAMANHO = (
+    ("estrelas", "Estrelas"),
+    ("contribuidores", "Contribuidores"),
+    ("idade_anos", "Idade em anos"),
+)
+
+PARES_RQ05 = (
+    ("df_release_semana", "cfr_a", "Frequência × CFR (a)"),
+    ("df_release_semana", "cfr_b_release", "Frequência × CFR (b)"),
+)
+
+NIVEIS_QUARTIL = ("Q1", "Q2", "Q3", "Q4")
+
 
 def _serie(valores) -> pd.Series:
     return pd.Series(valores, dtype="float64").dropna()
@@ -254,6 +267,69 @@ def juntar_medidas(dora: pd.DataFrame, graphql: pd.DataFrame) -> pd.DataFrame:
     return dora.merge(graphql, on=["owner", "repo"], how="inner")
 
 
+def correlacao_parcial_spearman(x, y, z) -> dict:
+    dados = pd.DataFrame({"x": np.asarray(x, dtype="float64"),
+                          "y": np.asarray(y, dtype="float64"),
+                          "z": np.asarray(z, dtype="float64")}).dropna()
+    n = len(dados)
+    if n < 5 or any(np.ptp(dados[c]) == 0 for c in ("x", "y", "z")):
+        return {"n": n, "rho": None, "p": None}
+    postos = dados.rank()
+    rxy = float(postos["x"].corr(postos["y"]))
+    rxz = float(postos["x"].corr(postos["z"]))
+    ryz = float(postos["y"].corr(postos["z"]))
+    denominador = np.sqrt((1 - rxz ** 2) * (1 - ryz ** 2))
+    if denominador == 0:
+        return {"n": n, "rho": None, "p": None}
+    parcial = (rxy - rxz * ryz) / denominador
+    if abs(parcial) >= 1:
+        return {"n": n, "rho": float(parcial), "p": 0.0}
+    t = parcial * np.sqrt((n - 3) / (1 - parcial ** 2))
+    return {"n": n, "rho": float(parcial), "p": float(2 * stats.t.sf(abs(t), n - 3))}
+
+
+def quartis(valores) -> pd.Series:
+    serie = pd.Series(np.asarray(valores, dtype="float64"))
+    return pd.qcut(serie, 4, labels=list(NIVEIS_QUARTIL), duplicates="drop")
+
+
+def tabela_confusao(df: pd.DataFrame, x: str, y: str,
+                    controles: tuple = CONTROLES_TAMANHO) -> pd.DataFrame:
+    agregado = convergencia(df[x], df[y])
+    linhas = [{"controle": "nenhum", "estrato": "agregado",
+               "n": agregado["n"], "rho": agregado["rho"], "p": agregado["p"]}]
+    for coluna, rotulo in controles:
+        if coluna not in df:
+            continue
+        faixa = quartis(df[coluna])
+        for nivel in NIVEIS_QUARTIL:
+            sub = df[(faixa == nivel).to_numpy()]
+            r = convergencia(sub[x], sub[y])
+            linhas.append({"controle": rotulo, "estrato": nivel,
+                           "n": r["n"], "rho": r["rho"], "p": r["p"]})
+        parcial = correlacao_parcial_spearman(df[x], df[y], df[coluna])
+        linhas.append({"controle": rotulo, "estrato": "parcial", **parcial})
+    tabela = pd.DataFrame(linhas)
+    tabela["par"] = f"{x} x {y}"
+    return tabela
+
+
+def diagnostico_confusao(tabela: pd.DataFrame) -> dict:
+    agregado = tabela[tabela["estrato"] == "agregado"]["rho"].iloc[0]
+    parciais = tabela[tabela["estrato"] == "parcial"]["rho"].dropna()
+    estratos = tabela[tabela["estrato"].isin(NIVEIS_QUARTIL)]["rho"].dropna()
+    if agregado is None or parciais.empty or estratos.empty:
+        return {"rho_agregado": agregado, "maior_queda_parcial": None, "confusao": None}
+    queda = float((abs(agregado) - abs(parciais)).max())
+    return {
+        "rho_agregado": float(agregado),
+        "rho_parcial_min": float(parciais.abs().min()),
+        "maior_queda_parcial": queda,
+        "estratos_mesmo_sinal": bool((np.sign(estratos) == np.sign(agregado)).all()),
+        "confusao": bool(queda > abs(agregado) * 0.5),
+    }
+
+
 def tabela_convergencia(df: pd.DataFrame,
                         pares: tuple = PARES_CONVERGENCIA) -> pd.DataFrame:
     linhas = []
@@ -308,6 +384,13 @@ def main(argv: list[str] | None = None) -> int:
         conv.to_csv(args.saida / "distribuicoes_convergencia.csv", index=False)
         print(f"{args.saida}/distribuicoes_convergencia.csv: {len(conv)} par(es), "
               f"{int(conv['n'].max())} repositorios")
+
+    conjunto = pd.concat(juntadas, ignore_index=True) if juntadas else df
+    confusao = pd.concat([tabela_confusao(conjunto, x, y) for x, y, _ in PARES_RQ05
+                          if x in conjunto and y in conjunto], ignore_index=True)
+    if not confusao.empty:
+        confusao.to_csv(args.saida / "distribuicoes_confusao.csv", index=False)
+        print(f"{args.saida}/distribuicoes_confusao.csv: {len(confusao)} linha(s)")
 
     if args.runs.exists():
         duracoes = duracoes_por_repositorio(pd.read_csv(args.runs))

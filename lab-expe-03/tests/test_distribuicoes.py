@@ -9,16 +9,20 @@ from analise.distribuicoes import (
     ajuste_weibull,
     centro,
     convergencia,
+    correlacao_parcial_spearman,
+    diagnostico_confusao,
     dispersao,
     duracoes_por_repositorio,
     faixas_dora,
     juntar_medidas,
     medias_amostrais,
     normalidade,
+    quartis,
     poder_discriminante,
     resumo_weibull,
     tabela_centro,
     tabela_contagem,
+    tabela_confusao,
     tabela_convergencia,
     tabela_normalidade,
     tabela_poder_discriminante,
@@ -272,6 +276,81 @@ def test_tabela_convergencia_corrige_por_holm():
     assert (tabela["p_holm"] >= tabela["p"]).all()
     assert bool(tabela.loc["lt_b_release_dias", "associacao"]) is True
     assert bool(tabela.loc["df_release_semana", "associacao"]) is False
+
+
+def test_parcial_derruba_correlacao_que_era_so_confusao():
+    rng = np.random.default_rng(21)
+    z = rng.normal(0, 1, 400)
+    x = z + rng.normal(0, 0.3, 400)
+    y = z + rng.normal(0, 0.3, 400)
+    bruto = convergencia(x, y)
+    parcial = correlacao_parcial_spearman(x, y, z)
+    assert bruto["rho"] > 0.8
+    assert abs(parcial["rho"]) < 0.2
+    assert parcial["p"] > 0.01
+
+
+def test_parcial_preserva_relacao_real():
+    rng = np.random.default_rng(22)
+    z = rng.normal(0, 1, 400)
+    x = rng.normal(0, 1, 400)
+    y = x + rng.normal(0, 0.3, 400)
+    parcial = correlacao_parcial_spearman(x, y, z)
+    assert parcial["rho"] > 0.8
+    assert parcial["p"] < 1e-10
+
+
+def test_parcial_com_poucos_dados_ou_sem_variacao():
+    assert correlacao_parcial_spearman([1, 2, 3], [1, 2, 3], [1, 2, 3])["rho"] is None
+    assert correlacao_parcial_spearman([1, 2, 3, 4, 5], [1, 2, 3, 4, 5],
+                                       [7, 7, 7, 7, 7])["rho"] is None
+
+
+def test_quartis_rotula_os_quatro_niveis():
+    q = quartis(list(range(100)))
+    assert list(q.value_counts().sort_index().index) == ["Q1", "Q2", "Q3", "Q4"]
+    assert q.value_counts().tolist() == [25, 25, 25, 25]
+
+
+def test_tabela_confusao_traz_agregado_estratos_e_parcial():
+    rng = np.random.default_rng(23)
+    n = 200
+    df = pd.DataFrame({
+        "df_release_semana": rng.normal(0, 1, n),
+        "cfr_a": rng.normal(0, 1, n),
+        "estrelas": rng.normal(0, 1, n),
+    })
+    t = tabela_confusao(df, "df_release_semana", "cfr_a", (("estrelas", "Estrelas"),))
+    assert list(t["estrato"]) == ["agregado", "Q1", "Q2", "Q3", "Q4", "parcial"]
+    assert t["par"].nunique() == 1
+
+
+def test_diagnostico_aponta_confusao_quando_a_parcial_desaba():
+    rng = np.random.default_rng(24)
+    n = 400
+    z = rng.normal(0, 1, n)
+    df = pd.DataFrame({
+        "df_release_semana": z + rng.normal(0, 0.3, n),
+        "cfr_a": z + rng.normal(0, 0.3, n),
+        "estrelas": z,
+    })
+    t = tabela_confusao(df, "df_release_semana", "cfr_a", (("estrelas", "Estrelas"),))
+    assert diagnostico_confusao(t)["confusao"] is True
+
+
+def test_diagnostico_nao_aponta_confusao_quando_a_relacao_se_sustenta():
+    rng = np.random.default_rng(25)
+    n = 400
+    base = rng.normal(0, 1, n)
+    df = pd.DataFrame({
+        "df_release_semana": base,
+        "cfr_a": base + rng.normal(0, 0.3, n),
+        "estrelas": rng.normal(0, 1, n),
+    })
+    d = diagnostico_confusao(tabela_confusao(df, "df_release_semana", "cfr_a",
+                                            (("estrelas", "Estrelas"),)))
+    assert d["confusao"] is False
+    assert d["estratos_mesmo_sinal"] is True
 
 
 def test_discriminancia_marca_separacao_real():

@@ -403,7 +403,7 @@ Implementadas em `analise/distribuicoes.py`, com testes em `tests/test_distribui
 | 4 | Normalidade, lognormalidade e centro (§3) | **feita** — 0 de 5 métricas normais |
 | 5 | Demonstração do TLC por reamostragem (§6.1) | **feita** — figura dos quatro painéis |
 | 6 | Poder discriminante das faixas DORA (§6.1.1) | **feita** — ε² de 0,008 em estrelas |
-| 7 | Controle de confusão por tamanho na RQ05 e RQ06 (§6.2) | pendente, e menos urgente após a 6 |
+| 7 | Controle de confusão por tamanho na RQ05 (§7.4) | **feita** — não há confusão |
 | 8 | Convergência entre paradigmas (§7.3) | **feita** — nenhum par chega a ρ = 0,7 |
 
 ### 7.3 Resultado: DORA e fluxo por PR são constructos distintos
@@ -438,6 +438,45 @@ enunciado não cobre.
 
 Tabela em `analise/saida/tabelas/distribuicoes_convergencia.csv`; figura em
 `analise/saida/figuras/distribuicoes-convergencia.png`.
+
+### 7.4 Resultado: a relação da RQ05 não é confusão por tamanho
+
+A §6.2 levantou o tamanho do repositório como variável de confusão candidata, pelo paralelo com
+El Emam et al. (2001). A suspeita foi testada de duas formas independentes nos 600: **estratificação**
+por quartis e **correlação parcial de Spearman**.
+
+Para `df_release_semana × cfr_b_release`, onde a associação é forte:
+
+| Controle | Q1 | Q2 | Q3 | Q4 | ρ parcial |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Estrelas | 0,547 | 0,577 | 0,454 | 0,674 | 0,568 |
+| Contribuidores | 0,612 | 0,645 | 0,529 | 0,517 | 0,593 |
+| Idade em anos | 0,698 | 0,550 | 0,387 | 0,381 | 0,503 |
+
+ρ agregado = **0,562**. A maior queda na parcial é de 0,059, e **os doze estratos mantêm o mesmo
+sinal**, variando entre 0,381 e 0,698. Se a associação fosse tamanho disfarçado, ela desapareceria
+dentro dos quartis. Não desaparece.
+
+O par fraco (`cfr_a`) se comporta igual: ρ agregado 0,117, parciais entre 0,083 e 0,118, estratos
+todos no mesmo sinal. Fraco, mas estável.
+
+**A ameaça de validade interna levantada na §6.2 fica fechada**, e pode ser reportada como tal no
+artigo — não como preocupação em aberto, mas como verificação feita com resultado negativo.
+
+#### Uma observação que não é desta issue, mas vale registrar
+
+O ρ de 0,562 entre frequência de deploy e CFR (b) é **positivo e forte**: quem publica mais releases
+tem maior taxa de falha por esse proxy. Antes de interpretar isso como achado substantivo, vale
+checar um acoplamento mecânico possível: o CFR (b) conta releases seguidas de uma corretiva em até
+7 dias, e quem publica com mais frequência tem naturalmente mais chance de ter *alguma* release nos
+7 dias seguintes a outra. A associação pode estar parcialmente embutida na definição da métrica.
+
+Isso é exatamente o tipo de problema de validade de constructo que a §1 descreve, e é verificável:
+bastaria comparar o CFR (b) observado com o esperado sob publicação aleatória na mesma cadência.
+Fica como sugestão para quem cuida da RQ05 e da RQ03 (b).
+
+Tabela em `analise/saida/tabelas/distribuicoes_confusao.csv`; figura em
+`analise/saida/figuras/distribuicoes-confusao.png`.
 
 ---
 
