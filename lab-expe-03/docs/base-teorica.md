@@ -211,7 +211,7 @@ Mesmo com a população assimétrica, a distribuição da *estatística* (média
 entre grupos) tende à normal conforme n cresce, com erro padrão `σ ÷ √n`. É isso que sustenta os
 intervalos de confiança e o p-valor dos testes da RQ05 e RQ06, mesmo com dados não normais.
 
-### 6.1 Resultado: a convergência existe, mas é lenta
+### 4.3.1 Resultado: a convergência existe, mas é lenta
 
 A demonstração foi construída e trouxe um achado que corrige a intuição comum. Reamostrando a
 própria população da A1 (10.000 reamostragens por tamanho):
@@ -401,7 +401,7 @@ Implementadas em `analise/distribuicoes.py`, com testes em `tests/test_distribui
 | 2 | Binomial negativa como substituta (§4.1) | **feita** — ajuste por momentos |
 | 3 | Weibull nos tempos de recuperação (§4.2.1) | **feita** — β mediano 0,557 |
 | 4 | Normalidade, lognormalidade e centro (§3) | **feita** — 0 de 5 métricas normais |
-| 5 | Demonstração do TLC por reamostragem (§6.1) | **feita** — figura dos quatro painéis |
+| 5 | Demonstração do TLC por reamostragem (§4.3.1) | **feita** — figura dos quatro painéis |
 | 6 | Poder discriminante das faixas DORA (§6.1.1) | **feita** — ε² de 0,008 em estrelas |
 | 7 | Controle de confusão por tamanho na RQ05 (§7.4) | **feita** — não há confusão |
 | 8 | Convergência entre paradigmas (§7.3) | **feita** — nenhum par chega a ρ = 0,7 |
