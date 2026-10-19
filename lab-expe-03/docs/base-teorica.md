@@ -300,11 +300,52 @@ seis critérios, e vocês já têm dados para vários deles:
 | Rastreamento | RQ08 temporal: Mann-Kendall por trimestre |
 | Consistência | RQ07: a ordenação muda com a definição operacional? |
 | Previsibilidade | lacuna — exigiria um desfecho externo para prever |
-| Poder discriminante | **as faixas DORA separam de fato?** análise ainda não feita |
+| Poder discriminante | medido (§6.1.1): forte só no que define a faixa |
 | Confiabilidade | comparação A1 × A2 × A3 — é literalmente este critério |
 
 Vale explicitar isso: **o desenho de três amostras independentes é o critério 6 da IEEE 1061
 operacionalizado.** Isso dá ao desenho amostral uma justificativa normativa, não apenas estatística.
+
+### 6.1.1 Resultado: a classificação DORA é quase toda autorreferente
+
+Critério 5 medido na A1 com a combinação C1 (release · LT (a) · CFR (a)). A faixa geral distribui-se
+em 150 Medium, 104 High, 24 Elite e 22 Low. Kruskal-Wallis entre as faixas, p corrigido por Holm,
+com os controles fora da correção:
+
+| Atributo | Tipo | ε² | p (Holm) | Separa? |
+| :--- | :--- | ---: | ---: | :--- |
+| Lead time (a) | controle tautológico | 0,527 | — | — |
+| Frequência de deploy | controle tautológico | 0,403 | — | — |
+| CFR (b) | outra operacionalização | 0,379 | 1,0 × 10⁻²³ | sim |
+| Lead time (b) | outra operacionalização | 0,296 | 4,9 × 10⁻¹⁸ | sim |
+| Idade em anos | independente | 0,109 | 1,2 × 10⁻⁶ | sim |
+| Contribuidores | independente | **0,022** | 0,179 | **não** |
+| Estrelas | independente | **0,008** | 0,512 | **não** |
+
+A leitura importa mais que os números. As faixas separam fortemente nas **variantes alternativas das
+próprias métricas** — CFR (b) chega a ε² = 0,379, perto do controle tautológico de 0,403. Isso é
+**validade convergente** entre operacionalizações, e serve à RQ07 como evidência de robustez à
+definição. Não é poder discriminante no sentido da norma.
+
+Contra atributos genuinamente independentes o resultado é magro: popularidade e tamanho de equipe
+**não separam nada** (ε² de 0,008 e 0,022, não significativos depois de Holm). Só a idade separa, com
+efeito pequeno.
+
+**Isto corrige a preocupação levantada na §6.2.** O risco de a RQ05 estar medindo popularidade
+disfarçada de desempenho é menor do que parecia: estrelas e contribuidores são estatisticamente
+independentes da faixa DORA. A ressalva é que este é um teste sobre a faixa composta e categórica,
+não sobre a correlação contínua da RQ05 — o controle por quartis continua valendo, mas como
+verificação, não como suspeita forte.
+
+**A limitação que precisa constar no artigo:** o critério 5 fala em separar alta e baixa
+*qualidade*, e o estudo não tem desfecho externo de qualidade — nenhuma medida de incidente em
+produção ou de satisfação que seja independente do pipeline. É a mesma lacuna do critério 4, com a
+mesma causa: todo o processo de entrega é medido por proxies do próprio GitHub. As medidas CHAOSS da
+#155 (tempo de resolução de bug, tempo até a primeira resposta) vêm de uma família de medição
+diferente e são a melhor chance de fechar essa lacuna.
+
+Tabela em `analise/saida/tabelas/distribuicoes_discriminancia.csv`; figura em
+`analise/saida/figuras/distribuicoes-discriminancia.png`.
 
 ### 6.2 Ameaças à validade (Cook & Campbell / Wohlin)
 
@@ -361,8 +402,8 @@ Implementadas em `analise/distribuicoes.py`, com testes em `tests/test_distribui
 | 3 | Weibull nos tempos de recuperação (§4.2.1) | **feita** — β mediano 0,557 |
 | 4 | Normalidade, lognormalidade e centro (§3) | **feita** — 0 de 5 métricas normais |
 | 5 | Demonstração do TLC por reamostragem (§6.1) | **feita** — figura dos quatro painéis |
-| 6 | Poder discriminante das faixas DORA | função pronta, falta rodar sobre as faixas |
-| 7 | Controle de confusão por tamanho na RQ05 e RQ06 (§6.2) | pendente |
+| 6 | Poder discriminante das faixas DORA (§6.1.1) | **feita** — ε² de 0,008 em estrelas |
+| 7 | Controle de confusão por tamanho na RQ05 e RQ06 (§6.2) | pendente, e menos urgente após a 6 |
 | 8 | Convergência entre paradigmas (DORA × fluxo por PR) | **bloqueada** — depende da #155 no `main` |
 
 Sobre a 8: o Spearman entre `lt_b_release_dias` e `lt_pr_mediana_horas` responde se as duas famílias

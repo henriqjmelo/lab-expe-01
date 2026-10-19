@@ -103,16 +103,71 @@ def fig_weibull(por_repo: pd.DataFrame, destino: Path) -> Path:
     return salvar(fig, destino)
 
 
+COR_TIPO = {"independente": SERIE[0], "operacionalizacao": SERIE[1], "controle": SERIE[2]}
+ROTULO_TIPO = {
+    "independente": "Atributo independente",
+    "operacionalizacao": "Outra operacionalização da mesma métrica",
+    "controle": "Métrica que define a faixa (tautológico)",
+}
+
+
+def fig_discriminancia(tabela: pd.DataFrame, destino: Path) -> Path:
+    t = tabela.dropna(subset=["epsilon2"]).sort_values("epsilon2").reset_index(drop=True)
+    fig, ax = plt.subplots(figsize=(LARGURA, 3.2))
+
+    for i, linha in t.iterrows():
+        tipo = linha["tipo"]
+        ax.barh(i, linha["epsilon2"], height=0.62, color=COR_TIPO[tipo],
+                edgecolor=SUPERFICIE, linewidth=0.8,
+                hatch="///" if tipo == "controle" else None, zorder=3)
+        marca = "" if linha["tipo"] == "controle" or linha["separa"] else "  n.s."
+        ax.annotate(f"{fmt_num(linha['epsilon2'], 3)}{marca}", xy=(linha["epsilon2"], i),
+                    xytext=(5, 0), textcoords="offset points", va="center",
+                    fontsize=8, color=TINTA_2)
+
+    ax.set_yticks(range(len(t)))
+    ax.set_yticklabels(t["atributo"], fontsize=8.5)
+    ax.set_xlim(0, float(t["epsilon2"].max()) * 1.28)
+    ax.set_xlabel("Tamanho de efeito ε² do Kruskal-Wallis entre as faixas DORA")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_color(EIXO)
+    ax.spines["bottom"].set_color(EIXO)
+    ax.grid(axis="x", color=GRADE, linewidth=0.6)
+    ax.set_axisbelow(True)
+
+    vistos, alcas = [], []
+    for tipo in ("independente", "operacionalizacao", "controle"):
+        if tipo in set(t["tipo"]) and tipo not in vistos:
+            vistos.append(tipo)
+            alcas.append(plt.Rectangle((0, 0), 1, 1, color=COR_TIPO[tipo],
+                                       hatch="///" if tipo == "controle" else None))
+    ax.legend(alcas, [ROTULO_TIPO[v] for v in vistos], fontsize=7.5, loc="lower right",
+              frameon=False, handlelength=1.1, handleheight=1.0)
+
+    cabecalho(ax, "As faixas DORA separam o que as define, e quase nada além disso",
+              f"Kruskal-Wallis entre Elite/High/Medium/Low (n = {int(t['n'].max())}); "
+              f"p corrigido por Holm, controles fora da correção. n.s. = não significativo")
+    return salvar(fig, destino)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analise.figuras_distribuicoes")
     ap.add_argument("--dataset", type=Path, default=Path("data/dataset_dora.csv"))
     ap.add_argument("--runs", type=Path, default=Path("data/eventos/runs.csv.gz"))
+    ap.add_argument("--tabelas", type=Path, default=Path("analise/saida/tabelas"))
     ap.add_argument("--saida", type=Path, default=Path("analise/saida/figuras"))
     args = ap.parse_args(argv)
 
     estilo()
     df = pd.read_csv(args.dataset)
     print(fig_tlc(df, args.saida / "distribuicoes-tlc.png"))
+
+    discriminancia = args.tabelas / "distribuicoes_discriminancia.csv"
+    if discriminancia.exists():
+        print(fig_discriminancia(pd.read_csv(discriminancia),
+                                 args.saida / "distribuicoes-discriminancia.png"))
+
     if args.runs.exists():
         por_repo = tabela_weibull(duracoes_por_repositorio(pd.read_csv(args.runs)))
         print(fig_weibull(por_repo, args.saida / "distribuicoes-weibull.png"))

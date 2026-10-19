@@ -10,6 +10,7 @@ from analise.distribuicoes import (
     centro,
     dispersao,
     duracoes_por_repositorio,
+    faixas_dora,
     medias_amostrais,
     normalidade,
     poder_discriminante,
@@ -19,6 +20,7 @@ from analise.distribuicoes import (
     tabela_normalidade,
     tabela_poder_discriminante,
     tabela_weibull,
+    tipo_do_atributo,
 )
 
 
@@ -176,3 +178,50 @@ def test_resumo_weibull_agrega_os_regimes():
 
 def test_resumo_weibull_vazio():
     assert resumo_weibull(pd.DataFrame()).empty
+
+
+def test_tipo_do_atributo_separa_controle_de_convergente_e_independente():
+    da_faixa = ("df_release_semana", "lt_a_release_dias")
+    assert tipo_do_atributo("df_release_semana", da_faixa) == "controle"
+    assert tipo_do_atributo("lt_b_release_dias", da_faixa) == "operacionalizacao"
+    assert tipo_do_atributo("estrelas", da_faixa) == "independente"
+
+
+def test_tipo_muda_quando_a_combinacao_muda():
+    assert tipo_do_atributo("lt_b_release_dias", ("lt_b_release_dias",)) == "controle"
+    assert tipo_do_atributo("lt_b_release_dias", ("lt_a_release_dias",)) == "operacionalizacao"
+
+
+def test_faixas_dora_traduz_os_codigos():
+    faixas = faixas_dora(pd.DataFrame({"geral": [1, 2, 3, 4]}))
+    assert list(faixas) == ["Elite", "High", "Medium", "Low"]
+
+
+def test_discriminancia_corrige_por_holm_e_deixa_o_controle_de_fora():
+    rng = np.random.default_rng(4)
+    n = 80
+    faixas = pd.Series(["Elite", "Low"] * (n // 2))
+    df = pd.DataFrame({
+        "df_release_semana": np.where(faixas == "Elite", rng.normal(9, 1, n), rng.normal(1, 1, n)),
+        "estrelas": rng.normal(100, 30, n),
+        "contribuidores": rng.normal(50, 10, n),
+        "idade_anos": rng.normal(5, 2, n),
+    })
+    tabela = tabela_poder_discriminante(df, faixas, ("df_release_semana",)).set_index("coluna")
+
+    assert tabela.loc["df_release_semana", "tipo"] == "controle"
+    assert pd.isna(tabela.loc["df_release_semana", "p_holm"])
+    assert pd.isna(tabela.loc["df_release_semana", "separa"])
+
+    independentes = tabela[tabela["tipo"] == "independente"]
+    assert (independentes["p_holm"] >= independentes["p"]).all()
+    assert not independentes["separa"].any()
+
+
+def test_discriminancia_marca_separacao_real():
+    faixas = pd.Series(["Elite"] * 40 + ["Low"] * 40)
+    df = pd.DataFrame({"estrelas": list(range(40)) + list(range(5000, 5040))})
+    linha = tabela_poder_discriminante(df, faixas).iloc[0]
+    assert linha["tipo"] == "independente"
+    assert bool(linha["separa"]) is True
+    assert linha["epsilon2"] > 0.5

@@ -6,7 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy import stats
+from statsmodels.stats.multitest import multipletests
 
+from analise import estatisticas as est
 from metricas.recuperacao import Run, episodios_do_workflow
 
 ALFA = 0.05
@@ -19,11 +21,17 @@ METRICAS_CONTINUAS = (
     ("recuperacao_mediana_horas", "Recuperacao"),
 )
 
-ATRIBUTOS_INDEPENDENTES = (
+ATRIBUTOS_DISCRIMINANCIA = (
     ("estrelas", "Estrelas"),
     ("contribuidores", "Contribuidores"),
     ("idade_anos", "Idade em anos"),
+    ("cfr_b_release", "CFR (b)"),
+    ("lt_b_release_dias", "Lead time (b)"),
+    ("df_release_semana", "Frequencia de deploy"),
+    ("lt_a_release_dias", "Lead time (a)"),
 )
+
+NOME_FAIXA = {1: "Elite", 2: "High", 3: "Medium", 4: "Low"}
 
 
 def _serie(valores) -> pd.Series:
@@ -184,14 +192,39 @@ def resumo_weibull(tabela: pd.DataFrame) -> pd.DataFrame:
     }])
 
 
-def tabela_poder_discriminante(df: pd.DataFrame, faixas: pd.Series) -> pd.DataFrame:
+def tipo_do_atributo(coluna: str, colunas_da_faixa: tuple[str, ...]) -> str:
+    if coluna in colunas_da_faixa:
+        return "controle"
+    if coluna in {c for c, _ in METRICAS_CONTINUAS}:
+        return "operacionalizacao"
+    return "independente"
+
+
+def tabela_poder_discriminante(df: pd.DataFrame, faixas: pd.Series,
+                               colunas_da_faixa: tuple[str, ...] = ()) -> pd.DataFrame:
+    niveis = list(faixas.dropna().unique())
     linhas = []
-    for coluna, rotulo in ATRIBUTOS_INDEPENDENTES:
+    for coluna, rotulo in ATRIBUTOS_DISCRIMINANCIA:
         if coluna not in df:
             continue
-        grupos = {nivel: df.loc[faixas == nivel, coluna] for nivel in faixas.dropna().unique()}
-        linhas.append({"atributo": rotulo, "coluna": coluna, **poder_discriminante(grupos)})
-    return pd.DataFrame(linhas)
+        grupos = {nivel: df.loc[faixas == nivel, coluna] for nivel in niveis}
+        linhas.append({"atributo": rotulo, "coluna": coluna,
+                       "tipo": tipo_do_atributo(coluna, colunas_da_faixa),
+                       **poder_discriminante(grupos)})
+    tabela = pd.DataFrame(linhas)
+    if tabela.empty:
+        return tabela
+    hipoteses = (tabela["tipo"] != "controle") & tabela["p"].notna()
+    tabela["p_holm"] = np.nan
+    if hipoteses.any():
+        tabela.loc[hipoteses, "p_holm"] = multipletests(tabela.loc[hipoteses, "p"], method="holm")[1]
+    tabela["separa"] = pd.array(tabela["p_holm"] < ALFA, dtype="boolean")
+    tabela.loc[tabela["p_holm"].isna(), "separa"] = pd.NA
+    return tabela
+
+
+def faixas_dora(classificacao: pd.DataFrame, coluna: str = "geral") -> pd.Series:
+    return classificacao[coluna].map(NOME_FAIXA)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -204,9 +237,16 @@ def main(argv: list[str] | None = None) -> int:
     df = pd.read_csv(args.dataset)
     args.saida.mkdir(parents=True, exist_ok=True)
 
+    combinacao = est.COMBINACOES[0]
+    faixas = faixas_dora(est.classificacoes(df, combinacao))
+    colunas_da_faixa = (combinacao.frequencia, combinacao.lead_time, combinacao.cfr,
+                        "recuperacao_mediana_horas")
+
     for nome, tabela in (("distribuicoes_normalidade", tabela_normalidade(df)),
                          ("distribuicoes_centro", tabela_centro(df)),
-                         ("distribuicoes_contagem", tabela_contagem(df))):
+                         ("distribuicoes_contagem", tabela_contagem(df)),
+                         ("distribuicoes_discriminancia",
+                          tabela_poder_discriminante(df, faixas, colunas_da_faixa))):
         tabela.to_csv(args.saida / f"{nome}.csv", index=False)
         print(f"{args.saida / nome}.csv: {len(tabela)} linha(s)")
 
