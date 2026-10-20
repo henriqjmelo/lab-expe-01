@@ -1,0 +1,6 @@
+par,dora,fluxo,n,rho,p,variancia_compartilhada,mesmo_constructo,p_holm,associacao
+Lead time (b): por release × por PR,lt_b_release_dias,lt_pr_mediana_horas,574,0.3193443683747348,4.487991285644327e-15,0.10198082561265831,False,1.3463973856932981e-14,True
+Lead time (a): por release × por PR,lt_a_release_dias,lt_pr_mediana_horas,574,0.342569884624487,3.004172339103889e-17,0.11735412585163434,False,1.2016689356415557e-16,True
+Ritmo: releases × PRs por semana,df_release_semana,prs_mergeados_semana,600,0.4597073080787265,1.0467275711225e-32,0.21133080910098917,False,5.2336378556125e-32,True
+Falha: CFR (b) × taxa de aceitação de PR,cfr_b_release,taxa_aceitacao_pr,597,0.04357215699771249,0.28782843326043706,0.0018985328654333054,False,0.28782843326043706,False
+Recuperação: CI × issue de bug,recuperacao_mediana_horas,resolucao_bug_mediana_horas,461,0.215996221113372,2.863055681086212e-06,0.04665436753525669,False,5.726111362172424e-06,True

@@ -1,0 +1,33 @@
+controle,estrato,n,rho,p,par
+nenhum,agregado,600,0.117131607326389,0.004065437758999556,df_release_semana x cfr_a
+Estrelas,Q1,150,0.03160298707553059,0.7010421987941124,df_release_semana x cfr_a
+Estrelas,Q2,150,0.2622461987748392,0.00118731321249895,df_release_semana x cfr_a
+Estrelas,Q3,150,0.08944479000271433,0.2763789655647518,df_release_semana x cfr_a
+Estrelas,Q4,150,0.08639154240014378,0.2931706741172638,df_release_semana x cfr_a
+Estrelas,parcial,600,0.10876768642545306,0.007713030364995593,df_release_semana x cfr_a
+Contribuidores,Q1,154,0.10327078076307393,0.20247706343217647,df_release_semana x cfr_a
+Contribuidores,Q2,146,0.15170626456772232,0.0675627185384197,df_release_semana x cfr_a
+Contribuidores,Q3,151,0.05491899758894906,0.5030148104840713,df_release_semana x cfr_a
+Contribuidores,Q4,149,0.14622192365656914,0.07517241767335137,df_release_semana x cfr_a
+Contribuidores,parcial,600,0.11824911949533394,0.0037529387114431855,df_release_semana x cfr_a
+Idade em anos,Q1,150,0.08509003996089796,0.30053026982237163,df_release_semana x cfr_a
+Idade em anos,Q2,150,0.00038612691720780253,0.9962583270754379,df_release_semana x cfr_a
+Idade em anos,Q3,150,0.11029031370333557,0.17908496385267922,df_release_semana x cfr_a
+Idade em anos,Q4,150,0.13681533486480624,0.09502203696453099,df_release_semana x cfr_a
+Idade em anos,parcial,600,0.0831356728785904,0.04195421434038786,df_release_semana x cfr_a
+nenhum,agregado,600,0.5619557162736694,3.0407796313109845e-51,df_release_semana x cfr_b_release
+Estrelas,Q1,150,0.546946363431254,4.444589349815839e-13,df_release_semana x cfr_b_release
+Estrelas,Q2,150,0.5768569927067041,1.1118929666201144e-14,df_release_semana x cfr_b_release
+Estrelas,Q3,150,0.4538741471656011,5.43574019518085e-09,df_release_semana x cfr_b_release
+Estrelas,Q4,150,0.6738008821393013,3.435064021093348e-21,df_release_semana x cfr_b_release
+Estrelas,parcial,600,0.5683551657856396,1.52432748208527e-52,df_release_semana x cfr_b_release
+Contribuidores,Q1,154,0.6121343357198492,3.320056539693456e-17,df_release_semana x cfr_b_release
+Contribuidores,Q2,146,0.6448004743531425,1.5946208000282822e-18,df_release_semana x cfr_b_release
+Contribuidores,Q3,151,0.5294228646116949,2.767053909237701e-12,df_release_semana x cfr_b_release
+Contribuidores,Q4,149,0.5168089184915369,1.5055932565470714e-11,df_release_semana x cfr_b_release
+Contribuidores,parcial,600,0.5925727807452968,4.637397318961618e-58,df_release_semana x cfr_b_release
+Idade em anos,Q1,150,0.6974540115565006,3.5741381758679316e-23,df_release_semana x cfr_b_release
+Idade em anos,Q2,150,0.5502859427499018,2.9979769810386887e-13,df_release_semana x cfr_b_release
+Idade em anos,Q3,150,0.3864674068868459,1.0353546838898986e-06,df_release_semana x cfr_b_release
+Idade em anos,Q4,150,0.3805442146767208,1.5576390731806671e-06,df_release_semana x cfr_b_release
+Idade em anos,parcial,600,0.5028041372322739,1.0692436498507068e-39,df_release_semana x cfr_b_release
