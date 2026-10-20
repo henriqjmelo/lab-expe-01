@@ -224,7 +224,9 @@ Para a discussão: a classificação DORA de um repositório **não é robusta �
 
 A pergunta desta seção é: **as conclusões dependem dos 300 repositórios que foram sorteados?** Ela é respondida de dois jeitos complementares:
 1. **A1 × A2**, duas amostras **independentes**, sem nenhum repositório em comum: testes de hipótese por métrica.
-2. **300 → 600:** se as estimativas ficam estáveis e mais precisas quando a amostra dobra. Como as duas se sobrepõem (a de 600 contém a de 300), aqui não cabe teste de hipótese, só a comparação das estimativas e dos intervalos.
+2. **300 → 600 → 900:** se as estimativas ficam estáveis e mais precisas conforme a amostra cresce. Como os níveis se contêm (900 contém 600, que contém 300), aqui não cabe teste de hipótese, só a comparação das estimativas e dos intervalos.
+
+As três amostras foram sorteadas com sementes distintas (42, 2026 e 2027) e **não têm nenhum repositório em comum**: a união das três dá exatamente 900 repositórios distintos. Esse desenho é o que operacionaliza o critério de **confiabilidade** da IEEE 1061 — uma métrica é confiável quando satisfaz os demais critérios de forma repetida, e não em um único conjunto de dados.
 
 ### Funil da amostra 2
 
@@ -261,17 +263,30 @@ Foram avaliados 1.108 candidatos para a A1 e 1.127 para a A2, e nenhum descarte 
 - Em nenhuma métrica há diferença significativa.
 - Todos os |δ| são < 0,07, bem abaixo do limite de efeito desprezível (0,147).
 
-### 300 → 600: as estimativas se mantêm?
+### 300 → 600 → 900: as estimativas se mantêm?
 
-![Convergência 300 → 600](../analise/saida/comparacao/figuras/fig12_convergencia_300_600.png)
+![Convergência 300 → 600 → 900](../analise/saida/comparacao/figuras/fig12_convergencia_300_600_900.png)
 
-**Como ler.** Para cada métrica, o ponto é a mediana e a barra é o intervalo de confiança de 95% (bootstrap), com 300 em azul e 600 em laranja. Se a mediana de 600 cai dentro do intervalo de 300, a estimativa se manteve. Uma barra mais curta indica mais precisão.
+**Como ler.** Para cada métrica, o ponto é a mediana e a barra é o intervalo de confiança de 95% (bootstrap), com 300 em azul, 600 em laranja e 900 em verde. Se a mediana de um nível cai dentro do intervalo do anterior, a estimativa se manteve. Uma barra mais curta indica mais precisão.
+
+**Tabela 4b — Estimativas nos três níveis** (`analise/saida/comparacao/tabelas/estimativas_300_600_900.csv`). Mediana com IC de 95%.
+
+| Métrica | 300 | 600 | 900 | Redução do IC |
+| :--- | ---: | ---: | ---: | ---: |
+| Frequência (releases/semana) | 0,35 [0,29; 0,42] | 0,34 [0,31; 0,37] | 0,35 [0,31; 0,38] | 43% |
+| Lead time (a) (dias) | 13,17 [9,92; 15,00] | 12,88 [10,48; 14,54] | 12,04 [10,38; 14,06] | 27% |
+| Lead time (b) (dias) | 8,85 [6,86; 13,19] | 9,44 [7,86; 11,71] | 9,01 [7,76; 10,85] | 51% |
+| CFR (a) | 5,6% [4,7%; 6,5%] | 5,0% [4,3%; 5,9%] | 5,3% [4,8%; 6,1%] | 21% |
+| CFR (b) | 25,0% [20,0%; 28,4%] | 23,8% [20,9%; 27,8%] | 25,0% [22,3%; 27,9%] | 33% |
+| Recuperação (horas) | 2,79 [2,15; 3,54] | 2,96 [2,47; 3,52] | 3,14 [2,71; 3,68] | 30% |
 
 **Resultado.**
-- **Todas as medianas de 600 caem dentro do intervalo de confiança de 300.**
-- **Os intervalos ficam de 11% a 50% mais estreitos**, como esperado ao dobrar a amostra. Por exemplo, o IC da frequência vai de 0,29–0,42 para 0,31–0,37.
-- As conclusões qualitativas das RQ01–RQ05 e da RQ07 **não mudam**: mesmo perfil DORA, mesma divergência entre os proxies de CFR, mesma proporção de reclassificação.
-- **A exceção é a RQ06:** com 600, a linguagem passa a ter efeito significativo, que antes estava escondido pela falta de poder estatístico. É o principal argumento para chegar a 900 (#157).
+- **Todas as medianas de 600 e de 900 caem dentro do intervalo de confiança de 300.** A frequência e o CFR (b) voltam ao mesmo valor em 900 que tinham em 300.
+- **Os intervalos ficam de 21% a 51% mais estreitos** ao triplicar a amostra, como esperado. O lead time (b) é o que mais ganha precisão.
+- As conclusões qualitativas das RQ01–RQ05 e da RQ07 **não mudam** em nenhum dos três níveis: mesmo perfil DORA, mesma divergência entre os proxies de CFR, mesma proporção de reclassificação.
+- **A exceção é a RQ06:** com 600, a linguagem passa a ter efeito significativo, que em 300 estava escondido pela falta de poder estatístico. Isso não é a métrica mudando, é o teste ganhando poder — motivo para reportar sempre o `n` e o tamanho de efeito ao lado do p-valor.
+
+**Leitura para a validade de conclusão.** A estabilidade acima é evidência **positiva** de confiabilidade. Ela não vale, porém, para toda medida do estudo: a cobertura da API de Deployments varia de forma detectável entre as três amostras (seção 3.12), e esse contraste é informativo — o mesmo desenho que confirma a robustez das métricas DORA detecta a fragilidade de uma medida auxiliar.
 
 ![A1 × A2, medianas](../analise/saida/comparacao/figuras/fig11_a1_x_a2_medianas.png)
 
@@ -381,3 +396,135 @@ Nenhuma das medidas alternativas muda de forma relevante: as medianas, os IQR e 
 - **A Figura 18 mostra um salto na mediana de frequência no último mês da janela** (de ≈ 0,23 para ≈ 0,47 release/semana). Não há teste de hipótese que sustente isso como tendência (o Mann-Kendall olha a série inteira, não só a ponta), e o padrão é compatível com um viés de seleção: o critério de inclusão (seção 3.2) exige atividade mínima dentro da janela, o que tende a favorecer repositórios com releases recentes bem próximas do fim da coleta. Fica registrado como limitação, não como achado de tendência.
 
 Para a discussão: o resultado da RQ08 não aponta melhora nem piora sistemática nas métricas DORA ao longo do ano, na amostra estudada. A conclusão mais defensável é metodológica, não substantiva: com 12 meses e centenas de repositórios testados ao mesmo tempo, a correção de múltiplos testes consome quase todo o poder estatístico disponível para detectar tendência individual por repositório. Uma análise de tendência agregada (por exemplo, a mediana por mês ao longo da amostra inteira, sem testar repositório por repositório) teria mais poder, mas também mistura tendência real com mudança de composição da amostra ao longo do tempo — e não foi o que esta issue pediu.
+
+---
+
+## 3.12 Validade das medidas (issues #156 e #166)
+
+As seções anteriores respondem **quanto** vale cada métrica. Esta responde uma pergunta anterior: **as métricas medem o que dizem medir, e os números suportam as operações que fazemos com eles?** O material completo está em `docs/base-teorica.md`.
+
+### Por que mediana e IQR, demonstrado
+
+O enunciado exige mediana e IQR. Os dados permitem demonstrar que é obrigatório, e não apenas aceitar como praxe.
+
+| Métrica | Assimetria | p (Shapiro-Wilk) | Normal? | Média ÷ mediana |
+| :--- | ---: | ---: | :--- | ---: |
+| Frequência | 8,26 | 1,1 × 10⁻³² | não | 3,19× |
+| Lead time (a) | 9,96 | 2,6 × 10⁻³³ | não | 5,71× |
+| Lead time (b) | 5,38 | 4,1 × 10⁻³¹ | não | 5,70× |
+| CFR (b) | 0,73 | 3,7 × 10⁻¹⁴ | não | — |
+| Recuperação | 12,9 | 1,7 × 10⁻³³ | não | — |
+
+Nenhuma das cinco é normal. A média do lead time é quase **seis vezes** a mediana: dizer que "o lead time típico é de 75 dias" descreveria um repositório que não existe, já que três quartos da amostra está abaixo de 37 dias. O logaritmo melhora muito (a assimetria da frequência cai de 8,26 para 1,01) mas não alcança normalidade — as métricas são **aproximadamente**, não exatamente, lognormais, o que sustenta o uso de testes não paramétricos em vez de transformar e aplicar teste paramétrico.
+
+### A contagem de releases não é Poisson
+
+A Poisson é o modelo natural para contagem de eventos em intervalo fixo, e exige **E[X] = Var[X]**. Na amostra:
+
+```
+n = 300     média = 57,39     variância = 28.302,10
+índice de dispersão Var/E = 493,2        (Poisson exige ≈ 1)
+qui-quadrado χ² = 147.453, gl = 299, p < 10⁻³⁰⁰
+```
+
+**Rejeitada, com superdispersão de 493×.** As duas premissas falham por motivos reconhecíveis: a taxa não é constante entre repositórios — alguns publicam *nightly*, outros duas vezes por ano — e as releases não são independentes dentro de um repositório, já que vêm em rajadas e uma release corretiva é causada pela anterior. O modelo compatível é a **binomial negativa**, que acrescenta um parâmetro de dispersão.
+
+A superdispersão é, por si, uma caracterização da amostra: a população de repositórios é profundamente heterogênea em ritmo de entrega, o que ajuda a explicar por que a classificação DORA em quatro faixas discrimina tão pouco (adiante).
+
+### A recuperação tem taxa decrescente
+
+Ajustando uma Weibull por repositório aos episódios de falha (238 repositórios com episódios suficientes), o parâmetro de forma β indica o regime: β < 1 é taxa de falha decrescente, β = 1 volta à exponencial, β > 1 é taxa crescente.
+
+```
+β mediano = 0,557       IQR = [0,459; 0,724]
+β < 1 em 90,3% dos repositórios
+```
+
+![Weibull nos episódios de falha](../analise/saida/figuras/distribuicoes-weibull.png)
+
+**Quanto mais tempo um episódio de falha já dura, menor a probabilidade de ele ser resolvido no instante seguinte.** Falhas curtas são corrigidas rápido; o episódio que se arrasta tende a se arrastar muito mais. Isso é invisível na mediana do MTTR reportada na RQ04 — duas populações com a mesma mediana podem ter dinâmicas opostas — e qualifica a métrica de recuperação do DORA, que trata todos os episódios como equivalentes.
+
+### A normal aparece na média, e só com amostra grande
+
+A normal não descreve as métricas brutas, mas sustenta a distribuição amostral via Teorema Central do Limite, e é isso que faz os testes das RQ05 e RQ06 valerem apesar de os dados não serem normais. Reamostrando a própria população (10.000 reamostragens por tamanho):
+
+![Convergência da distribuição amostral](../analise/saida/figuras/distribuicoes-tlc.png)
+
+| Distribuição | Assimetria |
+| :--- | ---: |
+| População (frequência de deploy) | 8,26 |
+| Média de amostras de n = 30 | 1,53 |
+| Média de amostras de n = 100 | 0,80 |
+| Média de amostras de n = 300 | 0,49 |
+
+**A regra de bolso "n ≥ 30 basta" falha nesta população.** A convergência só fica convincente perto de n = 300. Os testes sobre a amostra inteira estão em terreno firme; os de **subgrupo** da RQ06 — quartis de estrelas, linguagens com poucos repositórios — operam com n muito menor, onde a aproximação não vale. É mais um argumento para os testes não paramétricos e para reportar tamanho de efeito.
+
+### As faixas DORA separam o que as define, e pouco além
+
+Um valor de corte só é útil se separar os componentes em alguma dimensão que não seja a própria métrica que o construiu. Kruskal-Wallis entre Elite/High/Medium/Low, p corrigido por Holm:
+
+![Poder discriminante das faixas DORA](../analise/saida/figuras/distribuicoes-discriminancia.png)
+
+| Atributo | Tipo | ε² | p (Holm) | Separa? |
+| :--- | :--- | ---: | ---: | :--- |
+| Lead time (a) | controle tautológico | 0,527 | — | — |
+| Frequência de deploy | controle tautológico | 0,403 | — | — |
+| CFR (b) | outra operacionalização | 0,379 | 1,0 × 10⁻²³ | sim |
+| Lead time (b) | outra operacionalização | 0,296 | 4,9 × 10⁻¹⁸ | sim |
+| Idade em anos | independente | 0,109 | 1,2 × 10⁻⁶ | sim |
+| Contribuidores | independente | 0,022 | 0,179 | **não** |
+| Estrelas | independente | 0,008 | 0,512 | **não** |
+
+**A classificação é quase toda autorreferente.** Ela separa fortemente nas variantes alternativas das próprias métricas — o CFR (b) chega a ε² = 0,379, perto do controle tautológico de 0,403 —, o que é **validade convergente** e serve à RQ07, mas não é poder discriminante. Contra popularidade e tamanho de equipe, as faixas não separam nada.
+
+A limitação precisa constar: o critério fala em separar alta e baixa **qualidade**, e o estudo não dispõe de desfecho externo de qualidade — nenhuma medida de incidente em produção ou de satisfação independente do pipeline. É a mesma lacuna que impede avaliar a **previsibilidade** das métricas, e tem a mesma causa: todo o processo de entrega é medido por proxies do próprio GitHub.
+
+### A relação da RQ05 não é tamanho disfarçado
+
+Repositórios grandes têm mais releases, mais runs, mais contribuidores e mais issues ao mesmo tempo, o que torna o tamanho um candidato natural a variável de confusão — é o padrão que El Emam et al. (2001) encontraram ao controlar o tamanho da classe nas métricas CK. Testado por estratificação em quartis e por correlação parcial de Spearman, em frequência × CFR (b):
+
+![Controle de confusão por tamanho](../analise/saida/figuras/distribuicoes-confusao.png)
+
+| Controle | Q1 | Q2 | Q3 | Q4 | ρ parcial |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Estrelas | 0,547 | 0,577 | 0,454 | 0,674 | 0,568 |
+| Contribuidores | 0,612 | 0,645 | 0,529 | 0,517 | 0,593 |
+| Idade em anos | 0,698 | 0,550 | 0,387 | 0,381 | 0,503 |
+
+ρ agregado = 0,562. A maior queda na parcial é de 0,059, e os doze estratos mantêm o mesmo sinal. **A ameaça de validade interna fica fechada**, com resultado negativo — verificação feita, confusão não encontrada.
+
+Fica, porém, um alerta de **validade de constructo** em aberto: o ρ de 0,562 é positivo e forte, e o CFR (b) conta releases seguidas de corretiva em até 7 dias. Quem publica com mais frequência tem naturalmente mais chance de ter *alguma* release nessa janela, então parte da associação pode estar embutida na definição da métrica. É verificável comparando o CFR (b) observado com o esperado sob publicação aleatória na mesma cadência.
+
+### DORA e fluxo por PR não medem a mesma coisa
+
+Com as medidas de fluxo coletadas via GraphQL para os 900 repositórios (padrões CHAOSS, Flow Framework e SPACE), é possível perguntar se o DORA por release e o fluxo por PR são duas medições do mesmo constructo. Spearman por repositório, p corrigido por Holm:
+
+![Convergência entre paradigmas](../analise/saida/figuras/distribuicoes-convergencia.png)
+
+| Par | n | ρ | ρ² | p (Holm) |
+| :--- | ---: | ---: | ---: | ---: |
+| Ritmo: releases × PRs por semana | 600 | 0,460 | 0,211 | 5,2 × 10⁻³² |
+| Lead time (a): por release × por PR | 574 | 0,343 | 0,117 | 1,2 × 10⁻¹⁶ |
+| Lead time (b): por release × por PR | 574 | 0,319 | 0,102 | 1,3 × 10⁻¹⁴ |
+| Recuperação: CI × issue de bug | 461 | 0,216 | 0,047 | 5,7 × 10⁻⁶ |
+| Falha: CFR (b) × taxa de aceitação de PR | 597 | 0,044 | 0,002 | 0,288 (n.s.) |
+
+**Nenhum par alcança ρ = 0,7**, o limiar convencional para tratar duas medidas como do mesmo constructo. O par mais direto — "quanto tempo uma mudança leva para chegar ao usuário", medido por release e medido por PR — compartilha **10% da variância**; os outros 90% são outra coisa. E o último par é o mais contundente: o CFR por release e a taxa de aceitação de PR têm associação **estatisticamente nula** mesmo com n = 597, ou seja, qualidade medida na entrega e qualidade medida na revisão não são a mesma dimensão.
+
+**Esta é a evidência mais direta contra tratar o DORA como *a* medida de desempenho de engenharia.** Ele é *uma* lente — a da entrega por release — e outra lente legítima, a do fluxo de trabalho por PR, ordena os mesmos repositórios de maneira substancialmente diferente.
+
+### Cobertura das medidas de fluxo, e uma instabilidade
+
+| Medida | A1 | A2 | A3 | 900 | Papel |
+| :--- | ---: | ---: | ---: | ---: | :--- |
+| Lead time por PR | 99,3% | 98,0% | 97,7% | 98,3% | principal |
+| Primeira resposta | 98,7% | 99,3% | 98,3% | 98,8% | principal |
+| Taxa de aceitação de PR | 99,3% | 99,7% | 99,7% | 99,6% | principal |
+| Resolução de issue de bug | 81,0% | 82,7% | 77,7% | 80,4% | principal |
+| **Deployments API** | **31,3%** | **41,7%** | **43,3%** | **38,8%** | subamostra |
+
+As quatro primeiras medidas têm cobertura alta e medianas estáveis entre as três amostras (lead time de PR 8,99 / 9,47 / 10,12 h; taxa de aceitação 0,76 / 0,76 / 0,78). A **cobertura da API de Deployments, porém, sobe monotonicamente**, e o padrão não é ruído: qui-quadrado 3×2 com p = 0,0048 e teste de tendência de Cochran-Armitage com z = 3,02, p = 0,0026.
+
+Duas explicações foram testadas e nenhuma se sustentou. **Não é perfil dos repositórios:** estrelas, contribuidores, idade e número de releases não diferem entre as amostras (Kruskal-Wallis com p entre 0,35 e 0,92). **Não é linguagem:** a associação existe mas é fraca e vai na direção contrária ao esperado (Rust 51,2%, JavaScript 29,8%), e a diferença entre amostras sobrevive ao controle (p = 0,0395 fora de TypeScript e JavaScript).
+
+O resultado honesto é que **a cobertura dessa medida varia entre amostras independentes do mesmo desenho, de forma estatisticamente detectável, e a causa não foi identificada**. Isso reforça mantê-la como subamostra de validação e não como medida principal, e é evidência **negativa** sobre a confiabilidade — que vale tanto quanto a positiva da seção 3.9. Hipóteses remanescentes, que os dados atuais não separam: a API devolve o estado corrente e as três coletas ocorreram em dias diferentes; ou o truncamento da paginação age de forma desigual; ou é variação amostral sem causa estrutural.
