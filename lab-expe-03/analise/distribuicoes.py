@@ -56,6 +56,8 @@ PARES_RQ05 = (
 
 NIVEIS_QUARTIL = ("Q1", "Q2", "Q3", "Q4")
 
+FIM_JANELA = "2026-10-01T00:00:00Z"
+
 
 def _serie(valores) -> pd.Series:
     return pd.Series(valores, dtype="float64").dropna()
@@ -315,6 +317,48 @@ def cobertura_entre_amostras(por_amostra: dict) -> dict:
             "tendencia": bool(p_tendencia < ALFA)}
 
 
+def taxa_oportunidade(releases: pd.DataFrame, fim_janela: str, dias: int = 7) -> pd.DataFrame:
+    rel = releases.copy()
+    rel["published_at"] = pd.to_datetime(rel["published_at"], utc=True)
+    rel = rel.sort_values(["owner", "repo", "published_at"])
+    fim = pd.Timestamp(fim_janela, tz="UTC")
+    linhas = []
+    for (owner, repo), grupo in rel.groupby(["owner", "repo"], sort=False):
+        t = grupo["published_at"].reset_index(drop=True)
+        if len(t) < 2:
+            continue
+        ate_proxima = (t.shift(-1) - t).dt.total_seconds() / 86400
+        avaliavel = (fim - t).dt.total_seconds() / 86400 > dias
+        n_avaliadas = int(avaliavel.sum())
+        if n_avaliadas == 0:
+            continue
+        com_oportunidade = int((avaliavel & (ate_proxima <= dias)).sum())
+        linhas.append({"owner": owner, "repo": repo, "n_avaliadas": n_avaliadas,
+                       "n_com_oportunidade": com_oportunidade,
+                       "oportunidade": com_oportunidade / n_avaliadas})
+    return pd.DataFrame(linhas)
+
+
+def acoplamento_cadencia(df: pd.DataFrame, oportunidade: pd.DataFrame,
+                         frequencia: str = "df_release_semana",
+                         cfr: str = "cfr_b_release") -> pd.DataFrame:
+    m = df[["owner", "repo", frequencia, cfr]].merge(oportunidade, on=["owner", "repo"]).dropna(
+        subset=[frequencia, cfr, "oportunidade"])
+    if m.empty:
+        return pd.DataFrame()
+    m = m.assign(condicional=(m[cfr] / m["oportunidade"].replace(0, np.nan)))
+    linhas = [
+        {"serie": "oportunidade", **convergencia(m[frequencia], m["oportunidade"])},
+        {"serie": "cfr_bruto", **convergencia(m[frequencia], m[cfr])},
+        {"serie": "cfr_condicional", **convergencia(m[frequencia], m["condicional"])},
+    ]
+    tabela = pd.DataFrame(linhas)
+    tabela["violacoes"] = int((m[cfr] > m["oportunidade"] + 1e-9).sum())
+    tabela["mediana"] = [float(m["oportunidade"].median()), float(m[cfr].median()),
+                         float(m["condicional"].median())]
+    return tabela
+
+
 def quartis(valores) -> pd.Series:
     serie = pd.Series(np.asarray(valores, dtype="float64"))
     return pd.qcut(serie, 4, labels=list(NIVEIS_QUARTIL), duplicates="drop")
@@ -411,6 +455,15 @@ def main(argv: list[str] | None = None) -> int:
         conv.to_csv(args.saida / "distribuicoes_convergencia.csv", index=False)
         print(f"{args.saida}/distribuicoes_convergencia.csv: {len(conv)} par(es), "
               f"{int(conv['n'].max())} repositorios")
+
+    releases = args.dataset.parent / "eventos" / "releases.csv"
+    if releases.exists():
+        rel = pd.read_csv(releases)
+        rel = rel[(rel["na_janela"]) & (~rel["prerelease"])]
+        acoplamento = acoplamento_cadencia(df, taxa_oportunidade(rel, FIM_JANELA))
+        if not acoplamento.empty:
+            acoplamento.to_csv(args.saida / "distribuicoes_acoplamento.csv", index=False)
+            print(f"{args.saida}/distribuicoes_acoplamento.csv: {len(acoplamento)} linha(s)")
 
     conjunto = pd.concat(juntadas, ignore_index=True) if juntadas else df
     confusao = pd.concat([tabela_confusao(conjunto, x, y) for x, y, _ in PARES_RQ05

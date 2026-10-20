@@ -528,3 +528,45 @@ As quatro primeiras medidas têm cobertura alta e medianas estáveis entre as tr
 Duas explicações foram testadas e nenhuma se sustentou. **Não é perfil dos repositórios:** estrelas, contribuidores, idade e número de releases não diferem entre as amostras (Kruskal-Wallis com p entre 0,35 e 0,92). **Não é linguagem:** a associação existe mas é fraca e vai na direção contrária ao esperado (Rust 51,2%, JavaScript 29,8%), e a diferença entre amostras sobrevive ao controle (p = 0,0395 fora de TypeScript e JavaScript).
 
 O resultado honesto é que **a cobertura dessa medida varia entre amostras independentes do mesmo desenho, de forma estatisticamente detectável, e a causa não foi identificada**. Isso reforça mantê-la como subamostra de validação e não como medida principal, e é evidência **negativa** sobre a confiabilidade — que vale tanto quanto a positiva da seção 3.9. Hipóteses remanescentes, que os dados atuais não separam: a API devolve o estado corrente e as três coletas ocorreram em dias diferentes; ou o truncamento da paginação age de forma desigual; ou é variação amostral sem causa estrutural.
+
+---
+
+## 3.13 O CFR (b) mede falha ou mede cadência? (proposta além do escopo)
+
+A seção 3.12 deixou um alerta de validade de constructo em aberto: a correlação positiva entre frequência de deploy e CFR (b) poderia estar **embutida na definição da métrica**. Esta seção testa essa hipótese, e o resultado obriga a reinterpretar a RQ05 na variante (b).
+
+### O mecanismo suspeito
+
+O CFR (b) classifica uma release como falha se ela for seguida, em até 7 dias, por uma release corretiva. Isso cria uma dependência estrutural: **uma release só pode ser classificada como falha se existir alguma release nos 7 dias seguintes.** Quem publica com mais frequência tem, por construção, mais releases dentro dessa janela — e portanto mais oportunidades de ser classificado como falha, independentemente da qualidade do que entrega.
+
+Chamamos de **taxa de oportunidade** a proporção de releases avaliadas que têm alguma release seguinte em até 7 dias. Ela é o limite superior do CFR (b): nenhum repositório pode ter CFR (b) maior que sua taxa de oportunidade. Nos 300 repositórios da A1, essa restrição é satisfeita em **todos** eles, o que valida o cálculo.
+
+### O teste
+
+Se o CFR (b) mede qualidade, a associação com a frequência deve sobreviver ao controle da oportunidade. Se mede cadência, ela deve desaparecer. O **CFR (b) condicional** é a razão entre o CFR (b) e a taxa de oportunidade: entre as releases que *tiveram* a chance de ser classificadas como falha, quantas de fato foram.
+
+**Tabela 11 — Acoplamento entre CFR (b) e cadência de publicação** (`analise/saida/tabelas/distribuicoes_acoplamento.csv`). Spearman contra a frequência de deploy, n = 300.
+
+| Série | ρ | p | Mediana |
+| :--- | ---: | ---: | ---: |
+| Taxa de oportunidade | **0,784** | 1,2 × 10⁻⁶³ | 0,400 |
+| CFR (b) bruto | **0,604** | 3,3 × 10⁻³¹ | 0,250 |
+| CFR (b) \| oportunidade | **−0,039** | **0,522 (n.s.)** | 0,856 |
+
+### O resultado
+
+**A associação entre frequência de deploy e CFR (b) desaparece por completo ao condicionar na oportunidade** (ρ = −0,039, p = 0,52). Ela não apenas enfraquece: some, e o sinal residual é negativo e indistinguível de zero.
+
+A leitura é direta. A taxa de oportunidade, que é puramente um artefato de cadência, correlaciona-se com a frequência a ρ = 0,784 — mais forte que o próprio CFR (b) (ρ = 0,604). **O que a RQ05 detecta na variante (b) é predominantemente a cadência de publicação, e não uma relação entre velocidade e qualidade.**
+
+Um segundo número reforça o diagnóstico: a mediana do CFR (b) condicional é **0,856**. Entre as releases que têm alguma release seguinte em até 7 dias, cerca de 86% dessas sucessoras são classificadas como corretivas pela heurística. Em outras palavras, **publicar de novo em menos de uma semana é, na prática, quase sinônimo de "falhou"** segundo a operacionalização adotada — o que é mais uma consequência da definição do que uma descoberta sobre os projetos.
+
+### O que isso muda, e o que não muda
+
+**Não invalida a métrica.** O CFR (b) continua sendo um proxy razoável de retrabalho de entrega, e a heurística corretiva foi validada contra a amostra-ouro (seção 2). O que ele não suporta é a leitura causal.
+
+**Invalida uma leitura específica.** A conclusão "repositórios que entregam com mais frequência falham mais" não se sustenta para a variante (b). O resultado da RQ05 deve ser reportado com essa ressalva explícita, e a variante (a), que não tem esse acoplamento, passa a ser a leitura preferencial para a pergunta de velocidade × estabilidade.
+
+**Sugere uma correção simples para trabalhos futuros.** Reportar o CFR (b) condicional ao lado do bruto separa as duas coisas: o bruto mistura cadência e qualidade, o condicional isola a parcela de qualidade. O custo é uma coluna a mais no dataset.
+
+Esta análise não foi pedida pelo enunciado. Ela nasceu do alerta registrado na seção 3.12 e é o tipo de verificação que a teoria da medição exige de qualquer métrica derivada: **antes de interpretar uma correlação entre duas medidas, é preciso checar se uma delas não está definida em função da outra.**

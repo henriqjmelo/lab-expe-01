@@ -7,6 +7,7 @@ import pytest
 from analise.distribuicoes import (
     ajuste_binomial_negativa,
     ajuste_weibull,
+    acoplamento_cadencia,
     centro,
     cobertura_entre_amostras,
     convergencia,
@@ -21,6 +22,7 @@ from analise.distribuicoes import (
     quartis,
     poder_discriminante,
     resumo_weibull,
+    taxa_oportunidade,
     tabela_centro,
     tabela_contagem,
     tabela_confusao,
@@ -382,6 +384,55 @@ def test_cobertura_entre_amostras_com_coluna_constante():
 
 def test_cobertura_entre_amostras_com_uma_so():
     assert cobertura_entre_amostras({"A1": [True, False]})["p_qui2"] is None
+
+
+def _releases(owner, repo, datas):
+    return pd.DataFrame({"owner": owner, "repo": repo, "published_at": datas})
+
+
+def test_taxa_oportunidade_conta_releases_seguidas_em_ate_sete_dias():
+    rel = _releases("o", "r", ["2026-01-01T00:00:00Z", "2026-01-04T00:00:00Z",
+                               "2026-01-20T00:00:00Z", "2026-02-10T00:00:00Z"])
+    t = taxa_oportunidade(rel, "2026-10-01T00:00:00Z").iloc[0]
+    assert t["n_avaliadas"] == 4
+    assert t["n_com_oportunidade"] == 1
+    assert t["oportunidade"] == pytest.approx(0.25)
+
+
+def test_taxa_oportunidade_censura_as_ultimas_releases_da_janela():
+    rel = _releases("o", "r", ["2026-01-01T00:00:00Z", "2026-09-29T00:00:00Z"])
+    t = taxa_oportunidade(rel, "2026-10-01T00:00:00Z").iloc[0]
+    assert t["n_avaliadas"] == 1
+
+
+def test_taxa_oportunidade_ignora_repositorio_com_uma_release():
+    assert taxa_oportunidade(_releases("o", "r", ["2026-01-01T00:00:00Z"]),
+                             "2026-10-01T00:00:00Z").empty
+
+
+def test_acoplamento_detecta_associacao_que_some_ao_condicionar():
+    rng = np.random.default_rng(31)
+    n = 200
+    freq = rng.uniform(0.1, 5.0, n)
+    oport = np.clip(freq / 6, 0.02, 0.95)
+    cfr = oport * 0.8
+    df = pd.DataFrame({"owner": "o", "repo": [f"r{i}" for i in range(n)],
+                       "df_release_semana": freq, "cfr_b_release": cfr})
+    op = pd.DataFrame({"owner": "o", "repo": [f"r{i}" for i in range(n)],
+                       "n_avaliadas": 10, "n_com_oportunidade": 4, "oportunidade": oport})
+    t = acoplamento_cadencia(df, op).set_index("serie")
+    assert t.loc["oportunidade", "rho"] > 0.9
+    assert t.loc["cfr_bruto", "rho"] > 0.9
+    assert abs(t.loc["cfr_condicional", "rho"]) < 0.2
+    assert int(t["violacoes"].iloc[0]) == 0
+
+
+def test_acoplamento_vazio_quando_nao_ha_cruzamento():
+    df = pd.DataFrame({"owner": ["o"], "repo": ["a"], "df_release_semana": [1.0],
+                       "cfr_b_release": [0.1]})
+    op = pd.DataFrame({"owner": ["o"], "repo": ["b"], "n_avaliadas": [5],
+                       "n_com_oportunidade": [2], "oportunidade": [0.4]})
+    assert acoplamento_cadencia(df, op).empty
 
 
 def test_discriminancia_marca_separacao_real():
