@@ -543,7 +543,8 @@ def fig_comparacao_medianas(
             ax.plot([k, k], [lo, hi], color=cor, linewidth=2, solid_capstyle="round")
             ax.plot([k], [m], marker="o", markersize=7, color=cor, markeredgecolor=SUPERFICIE, markeredgewidth=1.5)
         ax.set_xlim(-0.6, len(amostras) - 0.4)
-        ax.set_xticks(range(len(amostras)), [nome for nome, _ in amostras])
+        rotulos = dict(fontsize=6.5) if len(amostras) > 2 else {}
+        ax.set_xticks(range(len(amostras)), [nome for nome, _ in amostras], **rotulos)
         ax.grid(axis="y")
         ax.set_title(rotulo, fontsize=8.5, pad=4)
         lo, hi = ax.get_ylim()
