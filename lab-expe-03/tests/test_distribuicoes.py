@@ -8,6 +8,7 @@ from analise.distribuicoes import (
     ajuste_binomial_negativa,
     ajuste_weibull,
     acoplamento_cadencia,
+    aderencia_contagem,
     centro,
     cobertura_entre_amostras,
     convergencia,
@@ -16,9 +17,11 @@ from analise.distribuicoes import (
     dispersao,
     duracoes_por_repositorio,
     faixas_dora,
+    indice_percentil,
     juntar_medidas,
     medias_amostrais,
     normalidade,
+    perda_por_faixa,
     quartis,
     poder_discriminante,
     resumo_weibull,
@@ -202,9 +205,13 @@ def test_tipo_muda_quando_a_combinacao_muda():
     assert tipo_do_atributo("lt_b_release_dias", ("lt_a_release_dias",)) == "operacionalizacao"
 
 
-def test_faixas_dora_traduz_os_codigos():
-    faixas = faixas_dora(pd.DataFrame({"geral": [1, 2, 3, 4]}))
+def test_faixas_dora_traduz_os_codigos_na_direcao_certa():
+    from metricas.dora import ELITE, HIGH, LOW, MEDIUM
+    faixas = faixas_dora(pd.DataFrame({"geral": [ELITE, HIGH, MEDIUM, LOW]}))
     assert list(faixas) == ["Elite", "High", "Medium", "Low"]
+    assert ELITE > LOW
+    assert faixas_dora(pd.DataFrame({"geral": [1, 2, 3, 4]})).tolist() == [
+        "Low", "Medium", "High", "Elite"]
 
 
 def test_discriminancia_corrige_por_holm_e_deixa_o_controle_de_fora():
@@ -384,6 +391,54 @@ def test_cobertura_entre_amostras_com_coluna_constante():
 
 def test_cobertura_entre_amostras_com_uma_so():
     assert cobertura_entre_amostras({"A1": [True, False]})["p_qui2"] is None
+
+
+def test_aderencia_prefere_poisson_em_amostra_poisson():
+    amostra = np.random.default_rng(41).poisson(6.0, size=500)
+    t = aderencia_contagem(amostra).set_index("modelo")
+    assert t.loc["poisson", "p"] > 0.01
+
+
+def test_aderencia_prefere_binomial_negativa_em_amostra_superdispersa():
+    rng = np.random.default_rng(42)
+    amostra = rng.negative_binomial(2, 0.05, size=500)
+    t = aderencia_contagem(amostra).set_index("modelo")
+    assert t.loc["binomial_negativa", "qui2"] < t.loc["poisson", "qui2"]
+    assert t.loc["binomial_negativa", "r"] > 0
+
+
+def test_aderencia_sem_dados_suficientes():
+    assert aderencia_contagem([1, 2, 3]).empty
+
+
+def test_indice_percentil_inverte_as_metricas_em_que_menor_e_melhor():
+    df = pd.DataFrame({"df_release_semana": [1.0, 2.0, 3.0],
+                       "lt_a_release_dias": [30.0, 20.0, 10.0]})
+    i = indice_percentil(df, (("df_release_semana", True), ("lt_a_release_dias", False)))
+    assert i["indice"].is_monotonic_increasing
+    assert i["n_metricas"].tolist() == [2, 2, 2]
+
+
+def test_indice_percentil_usa_as_metricas_disponiveis():
+    df = pd.DataFrame({"df_release_semana": [1.0, 2.0, np.nan],
+                       "cfr_a": [0.1, 0.2, 0.3]})
+    i = indice_percentil(df, (("df_release_semana", True), ("cfr_a", False)))
+    assert i["n_metricas"].tolist() == [2, 2, 1]
+    assert i["indice"].notna().all()
+
+
+def test_perda_por_faixa_mede_quanto_a_categorizacao_retem():
+    indice = pd.Series([0.1, 0.15, 0.2, 0.8, 0.85, 0.9])
+    faixas = pd.Series(["Low"] * 3 + ["Elite"] * 3)
+    t = perda_por_faixa(indice, faixas)
+    assert t["prop_retida_pela_faixa"].iloc[0] > 0.9
+    assert set(t["faixa"]) == {"Low", "Elite"}
+
+
+def test_perda_por_faixa_quando_a_faixa_nao_separa_nada():
+    indice = pd.Series([0.1, 0.9, 0.1, 0.9])
+    faixas = pd.Series(["A", "A", "B", "B"])
+    assert perda_por_faixa(indice, faixas)["prop_retida_pela_faixa"].iloc[0] < 0.1
 
 
 def _releases(owner, repo, datas):

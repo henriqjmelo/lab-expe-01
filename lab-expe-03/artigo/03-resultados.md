@@ -570,3 +570,72 @@ Um segundo número reforça o diagnóstico: a mediana do CFR (b) condicional é 
 **Sugere uma correção simples para trabalhos futuros.** Reportar o CFR (b) condicional ao lado do bruto separa as duas coisas: o bruto mistura cadência e qualidade, o condicional isola a parcela de qualidade. O custo é uma coluna a mais no dataset.
 
 Esta análise não foi pedida pelo enunciado. Ela nasceu do alerta registrado na seção 3.12 e é o tipo de verificação que a teoria da medição exige de qualquer métrica derivada: **antes de interpretar uma correlação entre duas medidas, é preciso checar se uma delas não está definida em função da outra.**
+
+---
+
+## 3.14 Um modelo compatível para a contagem de releases (proposta além do escopo)
+
+A seção 3.12 rejeitou a Poisson para `n_release` por superdispersão de 493×. Rejeitar um modelo é metade do trabalho; esta seção ajusta o modelo compatível e mede o ganho.
+
+A **binomial negativa** acrescenta um parâmetro de dispersão `r` que acomoda heterogeneidade entre unidades: quanto menor o `r`, mais heterogênea a população. Ajustada por momentos sobre os 900 repositórios e comparada à Poisson por qui-quadrado de aderência em 8 faixas de quantil:
+
+**Tabela 12 — Aderência da contagem de releases** (`analise/saida/tabelas/distribuicoes_aderencia.csv`).
+
+| Modelo | χ² | gl | Parâmetro |
+| :--- | ---: | ---: | :--- |
+| Poisson | 3,05 × 10¹³ | 6 | λ = média |
+| Binomial negativa | 1,60 × 10³ | 5 | r = 0,148 |
+
+O χ² cai **dez ordens de grandeza**. A binomial negativa é incomparavelmente melhor que a Poisson — e ainda assim é formalmente rejeitada (p < 0,001). A leitura honesta é que ela captura a superdispersão, que é a violação dominante, mas a distribuição real tem estrutura adicional que nenhum dos dois modelos de um ou dois parâmetros descreve.
+
+O valor de **r = 0,148** é o achado substantivo. Um `r` abaixo de 1 indica heterogeneidade extrema: a população de repositórios não se comporta como um grupo com ritmo comum e variação aleatória em torno dele, mas como uma mistura de regimes de publicação muito diferentes. Isso dá base quantitativa a uma afirmação que até aqui era qualitativa — **não existe "o" ritmo de entrega de um projeto open-source popular**, e qualquer sumário de tendência central para a população inteira esconde mais do que mostra.
+
+É também a explicação estrutural para o resultado da seção seguinte: uma população com essa heterogeneidade não é bem representada por quatro faixas fixas.
+
+---
+
+## 3.15 Um índice contínuo em lugar das quatro faixas (proposta além do escopo)
+
+A seção 3.12 mostrou que as faixas Elite/High/Medium/Low quase não discriminam fora das métricas que as definem. Esta seção propõe a alternativa que a teoria da medição indica e mede o que a categorização custa.
+
+### Por que posto percentílico, e não escore z
+
+Um índice composto precisa somar métricas em unidades diferentes — releases por semana, dias, proporções, horas. A padronização usual é o escore z, `(x − μ) ÷ σ`, mas ele é **inadequado aqui**: μ e σ não representam distribuições assimétricas como as da seção 3.12, e o resultado seria dominado pelos extremos.
+
+O **posto percentílico** é a padronização correta para este caso. Ele é invariante a qualquer transformação monotônica, o que o torna lícito em escala ordinal, e é robusto a outliers por construção. Cada métrica é convertida ao seu posto percentílico, invertido quando menor é melhor (lead time, CFR, recuperação), e o índice é a média dos quatro postos — um número entre 0 e 1, em que 1 é o melhor desempenho relativo da amostra.
+
+### O que as faixas escondem
+
+| Faixa | n | Índice mediano | Mínimo | Máximo | Amplitude |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Elite | 71 | 0,760 | 0,556 | 0,981 | 0,425 |
+| High | 324 | 0,630 | 0,369 | 0,908 | 0,539 |
+| Medium | 422 | 0,412 | 0,127 | 0,713 | 0,586 |
+| Low | 83 | 0,259 | 0,083 | 0,497 | 0,414 |
+
+A ordenação das medianas confirma que o índice e as faixas medem a mesma coisa (ρ = 0,804 entre eles). O problema está nas amplitudes: **as faixas se sobrepõem fortemente**. Um repositório classificado como Medium pode ter índice 0,713, acima da mediana da faixa High; um classificado como High pode ter índice 0,369, abaixo da mediana de Medium.
+
+Dois números quantificam a perda:
+
+**A categorização retém 64,2% da variância do índice.** Colapsar quatro medidas contínuas em quatro rótulos descarta mais de um terço da informação disponível.
+
+**8,2% de todos os pares em faixas diferentes estão invertidos** — ou seja, em 21.121 dos 257.505 pares possíveis, o repositório da faixa supostamente melhor tem índice igual ou pior que o da faixa supostamente pior. A inversão não é uniforme:
+
+| Par de faixas | Pares | Invertidos | Taxa |
+| :--- | ---: | ---: | ---: |
+| Elite × High | 23.004 | 3.614 | **15,7%** |
+| High × Medium | 136.728 | 10.800 | 7,9% |
+| Medium × Low | 35.026 | 6.247 | **17,8%** |
+| Elite × Medium | 29.962 | 183 | 0,6% |
+| High × Low | 26.892 | 277 | 1,0% |
+| Elite × Low | 5.893 | 0 | 0,0% |
+
+As faixas **extremas se separam perfeitamente** — nenhum par Elite × Low está invertido. O problema está nas fronteiras adjacentes: entre Elite e High, e entre Medium e Low, **cerca de um sexto dos pares contradiz a classificação**.
+
+### O que isso significa
+
+A classificação DORA funciona bem para o que ela foi desenhada: distinguir os extremos. Para comparar repositórios vizinhos, ela é pouco confiável, e a fronteira entre duas faixas adjacentes não corresponde a uma diferença real de desempenho em boa parte dos casos.
+
+Isso conecta diretamente à seção 3.14: uma população com `r = 0,148` — heterogeneidade extrema — não é bem particionada por cortes fixos. E conecta à 3.12: se as faixas quase não discriminam atributos independentes, parte da razão é que elas descartam 35,8% da informação que as próprias métricas carregavam.
+
+**A proposta prática é reportar os dois.** As faixas servem à comunicação e à comparação com a literatura do DORA; o índice contínuo serve à análise, porque preserva a ordenação e o tamanho das diferenças. O custo é uma coluna adicional no dataset, calculada em quatro linhas de código.
