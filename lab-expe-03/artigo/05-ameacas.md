@@ -76,6 +76,14 @@ Os dados cobrem 12 meses (01/10/2025 a 30/09/2026). A RQ08 não encontrou tendê
 
 *A análise estatística é adequada?*
 
+### Hipóteses reconstruídas, não pré-registradas — **aberta**
+
+As hipóteses informais da seção 1.4 foram escritas em 20/10/2026, depois de a coleta terminar e os resultados estarem disponíveis ao grupo (seção 1.5). Isso abre espaço para HARKing — formular a hipótese já sabendo o resultado — e para viés de confirmação na escolha de quais análises reportar.
+
+Três coisas limitam o dano, nenhuma o elimina. Primeiro, cada hipótese declara a origem da expectativa, e todas vêm do programa DORA, do texto do enunciado ou de raciocínio anterior à coleta; nenhuma foi derivada dos dados. Segundo, cinco das sete foram refutadas (seção 4.0), o que é o oposto do padrão que HARKing produz. Terceiro, as decisões analíticas que poderiam ter sido ajustadas ao resultado têm justificativa verificável sem olhar os dados — a escolha da série mensal em vez da trimestral na RQ08 (seção 3.11), por exemplo, decorre de um fato aritmético sobre o teste de Mann-Kendall (com n = 4, o menor p bilateral possível é ≈ 0,089, qualquer que seja a série), e não de preferência por um resultado.
+
+Ainda assim, a ameaça permanece aberta: não há como provar, depois do fato, que a expectativa era essa. Uma replicação deste desenho deve registrar as hipóteses antes da coleta.
+
 ### Múltiplas comparações — **mitigada**
 
 Todas as famílias de testes são corrigidas por **Holm**, e a RQ08, com centenas de testes simultâneos, usa FDR. O efeito da correção é visível e foi reportado: na RQ08, apenas 1 dos 600 repositórios mantém tendência significativa após o FDR.
