@@ -44,11 +44,11 @@ def gerar(df: pd.DataFrame, funil: pd.DataFrame | None, pasta: Path, rotulo: str
     return gerados
 
 
-def tabela_300_600(base: pd.DataFrame, total: pd.DataFrame) -> pd.DataFrame:
+def tabela_estimativas(niveis: list[tuple[str, pd.DataFrame]]) -> pd.DataFrame:
     linhas = []
     for (coluna, rotulo) in est.METRICAS:
         linha = {"metrica": rotulo}
-        for nome, df in (("300", base), (str(len(total)), total)):
+        for nome, df in niveis:
             v = df[coluna].dropna()
             lo, hi = est.ic_bootstrap_mediana(v)
             linha |= {f"n_{nome}": len(v), f"mediana_{nome}": v.median(), f"q1_{nome}": v.quantile(0.25),
@@ -57,11 +57,22 @@ def tabela_300_600(base: pd.DataFrame, total: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(linhas)
 
 
+def acumular(a1: pd.DataFrame, extras: list[pd.DataFrame]) -> list[tuple[str, pd.DataFrame, str]]:
+    niveis = [(str(len(a1)), a1, "A1")]
+    acumulado = a1
+    for i, extra in enumerate(extras, start=2):
+        acumulado = pd.concat([acumulado, extra], ignore_index=True)
+        niveis.append((str(len(acumulado)), acumulado, " + ".join(f"A{j}" for j in range(1, i + 1))))
+    return niveis
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analise")
     ap.add_argument("--dados", type=Path, default=Path("data/dataset_dora.csv"))
     ap.add_argument("--funil", type=Path, default=Path("data/funil.csv"))
-    ap.add_argument("--extra", type=Path, nargs="*", default=[Path("data/amostra2/dataset_dora.csv")],
+    ap.add_argument("--extra", type=Path, nargs="*",
+                    default=[Path("data/amostra2/dataset_dora.csv"),
+                             Path("data/amostra3/dataset_dora.csv")],
                     help="datasets das amostras seguintes (A2, A3...), somados a amostra 1")
     ap.add_argument("--saida", type=Path, default=Path("analise/saida"))
     args = ap.parse_args(argv)
@@ -72,20 +83,22 @@ def main(argv: list[str] | None = None) -> int:
 
     extras = [est.carregar_com_alternativas(p) for p in args.extra if p.exists()]
     if extras:
-        todas = pd.concat([a1, *extras], ignore_index=True)
-        n = len(todas)
-        nomes = " + ".join(f"A{i}" for i in range(1, len(extras) + 2))
-        gerados += gerar(todas, None, args.saida / str(n), f"{nomes} · n = {n}")
+        niveis = acumular(a1, extras)
+        for rotulo_n, acumulado, nomes in niveis[1:]:
+            gerados += gerar(acumulado, None, args.saida / rotulo_n, f"{nomes} · n = {rotulo_n}")
 
         comparacao = args.saida / "comparacao"
         (comparacao / "tabelas").mkdir(parents=True, exist_ok=True)
         figuras = comparacao / "figuras"
         g.ROTULO_AMOSTRA = ""
-        tabela_300_600(a1, todas).to_csv(comparacao / "tabelas" / f"estimativas_300_{n}.csv", index=False)
+        faixa = "_".join(r for r, _, _ in niveis)
+        tabela_estimativas([(r, d) for r, d, _ in niveis]).to_csv(
+            comparacao / "tabelas" / f"estimativas_{faixa}.csv", index=False)
+        legenda = " · ".join(f"{r} = {nomes}" for r, _, nomes in niveis)
         gerados.append(g.fig_comparacao_medianas(
-            [("300", a1), (str(n), todas)], figuras / f"fig12_convergencia_300_{n}.png",
-            titulo=f"As estimativas se mantêm de 300 para {n} repositórios?",
-            sub=f"Mediana com IC de 95% (bootstrap) · 300 = amostra 1 · {n} = {nomes}",
+            [(r, d) for r, d, _ in niveis], figuras / f"fig12_convergencia_{faixa}.png",
+            titulo=f"As estimativas se mantêm de {niveis[0][0]} para {niveis[-1][0]} repositórios?",
+            sub=f"Mediana com IC de 95% (bootstrap) · {legenda}",
         ))
         a2 = extras[0]
         teste = est.mann_whitney_amostras(a1, a2)

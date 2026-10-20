@@ -288,6 +288,33 @@ def correlacao_parcial_spearman(x, y, z) -> dict:
     return {"n": n, "rho": float(parcial), "p": float(2 * stats.t.sf(abs(t), n - 3))}
 
 
+def cobertura_entre_amostras(por_amostra: dict) -> dict:
+    nomes = [k for k, v in por_amostra.items() if len(v) > 0]
+    if len(nomes) < 2:
+        return {"amostras": len(nomes), "p_qui2": None, "z_tendencia": None,
+                "p_tendencia": None, "difere": None, "tendencia": None}
+    tabela = np.array([[int(pd.Series(por_amostra[k]).astype(bool).sum()),
+                        int((~pd.Series(por_amostra[k]).astype(bool)).sum())] for k in nomes])
+    if (tabela.sum(axis=0) == 0).any():
+        return {"amostras": len(nomes), "p_qui2": None, "z_tendencia": None,
+                "p_tendencia": None, "difere": None, "tendencia": None}
+    _, p_qui2, _, _ = stats.chi2_contingency(tabela)
+    n_i = tabela.sum(axis=1)
+    sucessos = tabela[:, 0]
+    escore = np.arange(len(nomes))
+    media = sucessos.sum() / n_i.sum()
+    denominador = np.sqrt(media * (1 - media) *
+                          ((n_i * escore ** 2).sum() - (n_i * escore).sum() ** 2 / n_i.sum()))
+    if denominador == 0:
+        return {"amostras": len(nomes), "p_qui2": float(p_qui2), "z_tendencia": None,
+                "p_tendencia": None, "difere": bool(p_qui2 < ALFA), "tendencia": None}
+    z = float((escore * (sucessos - n_i * media)).sum() / denominador)
+    p_tendencia = float(2 * stats.norm.sf(abs(z)))
+    return {"amostras": len(nomes), "p_qui2": float(p_qui2), "z_tendencia": z,
+            "p_tendencia": p_tendencia, "difere": bool(p_qui2 < ALFA),
+            "tendencia": bool(p_tendencia < ALFA)}
+
+
 def quartis(valores) -> pd.Series:
     serie = pd.Series(np.asarray(valores, dtype="float64"))
     return pd.qcut(serie, 4, labels=list(NIVEIS_QUARTIL), duplicates="drop")

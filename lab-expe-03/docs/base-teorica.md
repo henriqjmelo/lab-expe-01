@@ -386,9 +386,58 @@ Já coletado para a A1, com cobertura medida:
 | Flow | tempo de resolução de issue de bug | 81,0% |
 | DORA "puro" | deployments e CFR reais pela API | **31,3%** |
 
-A cobertura de 31,3% da API de Deployments é, ela mesma, um resultado: **a API de Deployments não
-serve como proxy universal**, o que justifica a escolha de releases como unidade de entrega. As
-medidas de PR, com ~99%, podem ser medidas principais.
+A cobertura baixa da API de Deployments é, ela mesma, um resultado: **a API de Deployments não serve
+como proxy universal**, o que justifica a escolha de releases como unidade de entrega. As medidas de
+PR, com ~99%, podem ser medidas principais.
+
+#### 7.1.1 A cobertura de Deployments não é estável entre as amostras
+
+Com as três amostras coletadas, a cobertura da API de Deployments aparece assim:
+
+| | A1 | A2 | A3 | 900 |
+| :--- | ---: | ---: | ---: | ---: |
+| Usa Deployments API | 31,3% | 41,7% | 43,3% | 38,8% |
+
+Três amostras independentes, mesma janela, mesmos filtros, sementes diferentes. Sob permutabilidade,
+a cobertura deveria oscilar ao acaso. Ela **sobe monotonicamente**, e o padrão não é ruído:
+
+```
+qui-quadrado 3x2              χ² = 10,68, gl = 2, p = 0,0048
+tendência (Cochran-Armitage)  z  =  3,02,          p = 0,0026
+```
+
+**Duas explicações foram testadas e nenhuma se sustentou.**
+
+A primeira era que a A3 teria ido mais fundo na lista de candidatos — a taxa de aceitação caiu de
+~27% para 20,7% — e portanto recrutaria projetos sistematicamente diferentes. Não se confirma:
+estrelas, contribuidores, idade e número de releases **não diferem entre as amostras** (Kruskal-Wallis
+com p entre 0,35 e 0,92 nos quatro atributos).
+
+A segunda era a linguagem, já que a proporção de TypeScript sobe de 26,7% para 33,7% entre A1 e A3, e
+projetos web costumam ter integrações (Vercel, Netlify) que criam deployments automaticamente. A
+associação entre linguagem e uso de Deployments existe, mas é fraca e vai na direção contrária ao
+esperado — **Rust lidera com 51,2% e JavaScript fica em 29,8%**. E a diferença entre amostras
+**sobrevive ao controle**: no grupo que não é TypeScript nem JavaScript, ela continua significativa
+(p = 0,0395).
+
+**O que fica, então, é um resultado honesto e incômodo:** a cobertura desta medida varia entre
+amostras independentes do mesmo desenho, de forma estatisticamente detectável, e a causa não foi
+identificada com os atributos disponíveis.
+
+Isso importa de duas formas para o artigo:
+
+1. **Reforça manter Deployments como subamostra de validação**, e não como medida principal. Uma
+   medida cuja própria cobertura é instável entre sorteios não suporta conclusão agregada.
+2. **É evidência sobre o critério 6 da IEEE 1061**, a confiabilidade — e evidência negativa, que vale
+   tanto quanto a positiva. As medidas de PR passam no critério com folga (medianas praticamente
+   idênticas nas três amostras); esta não passa.
+
+Hipóteses que restam e não dá para separar com os dados atuais: a API de Deployments devolve o estado
+*corrente* e as três coletas ocorreram em dias diferentes; ou o truncamento da paginação age de forma
+desigual; ou é variação amostral que o teste detecta mas que não tem causa estrutural. A análise
+completa de estabilidade 300 × 600 × 900 é escopo da #156.
+
+Implementado em `cobertura_entre_amostras()`, em `analise/distribuicoes.py`.
 
 ### 7.2 Análises propostas e seu estado
 

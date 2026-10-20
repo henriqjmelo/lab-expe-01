@@ -126,7 +126,8 @@ def calcular_graphql(pasta_amostra: Path) -> pd.DataFrame:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analise.alternativas")
-    ap.add_argument("pastas", type=Path, nargs="*", default=[Path("data"), Path("data/amostra2")])
+    ap.add_argument("pastas", type=Path, nargs="*",
+                    default=[Path("data"), Path("data/amostra2"), Path("data/amostra3")])
     args = ap.parse_args(argv)
     for pasta in args.pastas:
         tabela = calcular(pasta)

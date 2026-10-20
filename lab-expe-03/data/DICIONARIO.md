@@ -107,7 +107,7 @@ Todos os candidatos devolvidos pela busca (`GET /search/repositories`, fatiada p
 
 A situação de cada candidato numa amostra vem do cruzamento com o `repositorios.csv` (aceito) e o `descartes.csv` (descartado, com a etapa) da amostra. Os demais candidatos não foram avaliados, porque o alvo de 300 foi atingido antes.
 
-## `eventos/` (um diretório por amostra: `data/eventos/` = A1, `data/amostra2/eventos/` = A2)
+## `eventos/` (um diretório por amostra: `data/eventos/` = A1, `data/amostra2/eventos/` = A2, `data/amostra3/eventos/` = A3)
 
 Eventos por repositório da amostra, exportados do cache da coleta por `python -m pipeline.exportar --config <config> --saida <diretório>`. Servem para análises por período (RQ08), heurísticas sobre commits (#138, #154) e qualquer recálculo, sem precisar coletar de novo. Os arquivos `.csv.gz` são lidos direto pelo `pd.read_csv`.
 
@@ -161,7 +161,7 @@ Repositórios com lead time omitido (mais de 300 releases na janela) não aparec
 
 Só os runs de `push` no default branch, criados na janela.
 
-## `medidas_alternativas.csv` (um por amostra: `data/` = A1, `data/amostra2/` = A2)
+## `medidas_alternativas.csv` (um por amostra: `data/` = A1, `data/amostra2/` = A2, `data/amostra3/` = A3)
 
 Medidas alternativas às do DORA (issue #154), calculadas dos `eventos/` por `python -m analise.alternativas`. Uma linha por repositório da amostra.
 
@@ -180,3 +180,66 @@ Medidas alternativas às do DORA (issue #154), calculadas dos `eventos/` por `py
 | `adota_convencional` | booleano | — | `prop_convencional >= 0,5` |
 | `prop_fix`, `prop_feat` | decimal 0–1 | proporção | `fix` e `feat` entre os commits convencionais |
 | `prop_revert` | decimal 0–1 | proporção | commits de revert entre todos os commits |
+
+## `graphql/` (um diretório por amostra: `data/graphql/` = A1, `data/amostra2/graphql/` = A2, `data/amostra3/graphql/` = A3)
+
+Eventos brutos coletados pela API GraphQL (issue #155) por `python -m pipeline.coleta_graphql`. A cota do GraphQL é separada da REST, então esta coleta roda em paralelo com a das amostras. Paginação por cursor, com limite por repositório — quando ele é atingido, a linha correspondente em `resumo.csv` marca o truncamento.
+
+### `prs.csv.gz` — um PR por linha
+
+| Coluna | Tipo | Fórmula / origem |
+| :--- | :--- | :--- |
+| `owner`, `repo` | texto | repositório |
+| `number` | inteiro | número do PR |
+| `estado` | texto | `merged`, `closed` ou `open` |
+| `created_at` | data-hora ISO 8601 | abertura do PR |
+| `merged_at` | data-hora ISO 8601 | merge, vazio se não mergeado |
+| `closed_at` | data-hora ISO 8601 | fechamento, vazio se aberto |
+| `primeira_resposta_at` | data-hora ISO 8601 | primeira review ou comentário de alguém **que não é o autor**; vazio se ninguém respondeu |
+
+### `issues.csv.gz` — uma issue por linha
+
+| Coluna | Tipo | Fórmula / origem |
+| :--- | :--- | :--- |
+| `number` | inteiro | número da issue |
+| `created_at`, `closed_at` | data-hora ISO 8601 | abertura e fechamento |
+| `labels` | texto | labels separadas por vírgula |
+| `eh_bug` | booleano | alguma label casa com o padrão de bug (`bug`, `type: bug`, `kind/bug`...) |
+
+### `deployments.csv.gz` — um deployment por linha
+
+| Coluna | Tipo | Fórmula / origem |
+| :--- | :--- | :--- |
+| `created_at` | data-hora ISO 8601 | criação do deployment |
+| `environment` | texto | ambiente declarado (`production`, `preview`, `staging`...) |
+| `state` | texto | estado do deployment |
+| `status` | texto | último status: `SUCCESS`, `FAILURE`, `ERROR`, `INACTIVE`... |
+| `status_at` | data-hora ISO 8601 | momento do último status |
+
+### `resumo.csv` — uma linha por repositório
+
+Contagens brutas (`prs_mergeados`, `prs_fechados`, `issues_fechadas`, `issues_bug`, `deployments`, `deployments_total`) e os três indicadores de truncamento da paginação (`truncado_prs`, `truncado_issues`, `truncado_deployments`).
+
+## `medidas_graphql.csv` (um por amostra: `data/` = A1, `data/amostra2/` = A2, `data/amostra3/` = A3)
+
+Agregação por repositório dos eventos de `graphql/`, gerada por `python -m analise.alternativas`. Medidas de fluxo e colaboração nos padrões CHAOSS, Flow Framework e SPACE — independentes de releases e do CI.
+
+| Coluna | Tipo | Unidade | Fórmula / origem |
+| :--- | :--- | :--- | :--- |
+| `owner`, `repo` | texto | — | repositório |
+| `n_prs_mergeados` | inteiro | PRs | PRs mergeados na janela |
+| `prs_mergeados_semana` | decimal | PRs/semana | `n_prs_mergeados ÷ semanas da janela` (≈ 52,1) |
+| `lt_pr_mediana_horas` | decimal | horas | **Lead time por PR** (CHAOSS): mediana de `merged_at − created_at` |
+| `primeira_resposta_mediana_horas` | decimal | horas | **Tempo até a primeira resposta** (CHAOSS): mediana de `primeira_resposta_at − created_at` |
+| `prop_prs_sem_resposta` | decimal 0–1 | proporção | PRs sem nenhuma resposta de terceiro |
+| `taxa_aceitacao_pr` | decimal 0–1 | proporção | `mergeados ÷ (mergeados + fechados sem merge)` |
+| `n_bugs_fechados` | inteiro | issues | issues com label de bug fechadas na janela |
+| `resolucao_bug_mediana_horas` | decimal | horas | **Recuperação por issue de bug**: mediana de `closed_at − created_at` |
+| `n_deploys_producao` | inteiro | deployments | deployments em ambiente de produção |
+| `usa_deployments` | booleano | — | o repositório usa a API de Deployments de forma utilizável |
+| `df_deploy_semana` | decimal | deploys/semana | **Deployment frequency "pura"**, pela API de Deployments |
+| `cfr_d_deploy` | decimal 0–1 | proporção | **CFR (d)**: deployments com status de falha ÷ deployments avaliados |
+| `recuperacao_deploy_mediana_horas` | decimal | horas | mediana do tempo entre um deployment com falha e o próximo bem-sucedido |
+| `truncado_prs`, `truncado_issues`, `truncado_deployments` | booleano | — | a paginação atingiu o limite para aquele tipo de evento; a medida correspondente é um limite inferior |
+
+**Cobertura, medida nos 900:** lead time por PR 98,3%, primeira resposta 98,8%, taxa de aceitação 99,6%, resolução de bug 80,4% e **Deployments API 38,8%**. As quatro primeiras sustentam-se como medidas principais; a última entra como **subamostra de validação**, e sua cobertura varia de forma detectável entre as amostras (31,3%, 41,7% e 43,3%; qui-quadrado p = 0,0048). Ver `docs/base-teorica.md`, seção 7.1.1.

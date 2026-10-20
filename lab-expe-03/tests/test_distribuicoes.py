@@ -8,6 +8,7 @@ from analise.distribuicoes import (
     ajuste_binomial_negativa,
     ajuste_weibull,
     centro,
+    cobertura_entre_amostras,
     convergencia,
     correlacao_parcial_spearman,
     diagnostico_confusao,
@@ -351,6 +352,36 @@ def test_diagnostico_nao_aponta_confusao_quando_a_relacao_se_sustenta():
                                             (("estrelas", "Estrelas"),)))
     assert d["confusao"] is False
     assert d["estratos_mesmo_sinal"] is True
+
+
+def test_cobertura_entre_amostras_aponta_tendencia_monotonica():
+    r = cobertura_entre_amostras({
+        "A1": [True] * 90 + [False] * 210,
+        "A2": [True] * 125 + [False] * 175,
+        "A3": [True] * 130 + [False] * 170,
+    })
+    assert r["difere"] is True
+    assert r["tendencia"] is True
+    assert r["z_tendencia"] > 0
+
+
+def test_cobertura_entre_amostras_aceita_amostras_equivalentes():
+    r = cobertura_entre_amostras({
+        "A1": [True] * 100 + [False] * 200,
+        "A2": [True] * 102 + [False] * 198,
+        "A3": [True] * 98 + [False] * 202,
+    })
+    assert r["difere"] is False
+    assert r["tendencia"] is False
+
+
+def test_cobertura_entre_amostras_com_coluna_constante():
+    r = cobertura_entre_amostras({"A1": [False] * 10, "A2": [False] * 10})
+    assert r["p_qui2"] is None
+
+
+def test_cobertura_entre_amostras_com_uma_so():
+    assert cobertura_entre_amostras({"A1": [True, False]})["p_qui2"] is None
 
 
 def test_discriminancia_marca_separacao_real():
