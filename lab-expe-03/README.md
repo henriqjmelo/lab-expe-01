@@ -212,6 +212,56 @@ Spearman com `scipy.stats.spearmanr`, separadamente para CFR (a) e (b), com grá
 4. **Consenso** dos casos divergentes, com protocolo de desempate registrado no repositório.
 5. **Avaliar a heurística corretiva** contra o consenso: precisão, recall e F1 (`precision_recall_fscore_support`). **F1 < 0,70 → refinar e reavaliar**, documentando cada versão testada.
 
+### Rótulos possíveis
+
+Estes são os **únicos** valores aceitos. Qualquer outro valor quebra o cálculo do kappa.
+
+| Dimensão | Coluna | Valores aceitos |
+| :--- | :--- | :--- |
+| (i) Tipo do projeto | `tipo_projeto` | `biblioteca_framework` · `aplicacao_servico` · `ferramenta_cli` · `outro` |
+| (ii) Releases são entrega real | `releases_reais` | `sim` · `nao` · `incerto` |
+| (iii) Release é corretiva | `corretiva` | `sim` · `nao` |
+
+**Como decidir cada uma:**
+
+| Valor | Critério |
+| :--- | :--- |
+| `biblioteca_framework` | outro código o importa como dependência |
+| `aplicacao_servico` | roda como aplicação, serviço, daemon ou desktop |
+| `ferramenta_cli` | a interface principal é um comando que uma pessoa digita |
+| `outro` | documentação, spec, awesome-list, dataset, material de estudo |
+| `releases_reais = sim` | a release é o mecanismo de distribuição: publica em npm/PyPI/crates, anexa binários, tem changelog para o usuário |
+| `releases_reais = nao` | as tags são contabilidade interna (bot a cada merge, sem notas) ou o projeto distribui por outro caminho |
+| `releases_reais = incerto` | não deu para decidir — **use de verdade**; forçar `sim`/`nao` distorce o kappa |
+| `corretiva = sim` | o objetivo **principal** da release é corrigir defeito recente: notas dominadas por fixes, revert, hotfix, correção de regressão ou vulnerabilidade da versão anterior |
+| `corretiva = nao` | há feature, API nova ou breaking change de peso; é release periódica de rotina; ou só bump de dependência, docs, CI, chore |
+
+Projeto que é biblioteca **e** CLI (eslint, black, ruff): decida por como a maioria consome. Release com feature relevante + três fixes é `nao`; com dez fixes e um ajuste de texto é `sim`. A palavra que resolve o empate é **principal**.
+
+**Dois cuidados que decidem se a validação vale alguma coisa:**
+
+1. **Não rotule pelo número da versão.** A heurística automática usa exatamente isso (`2.3.0 → 2.3.1`). Rotular por SemVer produz F1 ≈ 1 sem ter medido nada. O enunciado manda ler as *release notes* e a lista de commits.
+2. **Não conte prefixos `fix:`.** É o que uma das versões da heurística faz; copiar a regra torna a validação circular. Julgue o propósito da release como um todo.
+
+Pelo mesmo motivo, não abra `validacao/heuristica_versoes.md`, `metricas/corretiva.py` nem a coluna `cfr_b_release` antes de terminar: os três revelam a resposta do script.
+
+### Planilhas
+
+Geradas a partir de `data/dataset_dora.csv` (amostra 1) e `data/eventos/`, com sorteio determinístico (`random_state=42`, e um `random.Random(42)` novo por repositório para as releases). Os três arquivos de rótulo são idênticos antes de preencher: mesmo sorteio, mesmos itens, julgamento independente.
+
+| Arquivo | Linhas | Para quê |
+| :--- | :---: | :--- |
+| `validacao/amostra_ouro_repos.csv` | 60 | referência do sorteio: url, linguagem, estrelas, descrição, topics |
+| `validacao/amostra_ouro_releases.csv` | 300 | referência do sorteio: url, data, nº de commits, mensagens dos commits |
+| `validacao/modelo_rotulos_repos.csv` | 60 | molde vazio |
+| `validacao/modelo_rotulos_releases.csv` | 300 | molde vazio |
+| `validacao/rotulos_<nome>_repos.csv` | 60 | **preencher** `tipo_projeto` e `releases_reais` |
+| `validacao/rotulos_<nome>_releases.csv` | 300 | **preencher** `corretiva` |
+
+`<nome>` ∈ {`guilherme`, `henrique`, `gabriel`}. São **360 julgamentos por pessoa**, não divididos entre os três: o kappa compara o que as três pessoas disseram sobre o **mesmo** item.
+
+As mensagens de commit de cada release já vêm na coluna `commits` (até 20, com contagem do excedente), então a maioria das releases se resolve lendo a linha, sem abrir o navegador. **31 releases vêm com `n_commits = 0`** — primeiras releases do histórico ou falhas do `compare` da API — e nessas é preciso abrir o link. A coluna `n_reverts` conta commits que revertem outro (26 releases): sinal forte de corretiva, mas não decisivo sozinho.
+
 ---
 
 ## Requisitos de Engenharia do Pipeline
