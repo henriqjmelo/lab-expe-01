@@ -1,0 +1,4 @@
+comparacao,variavel,teste,n_a,n_b,mediana_a,mediana_b,estatistica,p,delta_cliff,magnitude_delta,gl,p_holm,significativo_holm
+A1 × A2,Estrelas,mann_whitney,300,300,9484.5,9566.0,44123.0,0.6797219584646018,-0.01948888888888889,desprezivel,,1.0,False
+A1 × A2,Idade (anos),mann_whitney,300,300,5.789999999999999,6.39,45621.5,0.7699049047371024,0.013811111111111218,desprezivel,,1.0,False
+A1 × A2,Linguagem (8 principais + Outras),qui_quadrado,300,300,,,4.2496076889473136,0.8339299579104829,,,8.0,1.0,False
