@@ -5,8 +5,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from analise import caracterizacao as car
 from analise import estatisticas as est
 from analise import graficos as g
+from analise.caracterizacao import executar as caracterizacao
 
 
 def gerar(df: pd.DataFrame, funil: pd.DataFrame | None, pasta: Path, rotulo: str) -> list[Path]:
@@ -115,6 +117,21 @@ def main(argv: list[str] | None = None) -> int:
         if funil_a2.exists():
             g.ROTULO_AMOSTRA = f"Amostra 2 · n = {len(a2)}"
             gerados.append(g.fig_funil(pd.read_csv(funil_a2), figuras / "fig01b_funil_a2.png"))
+
+    gerados += car.executar(
+        Path("data/candidatos.csv"), args.dados, args.dados.parent / "descartes.csv",
+        args.extra[0] if args.extra and args.extra[0].exists() else Path("data/amostra2/dataset_dora.csv"),
+        args.saida / "caracterizacao",
+    )
+
+    caracterizacao = __import__("analise.caracterizacao", fromlist=["executar"])
+    gerados += caracterizacao.executar(
+        args.dados.parent / "candidatos.csv",
+        args.dados,
+        args.dados.parent / "descartes.csv",
+        args.extra[0] if args.extra and args.extra[0].exists() else Path("data/amostra2/dataset_dora.csv"),
+        args.saida / "caracterizacao",
+    )
 
     for caminho in gerados:
         print(caminho)

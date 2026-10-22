@@ -1,0 +1,16 @@
+comparacao,variavel,teste,n_a,n_b,mediana_a,mediana_b,estatistica,p,delta_cliff,magnitude_delta,gl,p_holm,significativo_holm
+aceitos × descartados_com_actions,Estrelas,mann_whitney,300,171,9484.5,2898.0,34810.5,1.1297727199539593e-10,0.3571345029239765,medio,,1.2427499919493554e-09,True
+aceitos × descartados_com_actions,Idade (anos),mann_whitney,300,171,5.789999999999999,7.31,24346.0,0.3588064149087792,-0.05083820662768035,desprezivel,,1.0,False
+aceitos × descartados_com_actions,Linguagem (8 principais + Outras),qui_quadrado,300,171,,,95.49233301666362,3.5508224532149075e-17,,,8.0,5.326233679822361e-16,True
+aceitos × descartados_min_5_releases,Estrelas,mann_whitney,300,538,9484.5,4543.5,102878.0,4.0582101013273375e-11,0.2748203221809169,pequeno,,4.869852121592805e-10,True
+aceitos × descartados_min_5_releases,Idade (anos),mann_whitney,300,538,5.789999999999999,8.51,64956.0,2.777534713258669e-06,-0.19509293680297402,pequeno,,2.4997812419328024e-05,True
+aceitos × descartados_min_5_releases,Linguagem (8 principais + Outras),qui_quadrado,300,538,,,45.95664024557883,2.4225357843321495e-07,,,8.0,2.4225357843321495e-06,True
+aceitos × descartados_min_50_runs,Estrelas,mann_whitney,300,99,9484.5,2921.0,18859.5,5.596639332791785e-05,0.27,pequeno,,0.0004477311466233428,True
+aceitos × descartados_min_50_runs,Idade (anos),mann_whitney,300,99,5.789999999999999,3.66,17881.0,0.00232078986023271,0.20410774410774413,pequeno,,0.01624552902162897,True
+aceitos × descartados_min_50_runs,Linguagem (8 principais + Outras),qui_quadrado,300,99,,,23.820198453607738,0.002456354600966928,,,8.0,0.01624552902162897,True
+aceitos × descartados_todos,Estrelas,mann_whitney,300,808,9484.5,2969.5,156548.0,8.127726322193693e-14,0.29165016501650176,pequeno,,1.137881685107117e-12,True
+aceitos × descartados_todos,Idade (anos),mann_whitney,300,808,5.789999999999999,7.88,107183.0,0.0030623343558670905,-0.11565181518151813,desprezivel,,0.01624552902162897,True
+aceitos × descartados_todos,Linguagem (8 principais + Outras),qui_quadrado,300,808,,,72.51554722424703,1.5484699021840362e-12,,,8.0,2.013010872839247e-11,True
+avaliados × nao_avaliados,Estrelas,mann_whitney,1108,7349,4612.0,4596.0,4140428.5,0.3618314854751161,0.01696797570140185,desprezivel,,1.0,False
+avaliados × nao_avaliados,Idade (anos),mann_whitney,1108,7349,7.475,7.27,4134087.0,0.40757268010770487,0.01541038270881434,desprezivel,,1.0,False
+avaliados × nao_avaliados,Linguagem (8 principais + Outras),qui_quadrado,1108,7349,,,10.299708646847929,0.24461722278899423,,,8.0,0.9784688911559769,False

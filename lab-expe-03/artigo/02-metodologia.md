@@ -99,7 +99,7 @@ O dataset final (`data/dataset_dora.csv`) tem uma linha por repositório. Ele tr
 
 Cada coluna está descrita em `data/DICIONARIO.md`, com nome, tipo, unidade e fórmula ou campo de origem na API.
 
-A amostra final tem **300 repositórios** em 27 linguagens. As mais frequentes são TypeScript (61), Python (55), Go (49), Rust (28), C++ (20) e JavaScript (19). A idade mediana é de 5,8 anos (IQR 2,0–10,9), e o número mediano de contribuidores é 142 (IQR 49–337). A coleta somou 17.217 releases, 28.792 tags e 833.582 workflow runs válidos na janela. A Tabela 2 resume a qualidade da coleta.
+A amostra final tem **300 repositórios** em 27 linguagens. As mais frequentes são TypeScript (61), Python (55), Go (49), Rust (28), C++ (20) e JavaScript (19). A idade mediana é de 5,8 anos (IQR 2,0–10,9), e o número mediano de contribuidores é 142 (IQR 50–335). A coleta somou 17.217 releases, 28.792 tags e 833.582 workflow runs válidos na janela. A Tabela 2 resume a qualidade da coleta.
 
 **Tabela 2 — Contagens de qualidade da coleta.**
 
@@ -111,6 +111,33 @@ A amostra final tem **300 repositórios** em 27 linguagens. As mais frequentes s
 | Releases ignoradas no lead time por *compare* com mais de 1.000 commits ou que a API não conseguiu gerar (422) | 244 |
 | Repositórios com lead time de release omitido (mais de 300 releases na janela) | 7 |
 | Episódios de falha de CI censurados (sem recuperação até o fim da janela) | 139 de 20.077, em 74 repositórios |
+
+**Caracterização e viés de seleção.** A Tabela 3 e os arquivos `analise/saida/caracterizacao/caracterizacao_numerica.csv` e `caracterizacao_linguagens.csv` descrevem a A1 e a amostra acumulada A1+A2. Na A1, estrelas têm mediana 9.484,5 (IQR 2.858,5–28.636), idade 5,79 anos (1,96–10,89) e contribuidores 142 (50,25–335). Em A1+A2 (600 repositórios), as medianas são 9.500 estrelas (2.878,75–29.144,5), 6,24 anos (2,43–10,17) e 150 contribuidores (52–343). A A1 distribui-se por 27 linguagens; TypeScript (61), Python (55), Go (49), Rust (28), C++ (20) e JavaScript (19) são as seis mais comuns. As tabelas listam as oito mais frequentes e agrupam as restantes em “Outras”.
+
+**Tabela 3 — Caracterização dos metadados das amostras.** Valores contínuos apresentados como mediana (Q1–Q3).
+
+| Amostra | Repositórios | Estrelas | Idade (anos) | Contribuidores |
+| :--- | ---: | :--- | :--- | :--- |
+| A1 | 300 | 9.484,5 (2.858,5–28.636) | 5,79 (1,96–10,89) | 142 (50,25–335) |
+| A1+A2 | 600 | 9.500 (2.878,75–29.144,5) | 6,24 (2,43–10,17) | 150 (52–343) |
+
+Na A1, as oito linguagens mais frequentes são TypeScript (61), Python (55), Go (49), Rust (28), C++ (20), JavaScript (19), Java (9) e C (9); as demais somam 50 repositórios. Na A1+A2, são TypeScript (134), Python (107), Go (86), Rust (61), JavaScript (37), C++ (35), C (19) e Java (17); as demais somam 104.
+
+Para medir viés de seleção, comparamos os aceitos com cada etapa de descarte e com todos os descartados, usando Mann–Whitney e delta de Cliff para estrelas e idade, qui-quadrado para linguagem (oito categorias mais “Outras”) e correção de Holm sobre os testes. No conjunto, os aceitos têm mais estrelas que os descartados (medianas 9.484,5 e 2.969,5; δ = 0,292, efeito pequeno; p ajustado < 0,001) e são ligeiramente mais jovens (5,79 e 7,88 anos; δ = −0,116, efeito desprezível; p ajustado = 0,016). A distribuição de linguagens também difere (p ajustado < 0,001). A diferença é particularmente marcada entre quem passou e quem não passou o filtro de Actions: as linguagens diferem (p ajustado < 0,001; δ de estrelas = 0,357). O corte de releases também está associado a estrelas, idade e linguagem (todos p ajustados ≤ 0,001); o corte de runs apresenta diferenças menores, mas ainda detectáveis (p ajustados ≤ 0,017). Portanto, a amostra caracteriza especificamente projetos populares, ativos e que publicam releases com frequência, não todos os repositórios open-source.
+
+Como teste de sanidade da ordem aleatória de avaliação, comparamos os 1.108 candidatos avaliados (aceitos e descartados) com os 7.349 não avaliados. Não houve diferenças detectáveis após Holm em estrelas (δ = 0,017; p ajustado = 1), idade (δ = 0,015; p ajustado = 1) ou linguagem (p ajustado = 1). A comparação independente A1 × A2 também não encontrou diferenças nos metadados: estrelas (δ = −0,019), idade (δ = 0,014) e linguagem (p ajustado = 1 em cada teste). Esses resultados dão suporte à reprodutibilidade da amostragem, mas não removem o viés imposto pelos critérios de inclusão.
+
+![Distribuições de estrelas e idade entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicoes_estrelas_idade.png)
+
+**Como ler.** Cada curva é a proporção acumulada de repositórios por estrelas (painel esquerdo) ou idade (direito), separada entre a amostra aceita e cada etapa de descarte; deslocamentos horizontais indicam diferenças de distribuição. Os eixos horizontais usam escala logarítmica e a legenda informa o tamanho de cada grupo.
+
+![Distribuição de linguagens entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicao_linguagens.png)
+
+**Como ler.** Cada barra representa um grupo do funil e soma 100%; as cores mostram as oito linguagens mais frequentes entre os aceitos e a categoria “Outras”. A figura evidencia diferenças de composição, mas a inferência estatística correspondente está na tabela de viés de seleção.
+
+Os testes, medianas e tamanhos de efeito podem ser regenerados sem acesso à API executando `python -m analise.caracterizacao` de dentro de `lab-expe-03`; a execução completa também é incluída em `python -m analise`.
+
+**Ameaça à validade externa — viés de seleção.** As conclusões não devem ser generalizadas a todo o ecossistema open-source: os critérios de ≥ 1.000 estrelas, uso de Actions, pelo menos cinco releases e 50 execuções válidas selecionam projetos populares, com CI e cadência de publicação formal. A comparação mostra diferenças de popularidade, idade e linguagem em relação aos descartados. A semelhança entre avaliados e não avaliados e entre A1 e A2 reduz a preocupação com a ordem aleatória e a composição das duas amostras, mas não elimina o viés dos filtros nem representa projetos corporativos ou repositórios com distribuição contínua sem releases.
 
 ## 2.7 Validação manual (amostra-ouro)
 
