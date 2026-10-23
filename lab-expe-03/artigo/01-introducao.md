@@ -2,17 +2,15 @@
 
 > Rascunho da issue #134, a ser revisado por Henrique e Gabriel antes de ir para o Overleaf.
 
-## 1.1 Contexto
+## 1.1 Contexto e problema
 
-As quatro métricas DORA — frequência de deploy, lead time for changes, change failure rate e tempo de recuperação — viraram o vocabulário padrão para falar de desempenho de entrega de software. Elas vêm do programa de pesquisa *DevOps Research and Assessment*, que as derivou de levantamentos com milhares de profissionais e as organizou em faixas de desempenho (Elite, High, Medium, Low). A tese central desse programa é que velocidade e estabilidade **não** são um trade-off: as equipes de melhor desempenho vão bem nas quatro métricas ao mesmo tempo.
+As quatro métricas DORA — frequência de deploy, lead time for changes, change failure rate e tempo de recuperação — viraram o vocabulário padrão para falar de desempenho de entrega de software. Vêm do programa *DevOps Research and Assessment*, que as derivou de levantamentos com milhares de profissionais e as organizou em faixas (Elite, High, Medium, Low). Sua tese central é que velocidade e estabilidade **não** são um trade-off.
 
-Essas métricas foram definidas para equipes que controlam o próprio pipeline de produção e sabem, por definição operacional interna, o que conta como "deploy" e o que conta como "falha em produção". Repositórios open-source no GitHub não oferecem nenhuma das duas coisas. Não há registro de deploy, não há registro de incidente e não há alguém para perguntar. O que existe são **rastros**: releases publicadas, execuções de workflow do GitHub Actions, commits, tags e comparações entre releases.
+Essas métricas foram definidas para equipes que controlam o próprio pipeline de produção e sabem, por definição operacional interna, o que conta como "deploy" e o que conta como "falha em produção". Repositórios open-source no GitHub não oferecem nenhuma das duas coisas. Não há registro de deploy, não há registro de incidente e não há a quem perguntar. O que existe são **rastros**: releases publicadas, execuções de workflow, commits, tags e comparações entre releases.
 
-## 1.2 Problema
+Medir DORA aqui, portanto, não é aplicar uma definição: é **escolher proxies** e assumir o custo dessa escolha. Uma release é um deploy? Uma execução de CI que falha é uma falha em produção? Uma release de *patch* publicada três dias depois da anterior corrige um defeito, ou é rotina de atualização de dependência?
 
-Medir DORA em repositórios open-source, portanto, não é aplicar uma definição: é **escolher proxies** e assumir o custo dessa escolha. Uma release é um deploy? Uma execução de CI que falha é uma falha em produção? Uma release de *patch* publicada três dias depois da anterior é a correção de um defeito, ou é rotina de atualização de dependência?
-
-Cada resposta a essas perguntas é uma hipótese não verificada sobre a relação entre um atributo interno, que se consegue contar, e um atributo externo, que é o que de fato interessa. É nesse ponto que este trabalho se separa de uma aplicação direta do enunciado. Calcular as quatro métricas em uma amostra grande é a parte mecânica. A parte que decide se os números significam alguma coisa é perguntar **o quanto os proxies escolhidos são medidas válidas** — se concordam com o julgamento humano, se sobrevivem à troca da definição operacional, se se reproduzem em amostras independentes e se as faixas DORA separam de fato grupos distintos de repositórios.
+Cada resposta é uma hipótese não verificada sobre a relação entre um atributo interno, que se consegue contar, e um atributo externo, que é o que interessa. É nesse ponto que este trabalho se separa de uma aplicação direta do enunciado. Calcular as quatro métricas numa amostra grande é a parte mecânica. A parte que decide se os números significam alguma coisa é perguntar **o quanto os proxies escolhidos são medidas válidas** — se concordam com o julgamento humano, se sobrevivem à troca da definição operacional, se se reproduzem em amostras independentes e se as faixas DORA separam de fato grupos distintos.
 
 ## 1.3 Objetivo e questões de pesquisa
 
@@ -48,20 +46,18 @@ Uma hipótese por RQ, com a origem de cada uma declarada. "Origem" diz de onde v
 
 ## 1.5 Nota sobre o registro das hipóteses
 
-O protocolo correto registra as hipóteses **antes** da coleta. Neste trabalho isso não aconteceu. O Lab03 começou em 08/10/2026, o primeiro dataset entrou no repositório em 13/10/2026 e as hipóteses acima só foram escritas e versionadas em **20/10/2026**, com os resultados já disponíveis ao grupo. Elas são, portanto, **reconstruídas**, não pré-registradas, e o leitor deve tratá-las como tal.
+O protocolo correto registra as hipóteses **antes** da coleta, e aqui isso não aconteceu: o Lab03 começou em 08/10/2026, o primeiro dataset entrou em 13/10/2026 e as hipóteses acima foram escritas em **20/10/2026**, com os resultados já disponíveis. Elas são **reconstruídas**, não pré-registradas.
 
-Para que a reconstrução não seja só uma racionalização do que foi encontrado, cada hipótese declara de onde veio a expectativa, e nenhuma foi derivada dos resultados. O leitor pode auditar isso pelo saldo: **cinco das sete foram refutadas** pelos dados (seção 4). Hipóteses escritas depois de ver o resultado tendem a acertar; estas, na maioria, erram — inclusive em direções que custaram retrabalho ao grupo, como a H05, que motivou a análise da seção 3.10.3.
-
-Isso está registrado também na seção 5 (ameaças à validade), como limitação de conclusão.
+Para que a reconstrução não seja racionalização do que foi encontrado, cada hipótese declara a origem da expectativa, e nenhuma foi derivada dos resultados. O leitor audita isso pelo saldo: **cinco das sete foram refutadas** (seção 4). Hipóteses escritas depois do resultado tendem a acertar; estas, na maioria, erram. A seção 5.4 trata disso como ameaça aberta.
 
 ## 1.6 Contribuições
 
-1. Um **dataset público de 900 repositórios** (três amostras independentes de 300) com as quatro métricas DORA e suas variantes, mais os eventos brutos (releases, commits por release, workflow runs) que permitem recalcular tudo.
-2. Uma **avaliação de validade das medidas** segundo os seis critérios da IEEE 1061, e não só o cálculo das métricas: correlação, rastreamento, consistência, previsibilidade, poder discriminante e confiabilidade.
-3. A demonstração de que o **CFR na variante (b) mede cadência de publicação, não falha** — a correlação com a frequência de deploy desaparece ao condicionar pela oportunidade de observar uma release corretiva (seção 3.10.3).
-4. A evidência de que as **faixas DORA não têm poder discriminante** nesta população e a proposta de um **índice contínuo** que preserva a informação que o corte em faixas descarta (seções 3.10.4 e 3.10.7).
-5. Um **ajuste de distribuições** às métricas (Poisson, binomial negativa, Weibull, normal) que mostra por que a média e o desvio-padrão não devem ser usados aqui, e a verificação empírica de que o Teorema do Limite Central precisa de n ≈ 300, não de n = 30, para estes dados (seção 3.10.5).
+1. **Dataset público de 900 repositórios** (três amostras independentes de 300) com as quatro métricas DORA, suas variantes e os eventos brutos que permitem recalcular tudo.
+2. **Avaliação de validade das medidas** segundo os seis critérios da IEEE 1061, e não apenas o cálculo das métricas.
+3. A demonstração, por duas vias independentes, de que **o CFR na variante (b) não mede falha**: a heurística reprova contra o gabarito humano (F1 = 0,478, precisão 36,5%) e a correlação com a frequência de deploy desaparece ao condicionar pela oportunidade de observação (seções 2.7 e 3.10.3).
+4. A evidência de que as **faixas DORA não têm poder discriminante** nesta população, e um **índice contínuo** que preserva a informação descartada pelo corte em faixas (seções 3.10.4 e 3.10.7).
+5. Um **ajuste de distribuições** que mostra por que média e desvio-padrão não se aplicam aqui, incluindo a verificação de que o Teorema do Limite Central precisa de n ≈ 300, não de n = 30 (seção 3.10.5).
 
 ## 1.7 Organização
 
-A seção 2 descreve a metodologia: fonte de dados, janela, seleção, definições operacionais e validação manual. A seção 3 apresenta os resultados das sete RQs e as análises adicionais de validade. A seção 4 confronta as hipóteses acima com o que os dados mostraram. A seção 5 discute as ameaças à validade segundo as quatro categorias de Cook e Campbell. A seção 6 descreve o pacote de replicação.
+Seção 2: metodologia e validação manual. Seção 3: resultados das RQs e análises de validade. Seção 4: hipóteses contra resultados. Seção 5: ameaças à validade. Seção 6: pacote de replicação.

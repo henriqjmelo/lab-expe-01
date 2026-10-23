@@ -64,14 +64,7 @@ Métricas por repositório:
     - **v2 patch + poucos commits:** v0 **e** a release tem no máximo 3 commits.
     - **v3 combinada:** v0 **ou** v1 **ou** o nome da tag contém `hotfix`/`patch`.
 
-    | Versão | Mediana do CFR (b) | IQR | Releases marcadas corretivas |
-    | :--- | :---: | :---: | :---: |
-    | v0 (semver) | 25,0% | 5,2% – 56,5% | 8.186 |
-    | v1 (mensagens) | 0,0% | 0,0% – 12,6% | 1.479 |
-    | v2 (patch + poucos commits) | 2,4% | 0,0% – 21,6% | 1.903 |
-    | v3 (combinada) | 25,0% | 6,0% – 57,2% | 8.597 |
-
-    A v0 sozinha já marca um quarto das releases como corretivas, bem acima do CFR (a) (mediana 2,6%, seção 3.1); a v1, baseada só na mensagem do commit, é bem mais conservadora. A escolha da versão final foi decidida contra o gabarito humano na seção 2.7: nenhuma das quatro atinge o F1 mínimo, e a v0 foi mantida como referência.
+    As quatro divergem muito entre si — a v0 marca 8.186 releases como corretivas, a v1 apenas 1.479 — o que por si só já indicava que a validação contra julgamento humano era necessária. A escolha final foi decidida na seção 2.7: **nenhuma atinge o F1 mínimo**, e a v0 foi mantida como referência.
 - **Tempo de recuperação (RQ 04):** os runs são agrupados por workflow e ordenados por `run_started_at`.
   - Um episódio começa na primeira falha depois de um sucesso e termina no sucesso seguinte, com duração `updated_at(sucesso) − run_started_at(1ª falha)`. O valor do repositório é a mediana dos episódios fechados, em horas.
   - Episódios sem sucesso até o fim da janela são **censurados**: não entram na mediana, mas são contados, e a proporção é reportada por repositório.
@@ -112,32 +105,28 @@ A amostra final tem **300 repositórios** em 27 linguagens. As mais frequentes s
 | Repositórios com lead time de release omitido (mais de 300 releases na janela) | 7 |
 | Episódios de falha de CI censurados (sem recuperação até o fim da janela) | 139 de 20.077, em 74 repositórios |
 
-**Caracterização e viés de seleção.** A Tabela 3 e os arquivos `analise/saida/caracterizacao/caracterizacao_numerica.csv` e `caracterizacao_linguagens.csv` descrevem a A1 e a amostra acumulada A1+A2. Na A1, estrelas têm mediana 9.484,5 (IQR 2.858,5–28.636), idade 5,79 anos (1,96–10,89) e contribuidores 142 (50,25–335). Em A1+A2 (600 repositórios), as medianas são 9.500 estrelas (2.878,75–29.144,5), 6,24 anos (2,43–10,17) e 150 contribuidores (52–343). A A1 distribui-se por 27 linguagens; TypeScript (61), Python (55), Go (49), Rust (28), C++ (20) e JavaScript (19) são as seis mais comuns. As tabelas listam as oito mais frequentes e agrupam as restantes em “Outras”.
+**Caracterização e viés de seleção.** A Tabela 3 resume os metadados da A1 e da amostra acumulada A1+A2; o detalhamento por linguagem está em `analise/saida/caracterizacao/`.
 
-**Tabela 3 — Caracterização dos metadados das amostras.** Valores contínuos apresentados como mediana (Q1–Q3).
+**Tabela 3 — Metadados das amostras.** Mediana (Q1–Q3).
 
 | Amostra | Repositórios | Estrelas | Idade (anos) | Contribuidores |
 | :--- | ---: | :--- | :--- | :--- |
 | A1 | 300 | 9.484,5 (2.858,5–28.636) | 5,79 (1,96–10,89) | 142 (50,25–335) |
 | A1+A2 | 600 | 9.500 (2.878,75–29.144,5) | 6,24 (2,43–10,17) | 150 (52–343) |
 
-Na A1, as oito linguagens mais frequentes são TypeScript (61), Python (55), Go (49), Rust (28), C++ (20), JavaScript (19), Java (9) e C (9); as demais somam 50 repositórios. Na A1+A2, são TypeScript (134), Python (107), Go (86), Rust (61), JavaScript (37), C++ (35), C (19) e Java (17); as demais somam 104.
+O viés de seleção foi medido comparando os aceitos com cada etapa de descarte, por Mann-Whitney e delta de Cliff para estrelas e idade, qui-quadrado para linguagem, com correção de Holm. **Os aceitos têm mais estrelas que os descartados** (9.484,5 contra 2.969,5; δ = 0,292, efeito pequeno; p < 0,001) e são ligeiramente mais jovens (5,79 contra 7,88 anos; δ = −0,116, desprezível; p = 0,016), e a distribuição de linguagens difere (p < 0,001). O filtro de Actions é o mais seletivo (δ de estrelas = 0,357); o de releases associa-se a estrelas, idade e linguagem (p ≤ 0,001); o de runs mostra diferenças menores mas detectáveis (p ≤ 0,017). A amostra caracteriza, portanto, **projetos populares, ativos e que publicam releases com frequência** — não o ecossistema open-source em geral.
 
-Para medir viés de seleção, comparamos os aceitos com cada etapa de descarte e com todos os descartados, usando Mann–Whitney e delta de Cliff para estrelas e idade, qui-quadrado para linguagem (oito categorias mais “Outras”) e correção de Holm sobre os testes. No conjunto, os aceitos têm mais estrelas que os descartados (medianas 9.484,5 e 2.969,5; δ = 0,292, efeito pequeno; p ajustado < 0,001) e são ligeiramente mais jovens (5,79 e 7,88 anos; δ = −0,116, efeito desprezível; p ajustado = 0,016). A distribuição de linguagens também difere (p ajustado < 0,001). A diferença é particularmente marcada entre quem passou e quem não passou o filtro de Actions: as linguagens diferem (p ajustado < 0,001; δ de estrelas = 0,357). O corte de releases também está associado a estrelas, idade e linguagem (todos p ajustados ≤ 0,001); o corte de runs apresenta diferenças menores, mas ainda detectáveis (p ajustados ≤ 0,017). Portanto, a amostra caracteriza especificamente projetos populares, ativos e que publicam releases com frequência, não todos os repositórios open-source.
-
-Como teste de sanidade da ordem aleatória de avaliação, comparamos os 1.108 candidatos avaliados (aceitos e descartados) com os 7.349 não avaliados. Não houve diferenças detectáveis após Holm em estrelas (δ = 0,017; p ajustado = 1), idade (δ = 0,015; p ajustado = 1) ou linguagem (p ajustado = 1). A comparação independente A1 × A2 também não encontrou diferenças nos metadados: estrelas (δ = −0,019), idade (δ = 0,014) e linguagem (p ajustado = 1 em cada teste). Esses resultados dão suporte à reprodutibilidade da amostragem, mas não removem o viés imposto pelos critérios de inclusão.
+Dois testes de sanidade não encontraram diferença: os 1.108 candidatos avaliados contra os 7.349 não avaliados (δ ≤ 0,017; p = 1 em estrelas, idade e linguagem) e a A1 contra a A2 (δ ≤ 0,019; p = 1). A ordem de avaliação e a composição das duas amostras, portanto, não introduzem viés adicional — o que não remove o viés dos critérios de inclusão, tratado na seção 5.3.
 
 ![Distribuições de estrelas e idade entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicoes_estrelas_idade.png)
 
-**Como ler.** Cada curva é a proporção acumulada de repositórios por estrelas (painel esquerdo) ou idade (direito), separada entre a amostra aceita e cada etapa de descarte; deslocamentos horizontais indicam diferenças de distribuição. Os eixos horizontais usam escala logarítmica e a legenda informa o tamanho de cada grupo.
+**Como ler.** Proporção acumulada de repositórios por estrelas (esquerda) e idade (direita), separada entre a amostra aceita e cada etapa de descarte. Deslocamento horizontal indica diferença de distribuição; eixos em escala logarítmica, com o `n` de cada grupo na legenda.
 
 ![Distribuição de linguagens entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicao_linguagens.png)
 
-**Como ler.** Cada barra representa um grupo do funil e soma 100%; as cores mostram as oito linguagens mais frequentes entre os aceitos e a categoria “Outras”. A figura evidencia diferenças de composição, mas a inferência estatística correspondente está na tabela de viés de seleção.
+**Como ler.** Cada barra é um grupo do funil e soma 100%, com as oito linguagens mais frequentes entre os aceitos e a categoria "Outras". A inferência correspondente está no parágrafo acima.
 
-Os testes, medianas e tamanhos de efeito podem ser regenerados sem acesso à API executando `python -m analise.caracterizacao` de dentro de `lab-expe-03`; a execução completa também é incluída em `python -m analise`.
-
-**Ameaça à validade externa — viés de seleção.** As conclusões não devem ser generalizadas a todo o ecossistema open-source: os critérios de ≥ 1.000 estrelas, uso de Actions, pelo menos cinco releases e 50 execuções válidas selecionam projetos populares, com CI e cadência de publicação formal. A comparação mostra diferenças de popularidade, idade e linguagem em relação aos descartados. A semelhança entre avaliados e não avaliados e entre A1 e A2 reduz a preocupação com a ordem aleatória e a composição das duas amostras, mas não elimina o viés dos filtros nem representa projetos corporativos ou repositórios com distribuição contínua sem releases.
+Tudo isso se regenera sem acesso à API com `python -m analise.caracterizacao`.
 
 ## 2.7 Validação manual (amostra-ouro)
 

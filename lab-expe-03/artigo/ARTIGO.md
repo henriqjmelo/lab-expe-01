@@ -12,17 +12,15 @@ Guilherme Costa · Henrique Jardim Melo · Gabriel Afonso
 
 > Rascunho da issue #134, a ser revisado por Henrique e Gabriel antes de ir para o Overleaf.
 
-## 1.1 Contexto
+## 1.1 Contexto e problema
 
-As quatro métricas DORA — frequência de deploy, lead time for changes, change failure rate e tempo de recuperação — viraram o vocabulário padrão para falar de desempenho de entrega de software. Elas vêm do programa de pesquisa *DevOps Research and Assessment*, que as derivou de levantamentos com milhares de profissionais e as organizou em faixas de desempenho (Elite, High, Medium, Low). A tese central desse programa é que velocidade e estabilidade **não** são um trade-off: as equipes de melhor desempenho vão bem nas quatro métricas ao mesmo tempo.
+As quatro métricas DORA — frequência de deploy, lead time for changes, change failure rate e tempo de recuperação — viraram o vocabulário padrão para falar de desempenho de entrega de software. Vêm do programa *DevOps Research and Assessment*, que as derivou de levantamentos com milhares de profissionais e as organizou em faixas (Elite, High, Medium, Low). Sua tese central é que velocidade e estabilidade **não** são um trade-off.
 
-Essas métricas foram definidas para equipes que controlam o próprio pipeline de produção e sabem, por definição operacional interna, o que conta como "deploy" e o que conta como "falha em produção". Repositórios open-source no GitHub não oferecem nenhuma das duas coisas. Não há registro de deploy, não há registro de incidente e não há alguém para perguntar. O que existe são **rastros**: releases publicadas, execuções de workflow do GitHub Actions, commits, tags e comparações entre releases.
+Essas métricas foram definidas para equipes que controlam o próprio pipeline de produção e sabem, por definição operacional interna, o que conta como "deploy" e o que conta como "falha em produção". Repositórios open-source no GitHub não oferecem nenhuma das duas coisas. Não há registro de deploy, não há registro de incidente e não há a quem perguntar. O que existe são **rastros**: releases publicadas, execuções de workflow, commits, tags e comparações entre releases.
 
-## 1.2 Problema
+Medir DORA aqui, portanto, não é aplicar uma definição: é **escolher proxies** e assumir o custo dessa escolha. Uma release é um deploy? Uma execução de CI que falha é uma falha em produção? Uma release de *patch* publicada três dias depois da anterior corrige um defeito, ou é rotina de atualização de dependência?
 
-Medir DORA em repositórios open-source, portanto, não é aplicar uma definição: é **escolher proxies** e assumir o custo dessa escolha. Uma release é um deploy? Uma execução de CI que falha é uma falha em produção? Uma release de *patch* publicada três dias depois da anterior é a correção de um defeito, ou é rotina de atualização de dependência?
-
-Cada resposta a essas perguntas é uma hipótese não verificada sobre a relação entre um atributo interno, que se consegue contar, e um atributo externo, que é o que de fato interessa. É nesse ponto que este trabalho se separa de uma aplicação direta do enunciado. Calcular as quatro métricas em uma amostra grande é a parte mecânica. A parte que decide se os números significam alguma coisa é perguntar **o quanto os proxies escolhidos são medidas válidas** — se concordam com o julgamento humano, se sobrevivem à troca da definição operacional, se se reproduzem em amostras independentes e se as faixas DORA separam de fato grupos distintos de repositórios.
+Cada resposta é uma hipótese não verificada sobre a relação entre um atributo interno, que se consegue contar, e um atributo externo, que é o que interessa. É nesse ponto que este trabalho se separa de uma aplicação direta do enunciado. Calcular as quatro métricas numa amostra grande é a parte mecânica. A parte que decide se os números significam alguma coisa é perguntar **o quanto os proxies escolhidos são medidas válidas** — se concordam com o julgamento humano, se sobrevivem à troca da definição operacional, se se reproduzem em amostras independentes e se as faixas DORA separam de fato grupos distintos.
 
 ## 1.3 Objetivo e questões de pesquisa
 
@@ -58,23 +56,21 @@ Uma hipótese por RQ, com a origem de cada uma declarada. "Origem" diz de onde v
 
 ## 1.5 Nota sobre o registro das hipóteses
 
-O protocolo correto registra as hipóteses **antes** da coleta. Neste trabalho isso não aconteceu. O Lab03 começou em 08/10/2026, o primeiro dataset entrou no repositório em 13/10/2026 e as hipóteses acima só foram escritas e versionadas em **20/10/2026**, com os resultados já disponíveis ao grupo. Elas são, portanto, **reconstruídas**, não pré-registradas, e o leitor deve tratá-las como tal.
+O protocolo correto registra as hipóteses **antes** da coleta, e aqui isso não aconteceu: o Lab03 começou em 08/10/2026, o primeiro dataset entrou em 13/10/2026 e as hipóteses acima foram escritas em **20/10/2026**, com os resultados já disponíveis. Elas são **reconstruídas**, não pré-registradas.
 
-Para que a reconstrução não seja só uma racionalização do que foi encontrado, cada hipótese declara de onde veio a expectativa, e nenhuma foi derivada dos resultados. O leitor pode auditar isso pelo saldo: **cinco das sete foram refutadas** pelos dados (seção 4). Hipóteses escritas depois de ver o resultado tendem a acertar; estas, na maioria, erram — inclusive em direções que custaram retrabalho ao grupo, como a H05, que motivou a análise da seção 3.10.3.
-
-Isso está registrado também na seção 5 (ameaças à validade), como limitação de conclusão.
+Para que a reconstrução não seja racionalização do que foi encontrado, cada hipótese declara a origem da expectativa, e nenhuma foi derivada dos resultados. O leitor audita isso pelo saldo: **cinco das sete foram refutadas** (seção 4). Hipóteses escritas depois do resultado tendem a acertar; estas, na maioria, erram. A seção 5.4 trata disso como ameaça aberta.
 
 ## 1.6 Contribuições
 
-1. Um **dataset público de 900 repositórios** (três amostras independentes de 300) com as quatro métricas DORA e suas variantes, mais os eventos brutos (releases, commits por release, workflow runs) que permitem recalcular tudo.
-2. Uma **avaliação de validade das medidas** segundo os seis critérios da IEEE 1061, e não só o cálculo das métricas: correlação, rastreamento, consistência, previsibilidade, poder discriminante e confiabilidade.
-3. A demonstração de que o **CFR na variante (b) mede cadência de publicação, não falha** — a correlação com a frequência de deploy desaparece ao condicionar pela oportunidade de observar uma release corretiva (seção 3.10.3).
-4. A evidência de que as **faixas DORA não têm poder discriminante** nesta população e a proposta de um **índice contínuo** que preserva a informação que o corte em faixas descarta (seções 3.10.4 e 3.10.7).
-5. Um **ajuste de distribuições** às métricas (Poisson, binomial negativa, Weibull, normal) que mostra por que a média e o desvio-padrão não devem ser usados aqui, e a verificação empírica de que o Teorema do Limite Central precisa de n ≈ 300, não de n = 30, para estes dados (seção 3.10.5).
+1. **Dataset público de 900 repositórios** (três amostras independentes de 300) com as quatro métricas DORA, suas variantes e os eventos brutos que permitem recalcular tudo.
+2. **Avaliação de validade das medidas** segundo os seis critérios da IEEE 1061, e não apenas o cálculo das métricas.
+3. A demonstração, por duas vias independentes, de que **o CFR na variante (b) não mede falha**: a heurística reprova contra o gabarito humano (F1 = 0,478, precisão 36,5%) e a correlação com a frequência de deploy desaparece ao condicionar pela oportunidade de observação (seções 2.7 e 3.10.3).
+4. A evidência de que as **faixas DORA não têm poder discriminante** nesta população, e um **índice contínuo** que preserva a informação descartada pelo corte em faixas (seções 3.10.4 e 3.10.7).
+5. Um **ajuste de distribuições** que mostra por que média e desvio-padrão não se aplicam aqui, incluindo a verificação de que o Teorema do Limite Central precisa de n ≈ 300, não de n = 30 (seção 3.10.5).
 
 ## 1.7 Organização
 
-A seção 2 descreve a metodologia: fonte de dados, janela, seleção, definições operacionais e validação manual. A seção 3 apresenta os resultados das sete RQs e as análises adicionais de validade. A seção 4 confronta as hipóteses acima com o que os dados mostraram. A seção 5 discute as ameaças à validade segundo as quatro categorias de Cook e Campbell. A seção 6 descreve o pacote de replicação.
+Seção 2: metodologia e validação manual. Seção 3: resultados das RQs e análises de validade. Seção 4: hipóteses contra resultados. Seção 5: ameaças à validade. Seção 6: pacote de replicação.
 
 ---
 
@@ -144,14 +140,7 @@ Métricas por repositório:
     - **v2 patch + poucos commits:** v0 **e** a release tem no máximo 3 commits.
     - **v3 combinada:** v0 **ou** v1 **ou** o nome da tag contém `hotfix`/`patch`.
 
-    | Versão | Mediana do CFR (b) | IQR | Releases marcadas corretivas |
-    | :--- | :---: | :---: | :---: |
-    | v0 (semver) | 25,0% | 5,2% – 56,5% | 8.186 |
-    | v1 (mensagens) | 0,0% | 0,0% – 12,6% | 1.479 |
-    | v2 (patch + poucos commits) | 2,4% | 0,0% – 21,6% | 1.903 |
-    | v3 (combinada) | 25,0% | 6,0% – 57,2% | 8.597 |
-
-    A v0 sozinha já marca um quarto das releases como corretivas, bem acima do CFR (a) (mediana 2,6%, seção 3.1); a v1, baseada só na mensagem do commit, é bem mais conservadora. A escolha da versão final foi decidida contra o gabarito humano na seção 2.7: nenhuma das quatro atinge o F1 mínimo, e a v0 foi mantida como referência.
+    As quatro divergem muito entre si — a v0 marca 8.186 releases como corretivas, a v1 apenas 1.479 — o que por si só já indicava que a validação contra julgamento humano era necessária. A escolha final foi decidida na seção 2.7: **nenhuma atinge o F1 mínimo**, e a v0 foi mantida como referência.
 - **Tempo de recuperação (RQ 04):** os runs são agrupados por workflow e ordenados por `run_started_at`.
   - Um episódio começa na primeira falha depois de um sucesso e termina no sucesso seguinte, com duração `updated_at(sucesso) − run_started_at(1ª falha)`. O valor do repositório é a mediana dos episódios fechados, em horas.
   - Episódios sem sucesso até o fim da janela são **censurados**: não entram na mediana, mas são contados, e a proporção é reportada por repositório.
@@ -192,32 +181,28 @@ A amostra final tem **300 repositórios** em 27 linguagens. As mais frequentes s
 | Repositórios com lead time de release omitido (mais de 300 releases na janela) | 7 |
 | Episódios de falha de CI censurados (sem recuperação até o fim da janela) | 139 de 20.077, em 74 repositórios |
 
-**Caracterização e viés de seleção.** A Tabela 3 e os arquivos `analise/saida/caracterizacao/caracterizacao_numerica.csv` e `caracterizacao_linguagens.csv` descrevem a A1 e a amostra acumulada A1+A2. Na A1, estrelas têm mediana 9.484,5 (IQR 2.858,5–28.636), idade 5,79 anos (1,96–10,89) e contribuidores 142 (50,25–335). Em A1+A2 (600 repositórios), as medianas são 9.500 estrelas (2.878,75–29.144,5), 6,24 anos (2,43–10,17) e 150 contribuidores (52–343). A A1 distribui-se por 27 linguagens; TypeScript (61), Python (55), Go (49), Rust (28), C++ (20) e JavaScript (19) são as seis mais comuns. As tabelas listam as oito mais frequentes e agrupam as restantes em “Outras”.
+**Caracterização e viés de seleção.** A Tabela 3 resume os metadados da A1 e da amostra acumulada A1+A2; o detalhamento por linguagem está em `analise/saida/caracterizacao/`.
 
-**Tabela 3 — Caracterização dos metadados das amostras.** Valores contínuos apresentados como mediana (Q1–Q3).
+**Tabela 3 — Metadados das amostras.** Mediana (Q1–Q3).
 
 | Amostra | Repositórios | Estrelas | Idade (anos) | Contribuidores |
 | :--- | ---: | :--- | :--- | :--- |
 | A1 | 300 | 9.484,5 (2.858,5–28.636) | 5,79 (1,96–10,89) | 142 (50,25–335) |
 | A1+A2 | 600 | 9.500 (2.878,75–29.144,5) | 6,24 (2,43–10,17) | 150 (52–343) |
 
-Na A1, as oito linguagens mais frequentes são TypeScript (61), Python (55), Go (49), Rust (28), C++ (20), JavaScript (19), Java (9) e C (9); as demais somam 50 repositórios. Na A1+A2, são TypeScript (134), Python (107), Go (86), Rust (61), JavaScript (37), C++ (35), C (19) e Java (17); as demais somam 104.
+O viés de seleção foi medido comparando os aceitos com cada etapa de descarte, por Mann-Whitney e delta de Cliff para estrelas e idade, qui-quadrado para linguagem, com correção de Holm. **Os aceitos têm mais estrelas que os descartados** (9.484,5 contra 2.969,5; δ = 0,292, efeito pequeno; p < 0,001) e são ligeiramente mais jovens (5,79 contra 7,88 anos; δ = −0,116, desprezível; p = 0,016), e a distribuição de linguagens difere (p < 0,001). O filtro de Actions é o mais seletivo (δ de estrelas = 0,357); o de releases associa-se a estrelas, idade e linguagem (p ≤ 0,001); o de runs mostra diferenças menores mas detectáveis (p ≤ 0,017). A amostra caracteriza, portanto, **projetos populares, ativos e que publicam releases com frequência** — não o ecossistema open-source em geral.
 
-Para medir viés de seleção, comparamos os aceitos com cada etapa de descarte e com todos os descartados, usando Mann–Whitney e delta de Cliff para estrelas e idade, qui-quadrado para linguagem (oito categorias mais “Outras”) e correção de Holm sobre os testes. No conjunto, os aceitos têm mais estrelas que os descartados (medianas 9.484,5 e 2.969,5; δ = 0,292, efeito pequeno; p ajustado < 0,001) e são ligeiramente mais jovens (5,79 e 7,88 anos; δ = −0,116, efeito desprezível; p ajustado = 0,016). A distribuição de linguagens também difere (p ajustado < 0,001). A diferença é particularmente marcada entre quem passou e quem não passou o filtro de Actions: as linguagens diferem (p ajustado < 0,001; δ de estrelas = 0,357). O corte de releases também está associado a estrelas, idade e linguagem (todos p ajustados ≤ 0,001); o corte de runs apresenta diferenças menores, mas ainda detectáveis (p ajustados ≤ 0,017). Portanto, a amostra caracteriza especificamente projetos populares, ativos e que publicam releases com frequência, não todos os repositórios open-source.
-
-Como teste de sanidade da ordem aleatória de avaliação, comparamos os 1.108 candidatos avaliados (aceitos e descartados) com os 7.349 não avaliados. Não houve diferenças detectáveis após Holm em estrelas (δ = 0,017; p ajustado = 1), idade (δ = 0,015; p ajustado = 1) ou linguagem (p ajustado = 1). A comparação independente A1 × A2 também não encontrou diferenças nos metadados: estrelas (δ = −0,019), idade (δ = 0,014) e linguagem (p ajustado = 1 em cada teste). Esses resultados dão suporte à reprodutibilidade da amostragem, mas não removem o viés imposto pelos critérios de inclusão.
+Dois testes de sanidade não encontraram diferença: os 1.108 candidatos avaliados contra os 7.349 não avaliados (δ ≤ 0,017; p = 1 em estrelas, idade e linguagem) e a A1 contra a A2 (δ ≤ 0,019; p = 1). A ordem de avaliação e a composição das duas amostras, portanto, não introduzem viés adicional — o que não remove o viés dos critérios de inclusão, tratado na seção 5.3.
 
 ![Distribuições de estrelas e idade entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicoes_estrelas_idade.png)
 
-**Como ler.** Cada curva é a proporção acumulada de repositórios por estrelas (painel esquerdo) ou idade (direito), separada entre a amostra aceita e cada etapa de descarte; deslocamentos horizontais indicam diferenças de distribuição. Os eixos horizontais usam escala logarítmica e a legenda informa o tamanho de cada grupo.
+**Como ler.** Proporção acumulada de repositórios por estrelas (esquerda) e idade (direita), separada entre a amostra aceita e cada etapa de descarte. Deslocamento horizontal indica diferença de distribuição; eixos em escala logarítmica, com o `n` de cada grupo na legenda.
 
 ![Distribuição de linguagens entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicao_linguagens.png)
 
-**Como ler.** Cada barra representa um grupo do funil e soma 100%; as cores mostram as oito linguagens mais frequentes entre os aceitos e a categoria “Outras”. A figura evidencia diferenças de composição, mas a inferência estatística correspondente está na tabela de viés de seleção.
+**Como ler.** Cada barra é um grupo do funil e soma 100%, com as oito linguagens mais frequentes entre os aceitos e a categoria "Outras". A inferência correspondente está no parágrafo acima.
 
-Os testes, medianas e tamanhos de efeito podem ser regenerados sem acesso à API executando `python -m analise.caracterizacao` de dentro de `lab-expe-03`; a execução completa também é incluída em `python -m analise`.
-
-**Ameaça à validade externa — viés de seleção.** As conclusões não devem ser generalizadas a todo o ecossistema open-source: os critérios de ≥ 1.000 estrelas, uso de Actions, pelo menos cinco releases e 50 execuções válidas selecionam projetos populares, com CI e cadência de publicação formal. A comparação mostra diferenças de popularidade, idade e linguagem em relação aos descartados. A semelhança entre avaliados e não avaliados e entre A1 e A2 reduz a preocupação com a ordem aleatória e a composição das duas amostras, mas não elimina o viés dos filtros nem representa projetos corporativos ou repositórios com distribuição contínua sem releases.
+Tudo isso se regenera sem acesso à API com `python -m analise.caracterizacao`.
 
 ## 2.7 Validação manual (amostra-ouro)
 
@@ -258,31 +243,26 @@ Por isso **a v0 foi mantida como definição de referência**: trocá-la pela v3
 
 ---
 
-# 3. Resultados (esboço v2)
+# 3. Resultados
 
-> Esboço da issue #151 para discutirmos em grupo. As análises finais de cada RQ ficam nas issues #140, #141, #142 e #158.
->
-> - **Dados:** amostra 1 (A1, 300 repositórios, `data/dataset_dora.csv`) e amostra 2 (A2, 300 repositórios novos, `data/amostra2/dataset_dora.csv`). A A2 usa a mesma janela e os mesmos filtros, outra semente, e exclui os repositórios da A1.
-> - **Todo resultado aparece em paralelo: 300 (A1) × 600 (A1 + A2).** A comparação formal entre as duas amostras está na seção 3.10.1.
-> - **Como regenerar:** `python -m analise`, de dentro de `lab-expe-03`. As figuras de 300 ficam em `analise/saida/figuras/`, as de 600 em `analise/saida/600/figuras/` e as de comparação em `analise/saida/comparacao/figuras/`.
-> - O CFR (b) usa a heurística v0 de release corretiva. Ela foi validada contra o gabarito humano (seção 2.7) e **reprovada**: F1 = 0,478, precisão de 36,5%. Foi mantida por ser a melhor disponível sem recoletar, e todo resultado marcado **[NÃO VALIDADO]** deve ser lido com essa ressalva.
+Todas as métricas são resumidas por **mediana e IQR** (1º–3º quartil), como pede o enunciado e como a seção 3.10.5 demonstra ser necessário. Os resultados aparecem no escopo pedido (300 repositórios da amostra 1) e na amostra estendida, para mostrar que não dependem do sorteio.
 
-Seguindo o enunciado, todas as métricas são resumidas por **mediana e IQR** (1º–3º quartil).
+O CFR (b) usa a heurística v0 de release corretiva, **reprovada na validação contra o gabarito humano** (F1 = 0,478, precisão 36,5%; seção 2.7). Foi mantida por ser a melhor disponível sem recoletar, e todo resultado marcado **[NÃO VALIDADO]** deve ser lido com essa ressalva.
 
-**Tabela 3 — Resumo das métricas, 300 × 600** (`analise/saida/comparacao/tabelas/estimativas_300_600.csv`).
+**Tabela 3 — Resumo das métricas.** Mediana [IQR].
 
-| Métrica | n (300 / 600) | Mediana 300 [IQR] | Mediana 600 [IQR] |
+| Métrica | n (300 / 900) | 300 | 900 |
 | :--- | :--- | :--- | :--- |
-| Frequência de deploy (releases/semana) | 300 / 600 | 0,35 [0,19 – 0,81] | 0,34 [0,19 – 0,84] |
-| Lead time (a), por release (dias) | 293 / 582 | 13,2 [3,1 – 37,3] | 12,9 [3,5 – 37,8] |
-| Lead time (b), por commit (dias) | 293 / 582 | 8,8 [2,8 – 29,4] | 9,4 [2,8 – 27,3] |
-| CFR (a), proxy de CI | 300 / 600 | 5,6% [2,2% – 11,2%] | 5,0% [2,1% – 10,8%] |
-| CFR (b), proxy de entrega [NÃO VALIDADO] | 300 / 600 | 25,0% [5,2% – 56,5%] | 23,8% [5,2% – 50,0%] |
-| Tempo de recuperação (horas) | 278 / 554 | 2,8 [0,9 – 11,9] | 3,0 [1,0 – 14,9] |
+| Frequência de deploy (releases/semana) | 300 / 900 | 0,35 [0,19 – 0,81] | 0,35 [0,19 – 0,84] |
+| Lead time (a), por release (dias) | 293 / 873 | 13,2 [3,1 – 37,3] | 12,0 [3,0 – 37,4] |
+| Lead time (b), por commit (dias) | 293 / 873 | 8,8 [2,8 – 29,4] | 9,0 [2,5 – 28,1] |
+| CFR (a), proxy de CI | 300 / 900 | 5,6% [2,2% – 11,2%] | 5,3% [2,2% – 11,2%] |
+| CFR (b), proxy de entrega [NÃO VALIDADO] | 300 / 900 | 25,0% [5,2% – 56,5%] | 25,0% [6,2% – 50,3%] |
+| Tempo de recuperação (horas) | 278 / 834 | 2,8 [0,9 – 11,9] | 3,1 [0,9 – 17,3] |
 
-Ficam sem lead time os repositórios com mais de 300 releases na janela, porque o cálculo foi omitido para preservar a cota da API (coluna `lt_release_omitido`): 7 na A1 e 18 no total. Ficam sem tempo de recuperação os que não tiveram nenhum episódio de falha fechado na janela: 22 na A1 e 46 no total.
+Ficam sem lead time os repositórios com mais de 300 releases na janela, cujo cálculo foi omitido para preservar a cota da API (7 na A1, 27 no total). Ficam sem tempo de recuperação os que não tiveram nenhum episódio de falha fechado (22 na A1, 66 no total).
 
-**Leitura geral:** com o dobro de repositórios, **todas as medianas ficam praticamente no mesmo lugar** e dentro do intervalo de confiança da amostra 1. O detalhe está na seção 3.10.1.
+**Leitura geral:** ao triplicar a amostra, **todas as medianas ficam praticamente no mesmo lugar**, dentro do intervalo de confiança do escopo de 300. O detalhe está na seção 3.10.1. As figuras se regeneram com `python -m analise`.
 
 ---
 
@@ -422,29 +402,24 @@ Para a discussão: o resultado com o proxy de CI é coerente com a afirmação d
 | Contribuidores | ≤ 48 → > 338 | 4,7 → 18,5 dias | sem efeito | 37% → 18% |
 | Estrelas | quartis | 6,1 → 18,4 dias | sem efeito | sem efeito |
 
-- **A idade é o fator com maior efeito**, e isso se mantém com 600: ε² de 0,25 → 0,21 no lead time (a), efeito grande. Repositórios com até 2 anos publicam com mais frequência e mais rápido, com lead time mediano de 2 dias contra 28,5 nos mais antigos. Também têm mais releases corretivas.
-- **Equipes maiores têm lead time maior**, também nas duas: ε² de 0,11–0,14 com 300 e 0,08–0,11 com 600, efeito médio.
-- **O que muda com 600: a linguagem passa a ser significativa.**
-  - Com 300 ela não tinha efeito após Holm. Com 600 aparece no lead time (ε² = 0,10, efeito médio), na frequência e no CFR (b).
-  - Lead time (a) mediano por linguagem: TypeScript 7,1 dias, JavaScript 8,9, Python 11,5, Rust 14,1, Go 16,7, Java 22,9, C 35,3, C++ 60,6.
-  - É o exemplo clássico de **poder estatístico**: o efeito existia, mas 300 repositórios divididos em 6 grupos não bastavam para detectá-lo depois da correção.
-- **O CFR (a) não se associa a nenhum fator** nas duas versões. Com 600, a idade passa a ter um efeito pequeno no tempo de recuperação (ε² = 0,03).
+- **A idade é o fator de maior efeito**, e isso se mantém com a amostra maior (ε² 0,25 → 0,21 no lead time, efeito grande). Repositórios de até 2 anos publicam mais rápido e com mais frequência: lead time mediano de 2 dias contra 28,5 nos mais antigos.
+- **Equipes maiores têm lead time maior** (ε² 0,08–0,14, efeito médio).
+- **A linguagem só fica significativa com 600.** Com 300 não sobrevivia a Holm; com 600 aparece no lead time (ε² = 0,10), na frequência e no CFR (b). Lead time mediano: TypeScript 7,1 dias, JavaScript 8,9, Python 11,5, Rust 14,1, Go 16,7, Java 22,9, C 35,3, C++ 60,6. É exemplo clássico de **poder estatístico** — o efeito existia, mas 300 repositórios em 6 grupos não bastavam para detectá-lo após a correção.
+- **O CFR (a) não se associa a nenhum fator.**
 
-Para a discussão: idade, contribuidores, estrelas e linguagem são correlacionados entre si. Projetos em C/C++ tendem a ser mais antigos, e projetos antigos tendem a ser maiores e mais populares. O Kruskal-Wallis univariado não separa esses efeitos: **a #141 testa cada fator controlando os demais**. Uma hipótese é que projetos jovens estejam em fase de iteração rápida, com muitas releases de *patch*.
-
-### Robustez (issue #141): o efeito se mantém controlando os demais fatores?
+### O efeito se mantém controlando os demais fatores?
 
 ![RQ06, robustez](../analise/saida/figuras/fig16_rq06_robustez.png)
 
-A correlação entre os três fatores contínuos é moderada: estrelas × contribuidores ρ = 0,59, contribuidores × idade ρ = 0,44, estrelas × idade ρ = 0,07 (com 600). O VIF de cada preditor na regressão fica entre 1,2 e 1,9, abaixo do corte de 5 — a multicolinearidade não impede separar os efeitos.
+Idade, contribuidores, estrelas e linguagem são correlacionados entre si — projetos em C/C++ tendem a ser mais antigos, e projetos antigos tendem a ser maiores. O Kruskal-Wallis univariado não separa esses efeitos, então cada fator foi testado controlando os demais.
 
-A correlação parcial de Spearman, controlando os outros dois fatores contínuos, confirma a leitura da idade e reduz a dos contribuidores:
+A correlação entre os fatores contínuos é moderada (estrelas × contribuidores ρ = 0,59; contribuidores × idade ρ = 0,44; estrelas × idade ρ = 0,07) e o VIF fica entre 1,2 e 1,9, abaixo do corte de 5: a multicolinearidade não impede a separação.
 
-- **Idade** continua associada a quase todas as métricas depois de controlar contribuidores e estrelas, com 600: ρ parcial = 0,34 no lead time (a), −0,39 na frequência, −0,34 no CFR (b), todas com p ajustado < 0,001. Na regressão log-log, o coeficiente padronizado da idade no lead time (a) é 0,52 (IC 95% [0,38; 0,65]), o maior dos três fatores.
-- **Contribuidores** perde a associação com o lead time (a) depois de controlar idade e estrelas: a correlação parcial cai para ρ = 0,10 (p ajustado = 0,17, não significativo), e o coeficiente padronizado da regressão (0,21, IC [0,05; 0,37]) é menos da metade do da idade. A associação com a frequência se mantém (ρ parcial = 0,21, p ajustado < 0,001).
-- **Estrelas** não tem associação parcial significativa com nenhuma métrica, em nenhuma das duas amostras.
+- **Idade** resiste ao controle: ρ parcial = 0,34 no lead time (a), −0,39 na frequência, −0,34 no CFR (b), todas com p ajustado < 0,001. Na regressão log-log é o maior coeficiente padronizado (0,52; IC 95% [0,38; 0,65]).
+- **Contribuidores** perde a associação com o lead time ao controlar idade e estrelas: ρ parcial cai para 0,10 (p = 0,17, n.s.). A associação com a frequência se mantém (ρ parcial = 0,21).
+- **Estrelas** não tem associação parcial significativa com nenhuma métrica.
 
-A leitura muda em relação à seção 3.7: parte do efeito de "equipes maiores" que o Kruskal-Wallis univariado atribuía aos contribuidores parece, na verdade, efeito da idade. Repositórios mais antigos acumulam contribuidores e, ao mesmo tempo, têm lead time maior, por uma razão que não é só o tamanho da equipe. É uma associação, não uma relação causal — outras variáveis não medidas (maturidade do processo de release, dívida técnica acumulada) podem explicar a idade.
+**A leitura muda:** parte do efeito de "equipes maiores" que o teste univariado atribuía aos contribuidores é, na verdade, efeito da idade. Repositórios antigos acumulam contribuidores e têm lead time maior por razões que não se reduzem ao tamanho da equipe. É associação, não causalidade — maturidade do processo de release e dívida técnica são explicações não medidas.
 
 ## 3.8 RQ 07 — Sensibilidade à definição operacional
 
@@ -480,36 +455,33 @@ Para a discussão: a classificação DORA de um repositório **não é robusta �
 
 ## 3.9 RQ 08 (bônus) — Evolução temporal
 
-> A outra opção do bônus, a rework rate, fica para a #142. Esta seção responde à RQ08 pela opção de evolução temporal (issue #158): os repositórios melhoram ou pioram nas métricas DORA ao longo dos 12 meses da janela?
+Os repositórios melhoram ou pioram nas métricas DORA ao longo dos 12 meses da janela?
 
-**Armadilha estatística, decidida antes de olhar o resultado.** O enunciado sugere métricas por trimestre com o teste de Mann-Kendall. Com só 4 pontos por série, esse teste nunca alcança p < 0,05, mesmo com a série perfeitamente monótona (o menor p bilateral possível com n = 4 é ≈ 0,089). Por isso a análise principal usa a **série mensal** (12 pontos), em que o teste tem poder de verdade; o recorte trimestral fica só como leitura visual na Figura 18 (linhas verticais), sem teste de hipótese.
+**Armadilha estatística, resolvida antes do resultado.** O enunciado sugere séries trimestrais com Mann-Kendall. Com 4 pontos, esse teste nunca alcança p < 0,05 — o menor p bilateral possível com n = 4 é ≈ 0,089, qualquer que seja a série. A análise principal usa a **série mensal** (12 pontos), onde o teste tem poder; o recorte trimestral fica como leitura visual na Figura 18.
 
 ![RQ08, tendência](../analise/saida/figuras/fig17_rq08_tendencia_600.png)
 
 ![RQ08, trajetória](../analise/saida/figuras/fig18_rq08_trajetoria_600.png)
 
-**Como ler.**
-- Mann-Kendall por repositório e por métrica, mês a mês, mínimo de 8 dos 12 meses com dado (senão "dados insuficientes"). "Melhora" e "piora" dependem da métrica: frequência melhora subindo; lead time, CFR e recuperação melhoram descendo.
-- São ~250 a 600 testes por métrica (repositórios com menos de 8 meses de dado ficam fora): correção de **Benjamini-Hochberg (FDR)**, reportada ao lado do Holm nas tabelas. Com tantos testes simultâneos, o Holm fica conservador demais; o FDR é o resultado principal.
-- A Figura 18 mostra a mediana entre repositórios a cada mês, com a faixa entre Q1 e Q3 sombreada.
+**Como ler.** Mann-Kendall por repositório e métrica, mês a mês, exigindo ao menos 8 dos 12 meses com dado. São 250 a 600 testes por métrica, corrigidos por **Benjamini-Hochberg (FDR)** — com tantos testes simultâneos o Holm fica conservador demais. A Figura 18 traz a mediana mensal entre repositórios, com a faixa Q1–Q3 sombreada.
 
-**Resultado, com 600 (A1 + A2).**
+**Resultado, com 600 repositórios.**
 
-| Métrica | % com p bruto < 0,05 | % significativo após FDR | % "dados insuficientes" |
+| Métrica | p bruto < 0,05 | Significativo após FDR | Dados insuficientes |
 | :--- | :---: | :---: | :---: |
 | Frequência | 16,8% | 0% | 0% |
 | Lead time (a) | 16,7% | 0% | 50,2% |
-| CFR (a) | 13,2% | 0,17% (1 repositório, piora) | 19,2% |
+| CFR (a) | 13,2% | 0,17% (1 repo, piora) | 19,2% |
 | Recuperação | 16,5% | 0% | 59,7% |
 
-- **O teste bruto, sem correção, "encontra" tendência em 13% a 17% dos repositórios em todas as métricas** — bem mais que os 5% esperados por acaso num teste isolado, o que sugere que há, sim, alguma oscilação mensal real nas séries.
-- **Depois da correção por FDR, quase nada sobrevive**: só 1 dos 600 repositórios mantém uma tendência significativa (CFR a, piora). Com 250 a 600 testes simultâneos por métrica, o FDR exige um p bruto bem menor que 0,05 pra sobreviver (o menor p-valor FDR observado foi 0,033, só na CFR). É o retrato didático de por que a correção de múltiplos testes importa: a aparência de 1 em cada 6 repositórios "mudando" vira ruído estatístico quase por completo quando se testa centenas deles ao mesmo tempo.
-- **"Dados insuficientes" é alto em lead time e recuperação** (50% e 60%) porque nem todo repositório publica release ou tem episódio de falha em pelo menos 8 dos 12 meses — frequência nunca é "insuficiente" porque zero releases no mês é um valor válido (zero), não um dado faltante.
-- **A Figura 18 mostra um salto na mediana de frequência no último mês da janela** (de ≈ 0,23 para ≈ 0,47 release/semana). Não há teste de hipótese que sustente isso como tendência (o Mann-Kendall olha a série inteira, não só a ponta), e o padrão é compatível com um viés de seleção: o critério de inclusão (seção 3.2) exige atividade mínima dentro da janela, o que tende a favorecer repositórios com releases recentes bem próximas do fim da coleta. Fica registrado como limitação, não como achado de tendência.
+O teste bruto "encontra" tendência em 13% a 17% dos repositórios — bem acima dos 5% esperados por acaso, o que sugere oscilação mensal real. **Após o FDR, só 1 dos 600 sobrevive.** É o retrato didático de por que a correção de múltiplos testes importa: a aparência de 1 em cada 6 repositórios mudando vira quase inteiramente ruído quando se testa centenas ao mesmo tempo.
 
-Para a discussão: o resultado da RQ08 não aponta melhora nem piora sistemática nas métricas DORA ao longo do ano, na amostra estudada. A conclusão mais defensável é metodológica, não substantiva: com 12 meses e centenas de repositórios testados ao mesmo tempo, a correção de múltiplos testes consome quase todo o poder estatístico disponível para detectar tendência individual por repositório. Uma análise de tendência agregada (por exemplo, a mediana por mês ao longo da amostra inteira, sem testar repositório por repositório) teria mais poder, mas também mistura tendência real com mudança de composição da amostra ao longo do tempo — e não foi o que esta issue pediu.
+Os "dados insuficientes" altos em lead time e recuperação (50% e 60%) vêm de repositórios que não publicam release nem têm falha em 8 dos 12 meses. Frequência nunca é insuficiente porque zero release no mês é um valor válido, não um dado faltante.
 
----
+A Figura 18 mostra um salto na mediana de frequência no último mês (≈ 0,23 → ≈ 0,47 release/semana). Nenhum teste sustenta isso como tendência, e o padrão é compatível com viés de seleção: o critério de inclusão favorece repositórios com releases próximas do fim da coleta. Fica como limitação, não como achado.
+
+Para a discussão: **não há melhora nem piora sistemática** ao longo do ano. A conclusão defensável é metodológica — com 12 meses e centenas de repositórios, a correção de múltiplos testes consome quase todo o poder disponível para detectar tendência individual.
+
 ---
 
 ## 3.10 Análises complementares (além do escopo pedido)
@@ -643,149 +615,81 @@ Isso recontextualiza a RQ03 inteira. A divergência entre o CFR (a) e o CFR (b) 
 
 ### DORA e fluxo por PR são constructos distintos
 
-Esta foi a maior surpresa. A expectativa implícita em boa parte da literatura é que medidas de desempenho de entrega convirjam — que um time "rápido" apareça rápido em qualquer lente. Não é o que acontece.
+A expectativa implícita em boa parte da literatura é que medidas de desempenho convirjam — que um time "rápido" apareça rápido em qualquer lente. Não acontece. O par mais direto, lead time por release contra lead time por PR, compartilha **10% da variância** (ρ = 0,319, n = 574), e o CFR por release contra a taxa de aceitação de PR não tem associação alguma (ρ = 0,044, p = 0,288 após Holm).
 
-O par mais direto, lead time medido por release contra lead time medido por PR, compartilha **10% da variância** (ρ = 0,319, n = 574). E o CFR por release contra a taxa de aceitação de PR não tem associação alguma (ρ = 0,044, p = 0,288 após Holm, n = 597), apesar de ambos pretenderem falar sobre qualidade.
-
-A consequência é direta e incômoda: **o DORA não é *a* medida de desempenho de engenharia, é *uma* medida**, e uma lente igualmente legítima — a do fluxo de trabalho por pull request, nos padrões CHAOSS e SPACE — ordena os mesmos 900 repositórios de maneira substancialmente diferente. Um repositório bem classificado pela cadência de release pode ser lento na revisão de código, e vice-versa.
+A consequência é incômoda: **o DORA não é *a* medida de desempenho de engenharia, é *uma* medida.** Uma lente igualmente legítima — o fluxo por pull request, nos padrões CHAOSS e SPACE — ordena os mesmos repositórios de maneira substancialmente diferente.
 
 ### A recuperação não tem taxa constante
 
-A métrica de tempo de recuperação do DORA é reportada como mediana, o que implicitamente trata todos os episódios de falha como equivalentes. O ajuste de uma Weibull aos episódios mostra que não são: o parâmetro de forma tem mediana 0,557, com β < 1 em 90,3% dos repositórios.
-
-Isso significa **taxa de recuperação decrescente** — quanto mais tempo um episódio de falha já dura, menor a probabilidade de ele terminar no instante seguinte. Falhas curtas se resolvem rápido; o episódio que se arrasta tende a se arrastar muito mais. Duas populações com o mesmo MTTR mediano podem ter dinâmicas opostas, e a mediana não distingue.
+A métrica de recuperação é reportada como mediana, o que trata todos os episódios como equivalentes. O ajuste de Weibull mostra que não são: forma mediana β = 0,557, com β < 1 em **87,8%** dos repositórios. Isso é **taxa de recuperação decrescente** — quanto mais tempo um episódio dura, menor a chance de terminar no instante seguinte. Falhas curtas se resolvem rápido; o episódio que se arrasta tende a se arrastar muito mais. Duas populações com o mesmo MTTR mediano podem ter dinâmicas opostas, e a mediana não distingue.
 
 ### A regra "n ≥ 30" não vale aqui
 
-Com a população tendo assimetria 8,26, a distribuição amostral da média ainda tem assimetria 1,53 em n = 30, e só se aproxima da normal perto de n = 300. A consequência prática recai sobre a RQ06: os testes por subgrupo — quartis de estrelas, linguagens com poucos repositórios — operam exatamente na faixa onde a aproximação não vale, o que reforça o uso de testes não paramétricos e a obrigação de reportar tamanho de efeito junto do p-valor.
+Com assimetria populacional de 8,26, a distribuição amostral da média ainda tem assimetria 1,53 em n = 30, e só se aproxima da normal perto de n = 300. A consequência recai sobre a RQ06: os testes por subgrupo operam exatamente onde a aproximação não vale, o que reforça os testes não paramétricos e o relato obrigatório de tamanho de efeito.
 
-## 4.3 O que o tamanho da amostra mudou, e o que não mudou
+## 4.3 O que o tamanho da amostra mudou
 
-Triplicar a amostra de 300 para 900 **não alterou nenhuma conclusão qualitativa** das RQ01 a RQ05 nem da RQ07. Todas as medianas de 600 e de 900 caíram dentro do intervalo de confiança de 300, e os intervalos estreitaram de 21% a 51%.
+Triplicar de 300 para 900 **não alterou nenhuma conclusão qualitativa** das RQ01–RQ05 nem da RQ07: todas as medianas caíram dentro do IC de 300 e os intervalos estreitaram de 21% a 51%. A exceção é a RQ06, onde a linguagem passa a ter efeito significativo — ganho de poder, não mudança de fenômeno.
 
-A exceção é a RQ06: com 600 repositórios, a linguagem passa a apresentar efeito significativo que em 300 estava abaixo do limiar de detecção. Isso não é a métrica mudando de comportamento, é o teste ganhando poder — e é a razão de reportar sempre o `n` e o tamanho de efeito ao lado do p-valor.
-
-Houve, porém, um resultado na direção oposta. A cobertura da API de Deployments **varia de forma detectável entre as três amostras independentes** (31,3%, 41,7% e 43,3%; qui-quadrado p = 0,0048, tendência de Cochran-Armitage p = 0,0026), e nem o perfil dos repositórios nem a linguagem explicam a diferença. O mesmo desenho amostral que confirma a robustez das métricas DORA detecta a fragilidade de uma medida auxiliar — e esse contraste é o que dá credibilidade ao primeiro resultado.
+Houve um resultado na direção oposta: a cobertura da API de Deployments **varia de forma detectável entre as três amostras** (31,3%, 41,7%, 43,3%; p = 0,0048), sem que perfil ou linguagem expliquem. O mesmo desenho que confirma a robustez das métricas DORA detecta a fragilidade de uma medida auxiliar — e é esse contraste que dá credibilidade ao primeiro resultado.
 
 ## 4.4 O que o estudo não consegue responder
 
-Duas perguntas ficam estruturalmente fora de alcance, e por uma única causa: **todo o processo de entrega é medido por proxies do próprio GitHub**, sem nenhum desfecho externo de qualidade.
+Duas perguntas ficam estruturalmente fora de alcance pela mesma causa: **todo o processo é medido por proxies do próprio GitHub**, sem desfecho externo de qualidade.
 
-**Previsibilidade.** Não é possível verificar se as métricas preveem algum resultado que interesse — incidente em produção, satisfação de usuário, custo de manutenção —, porque nenhum desses desfechos está disponível.
+**Previsibilidade.** Não há como verificar se as métricas preveem algo que interesse — incidente em produção, satisfação de usuário, custo de manutenção — porque nenhum desses desfechos existe nos dados.
 
-**Poder discriminante contra qualidade.** Pelo mesmo motivo, o máximo que se consegue avaliar é se as faixas separam repositórios em atributos observáveis, e não se separam alta de baixa qualidade. O resultado negativo da seção 3.10.4 deve ser lido com essa ressalva: ele mostra que as faixas não separam popularidade nem tamanho de equipe, o que é informativo, mas não equivale a dizer que não separam qualidade.
-
-Fechar essas lacunas exigiria dados de fora do GitHub — relatórios de incidente, pesquisas com mantenedores, dados de uso — e é a direção natural para uma extensão do estudo.
+**Poder discriminante contra qualidade.** Pelo mesmo motivo, só se avalia se as faixas separam atributos observáveis, não se separam alta de baixa qualidade. O resultado negativo da seção 3.10.4 mostra que elas não separam popularidade nem tamanho de equipe — o que é informativo, mas não equivale a dizer que não separam qualidade.
 
 ---
 
 # 5. Ameaças à validade
 
-As ameaças seguem a taxonomia de Cook & Campbell adotada por Wohlin et al. em engenharia de software. Cada uma é apoiada nos resultados da validação manual (seção 2) e das análises de sensibilidade e validade (seções 3.8 e 3.10), e é classificada entre **mitigada**, **parcialmente mitigada** e **aberta**.
+Taxonomia de Cook & Campbell, na adaptação de Wohlin et al. para engenharia de software. Cada ameaça é classificada em **mitigada**, **parcialmente mitigada** ou **aberta**, e apoiada nos resultados da validação manual (seção 2.7) e das análises de validade (seções 3.8 e 3.10).
 
-## 5.1 Validade de construto
+## 5.1 Validade de construto — *medimos o que achamos que medimos?*
 
-*Medimos o que achamos que medimos?*
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Release não é deploy** | aberta, por construção | O GitHub não registra implantação. A API de Deployments cobre só 38,8% dos 900 repositórios, com cobertura que varia entre amostras (seção 3.10.8). É a limitação mais importante do trabalho. |
+| **A heurística de release corretiva não é válida** | **aberta, agora quantificada** | Contra o gabarito humano, nenhuma das quatro versões atinge F1 = 0,70; a que gerou o dataset tem precisão de 36,5% (seção 2.7). |
+| **O CFR (b) está acoplado à cadência** | **confirmada e medida** | A suspeita foi testada: ao condicionar pela oportunidade de observação, ρ cai de 0,604 para −0,039 (p = 0,52). O CFR (b) mede, em boa parte, ritmo de publicação (seção 3.10.3). |
+| **Falha de CI não é falha em produção** | parcialmente mitigada | Os dois proxies diferem por quase cinco vezes (5,3% × 25,0%). Mitigação: reportar as duas variantes lado a lado, nunca escolher uma. |
+| **Mono-método** | parcialmente mitigada | Tudo vem da API do GitHub. Mitigação: medir os mesmos constructos por PRs e issues (CHAOSS, SPACE). Nenhum par alcança ρ = 0,7 (seção 3.10.6). |
+| **Ausência de desfecho externo** | aberta | Não há incidente em produção, satisfação de usuário nem custo de manutenção. Impede avaliar previsibilidade e restringe o poder discriminante a atributos observáveis, não a qualidade. |
 
-### Release não é deploy — **aberta, por construção**
+As duas primeiras linhas mudaram de natureza neste trabalho: eram suspeitas e passaram a ser **resultados medidos**. Isso não as mitiga — ao contrário, confirma que o CFR (b) deve ser lido como indicador de cadência, não de falha.
 
-O GitHub não registra deploy em produção. A frequência de entrega é medida por releases publicadas, e o lead time pelo intervalo entre commit e release. Um projeto que publica release sem implantar, ou que implanta continuamente sem publicar release, é medido errado por este estudo.
+## 5.2 Validade interna — *há fatores não controlados?*
 
-A tentativa de medir deploy diretamente, pela API de Deployments, esbarrou em **cobertura de 38,8% nos 900 repositórios** — e numa cobertura que varia entre amostras de forma detectável (seção 3.10.8). Por isso ela entra como subamostra de validação, não como medida principal. A ameaça permanece aberta e é a limitação mais importante do trabalho.
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Tamanho e popularidade como confusão** | **mitigada** | Testada por dois caminhos: estratificação em quartis e correlação parcial de Spearman. O ρ de 0,562 cai no máximo 0,059 na parcial, e os doze estratos mantêm o sinal (0,381–0,698). As faixas também não separam estrelas (ε² = 0,008) nem contribuidores (ε² = 0,022). |
+| **Repositórios antigos acumulam releases** | parcialmente mitigada | Idade é o único atributo independente que as faixas separam (ε² = 0,109). As métricas são normalizadas pela janela, o que limita a acumulação, e a idade entra como fator na RQ06. |
+| **Heterogeneidade da população** | documentada, não mitigável | Índice de dispersão de 493× em relação à Poisson (seção 3.10.5). Quatro faixas fixas não capturam essa estrutura. |
 
-### Falha de CI não é falha em produção — **parcialmente mitigada**
+## 5.3 Validade externa — *vale além da amostra?*
 
-O CFR (a) mede falha de pipeline. A diferença em relação ao CFR (b), que mede release seguida de corretiva, é de quase cinco vezes (5,3% contra 25,0%), o que mostra que os dois proxies não são intercambiáveis. A mitigação adotada foi reportar as duas variantes lado a lado em todas as análises, em vez de escolher uma.
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Amostra de repositórios populares** | aberta, por desenho | ≥ 1.000 estrelas, ≥ 5 releases e ≥ 50 runs. **Nada aqui se generaliza para projetos corporativos, pequenos ou sem CI/CD estabelecido.** |
+| **Sobrevivência do funil** | documentada | Dos 8.457 candidatos, poucos chegam à amostra; o filtro de releases é o mais severo. Funil e caracterização dos descartados em 2.6 e 3.10.1. |
+| **Estabilidade entre amostras** | **mitigada para as métricas DORA** | Três amostras sem repositório em comum produzem estimativas sobrepostas nas seis métricas, com ICs estreitando 21%–51% (seção 3.10.1). |
+| **…mas não para medidas auxiliares** | aberta | A cobertura da API de Deployments varia entre amostras de forma detectável (p = 0,0048) e sem causa identificada. |
+| **Janela única** | aberta | 12 meses. A RQ08 não encontrou tendência interna, mas outro período pode dar outros valores absolutos. |
 
-### O CFR (b) pode estar acoplado à cadência de publicação — **aberta**
+## 5.4 Validade de conclusão — *a estatística é adequada?*
 
-A correlação entre frequência de deploy e CFR (b) é positiva e forte (ρ = 0,562). O CFR (b) conta releases seguidas de uma corretiva em até 7 dias, e quem publica com mais frequência tem naturalmente mais chance de ter *alguma* release nessa janela. **Parte da associação pode estar embutida na definição da métrica.**
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Hipóteses reconstruídas, não pré-registradas** | **aberta** | Ver abaixo. |
+| **Múltiplas comparações** | mitigada | Holm em todas as famílias de testes; FDR na RQ08, onde apenas 1 de 600 repositórios mantém tendência após a correção. |
+| **Pressupostos de normalidade** | mitigada | Nenhuma métrica passa em Shapiro-Wilk (p entre 10⁻¹⁴ e 10⁻³³). Todos os testes são não paramétricos e as estimativas são medianas com IQR. |
+| **Poder em subgrupos** | parcialmente mitigada | O TLC só se aproxima perto de n = 300 nesta população (seção 3.10.5), e os subgrupos da RQ06 são menores. Mitigação: testes não paramétricos e relato obrigatório de tamanho de efeito. A linguagem na RQ06, que só fica significativa com 600, ilustra ganho de poder e não mudança de fenômeno. |
+| **Dados censurados** | mitigada | Episódios sem recuperação na janela e releases dos últimos 7 dias ficam fora dos denominadores, com a proporção censurada reportada. |
+| **Truncamento da paginação** | documentada | Atinge ~3% dos PRs e 8%–10% dos deployments, marcado por repositório; as medidas afetadas são lidas como limite inferior. |
 
-A verificação é possível e não foi feita: bastaria comparar o CFR (b) observado com o esperado sob publicação aleatória na mesma cadência. Fica registrado como limitação conhecida.
-
-### Mono-método — **parcialmente mitigada**
-
-Todas as métricas vêm da mesma fonte, a API do GitHub. A mitigação foi medir os mesmos constructos por caminhos independentes: releases e CI (DORA clássico) contra pull requests e issues (CHAOSS, Flow, SPACE). O resultado foi revelador — **nenhum par de medidas do mesmo constructo alcança ρ = 0,7** (seção 3.10.6), o que indica que a operacionalização escolhida determina boa parte do resultado.
-
-### Ausência de desfecho externo — **aberta**
-
-Não há nenhuma medida de qualidade independente do pipeline: nem incidente em produção, nem satisfação de usuário, nem custo de manutenção. Isso impede avaliar a **previsibilidade** das métricas e limita a avaliação do **poder discriminante** a atributos observáveis, não a qualidade de fato.
-
-## 5.2 Validade interna
-
-*Há fatores não controlados que explicam os resultados?*
-
-### Tamanho e popularidade como variável de confusão — **mitigada**
-
-Repositórios grandes têm mais releases, mais runs, mais contribuidores e mais issues ao mesmo tempo, o que é o padrão que El Emam et al. (2001) encontraram ao controlar o tamanho da classe nas métricas CK.
-
-A ameaça foi **testada por dois caminhos independentes** (seção 3.10.3): estratificação em quartis e correlação parcial de Spearman. O ρ agregado de 0,562 cai no máximo 0,059 na parcial, e os doze estratos mantêm o mesmo sinal, variando entre 0,381 e 0,698. **Verificação feita, confusão não encontrada.**
-
-Reforça o resultado o fato de as faixas DORA não separarem estrelas (ε² = 0,008) nem contribuidores (ε² = 0,022).
-
-### Repositórios antigos acumulam mais releases — **parcialmente mitigada**
-
-A idade é o único atributo independente que as faixas DORA separam (ε² = 0,109, p = 1,2 × 10⁻⁶), ainda que com efeito pequeno. Como as métricas são normalizadas pela janela de 12 meses, o efeito de acumulação histórica é limitado, mas repositórios mais maduros podem ter processos mais estabelecidos. A idade entra como fator na RQ06 e o efeito é reportado.
-
-### Heterogeneidade da população — **documentada, não mitigável**
-
-A contagem de releases tem índice de dispersão de **493×** em relação ao que a Poisson exigiria (seção 3.10.5). A população não é homogênea em ritmo de entrega, e nenhum agrupamento em quatro faixas fixas captura essa estrutura. Isso não é um defeito do estudo, mas precisa ser considerado ao interpretar qualquer média ou classificação.
-
-## 5.3 Validade externa
-
-*Os resultados valem para além da amostra?*
-
-### Amostra de repositórios populares — **aberta, por desenho**
-
-O critério de inclusão exige no mínimo 1.000 estrelas, 5 releases publicadas e 50 workflow runs válidos na janela. Isso seleciona projetos open-source maduros e visíveis. **Nada aqui se generaliza para projetos corporativos, projetos pequenos ou projetos sem CI/CD estabelecido**, e as conclusões devem ser lidas restritas a esse contexto.
-
-### Sobrevivência do funil — **documentada**
-
-Dos 8.457 candidatos da busca, apenas uma fração chega à amostra: o filtro de releases é o mais severo, eliminando a maioria. O funil completo é reportado por amostra (seções 3.10.1 e 2), e a caracterização dos descartados está na seção de viés de seleção.
-
-### Estabilidade entre amostras independentes — **mitigada para as métricas DORA**
-
-Três amostras com sementes distintas e **nenhum repositório em comum** produzem estimativas que se sobrepõem em todas as seis métricas, com os intervalos estreitando de 21% a 51% ao triplicar o n (seção 3.10.1). É evidência de que os resultados não dependem do sorteio.
-
-A mitigação **não se estende** à cobertura da API de Deployments, que varia entre as amostras de forma estatisticamente detectável e sem causa identificada (seção 3.10.8).
-
-### Janela de observação única — **aberta**
-
-Os dados cobrem 12 meses (01/10/2025 a 30/09/2026). A RQ08 não encontrou tendência sistemática dentro da janela, mas nada garante que outro período produziria os mesmos valores absolutos.
-
-## 5.4 Validade de conclusão
-
-*A análise estatística é adequada?*
-
-### Hipóteses reconstruídas, não pré-registradas — **aberta**
-
-As hipóteses informais da seção 1.4 foram escritas em 20/10/2026, depois de a coleta terminar e os resultados estarem disponíveis ao grupo (seção 1.5). Isso abre espaço para HARKing — formular a hipótese já sabendo o resultado — e para viés de confirmação na escolha de quais análises reportar.
-
-Três coisas limitam o dano, nenhuma o elimina. Primeiro, cada hipótese declara a origem da expectativa, e todas vêm do programa DORA, do texto do enunciado ou de raciocínio anterior à coleta; nenhuma foi derivada dos dados. Segundo, cinco das sete foram refutadas (seção 4.0), o que é o oposto do padrão que HARKing produz. Terceiro, as decisões analíticas que poderiam ter sido ajustadas ao resultado têm justificativa verificável sem olhar os dados — a escolha da série mensal em vez da trimestral na RQ08 (seção 3.9), por exemplo, decorre de um fato aritmético sobre o teste de Mann-Kendall (com n = 4, o menor p bilateral possível é ≈ 0,089, qualquer que seja a série), e não de preferência por um resultado.
-
-Ainda assim, a ameaça permanece aberta: não há como provar, depois do fato, que a expectativa era essa. Uma replicação deste desenho deve registrar as hipóteses antes da coleta.
-
-### Múltiplas comparações — **mitigada**
-
-Todas as famílias de testes são corrigidas por **Holm**, e a RQ08, com centenas de testes simultâneos, usa FDR. O efeito da correção é visível e foi reportado: na RQ08, apenas 1 dos 600 repositórios mantém tendência significativa após o FDR.
-
-### Pressupostos de normalidade — **mitigada**
-
-Nenhuma das cinco métricas passa em teste de normalidade (p entre 10⁻¹⁴ e 10⁻³³). Por isso **todos os testes são não paramétricos** — Spearman, Mann-Whitney, Kruskal-Wallis — e as estimativas centrais são medianas com IQR, nunca média e desvio.
-
-### Poder estatístico em subgrupos — **parcialmente mitigada**
-
-A demonstração do Teorema Central do Limite (seção 3.10.5) mostra que, nesta população, a distribuição amostral só se aproxima da normal perto de n = 300. Os testes por subgrupo da RQ06 operam com n muito menor. A mitigação é dupla: testes não paramétricos, que não dependem da aproximação, e **relato obrigatório do tamanho de efeito** (ε² e delta de Cliff) junto do p-valor.
-
-O caso da linguagem na RQ06 ilustra o ponto: o efeito só passa a ser significativo com 600 repositórios, o que é ganho de poder e não mudança de fenômeno.
-
-### Dados censurados — **mitigada**
-
-Episódios de falha que não terminam dentro da janela e releases publicadas nos últimos 7 dias ficam fora dos denominadores, e a proporção censurada é reportada por repositório em vez de ser descartada em silêncio.
-
-### Truncamento da paginação — **documentada**
-
-A coleta GraphQL tem limite por repositório. O truncamento atinge cerca de 3% dos PRs e 8% a 10% dos deployments, e é marcado por repositório, de modo que as medidas afetadas são lidas como limite inferior.
+**Sobre as hipóteses.** As da seção 1.4 foram escritas em 20/10/2026, com os resultados já disponíveis (seção 1.5). Isso abre espaço para HARKing e para viés na escolha do que reportar. Três coisas limitam o dano sem eliminá-lo: cada hipótese declara a origem da expectativa, e nenhuma foi derivada dos dados; cinco das sete foram refutadas, o oposto do padrão que HARKing produz; e as decisões analíticas sensíveis têm justificativa verificável sem olhar os dados — a série mensal da RQ08, por exemplo, decorre de um fato aritmético do teste de Mann-Kendall (com n = 4 o menor p bilateral possível é ≈ 0,089). Ainda assim não há como provar, depois do fato, qual era a expectativa. **Uma replicação deste desenho deve registrar as hipóteses antes da coleta.**
 
 ---
 
