@@ -297,7 +297,8 @@ O relatório tem formato de **artigo científico**, no [template da SBC (Overlea
 6. **Replicação cruzada:** o relato da seção 9.
 7. Link do repositório/GitHub Projects do grupo.
 
-Link do repositório/GitHub Projects: `<preencher>`
+Link do repositório: https://github.com/henriqjmelo/lab-expe-01
+Link do GitHub Projects (Lab03): https://github.com/users/guicostak/projects/3
 
 ### 9. Replicação cruzada (entrega final)
 
