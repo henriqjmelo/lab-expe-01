@@ -4,29 +4,25 @@
 
 ## 1.1 Contexto e problema
 
-As quatro métricas DORA — frequência de deploy, lead time for changes, change failure rate e tempo de recuperação — viraram o vocabulário padrão para falar de desempenho de entrega de software. Vêm do programa *DevOps Research and Assessment*, que as derivou de levantamentos com milhares de profissionais e as organizou em faixas (Elite, High, Medium, Low). Sua tese central é que velocidade e estabilidade **não** são um trade-off.
+As quatro métricas DORA — frequência de deploy, lead time for changes, change failure rate e tempo de recuperação — viraram o vocabulário padrão para falar de desempenho de entrega de software, e sua tese central é que velocidade e estabilidade não são um trade-off. Elas foram definidas, porém, para equipes que controlam o próprio pipeline de produção e sabem, por definição operacional interna, o que conta como "deploy" e o que conta como "falha em produção".
 
-Essas métricas foram definidas para equipes que controlam o próprio pipeline de produção e sabem, por definição operacional interna, o que conta como "deploy" e o que conta como "falha em produção". Repositórios open-source no GitHub não oferecem nenhuma das duas coisas. Não há registro de deploy, não há registro de incidente e não há a quem perguntar. O que existe são **rastros**: releases publicadas, execuções de workflow, commits, tags e comparações entre releases.
+Repositórios open-source no GitHub não oferecem nenhuma das duas coisas. Não há registro de implantação, não há registro de incidente e não há a quem perguntar. O que existe são rastros: releases publicadas, execuções de workflow, commits e tags. Medir DORA aqui, portanto, não é aplicar uma definição — é **escolher proxies** e herdar o erro de cada escolha. Uma release é um deploy? Uma execução de CI que falha é uma falha em produção? Uma release de *patch* publicada três dias depois da anterior corrige um defeito, ou é rotina?
 
-Medir DORA aqui, portanto, não é aplicar uma definição: é **escolher proxies** e assumir o custo dessa escolha. Uma release é um deploy? Uma execução de CI que falha é uma falha em produção? Uma release de *patch* publicada três dias depois da anterior corrige um defeito, ou é rotina de atualização de dependência?
+Cada resposta é uma hipótese não verificada ligando um atributo interno, que se consegue contar, a um atributo externo, que é o que interessa. Calcular as quatro métricas numa amostra grande é a parte mecânica; a parte que decide se os números significam alguma coisa é perguntar **o quanto os proxies são medidas válidas** — se concordam com julgamento humano, se sobrevivem à troca da definição, se se reproduzem em amostras independentes e se as faixas separam grupos distintos.
 
-Cada resposta é uma hipótese não verificada sobre a relação entre um atributo interno, que se consegue contar, e um atributo externo, que é o que interessa. É nesse ponto que este trabalho se separa de uma aplicação direta do enunciado. Calcular as quatro métricas numa amostra grande é a parte mecânica. A parte que decide se os números significam alguma coisa é perguntar **o quanto os proxies escolhidos são medidas válidas** — se concordam com o julgamento humano, se sobrevivem à troca da definição operacional, se se reproduzem em amostras independentes e se as faixas DORA separam de fato grupos distintos.
+## 1.2 Objetivo e questões de pesquisa
 
-## 1.3 Objetivo e questões de pesquisa
-
-O objetivo é minerar as métricas DORA de repositórios populares que usam GitHub Actions e, em paralelo, avaliar a validade das medidas usadas. O escopo inicial do enunciado é de 300 repositórios; este trabalho o estende para **900**, em três amostras independentes de 300 (A1, A2 e A3), justamente para poder testar reprodutibilidade.
-
-As sete questões de pesquisa são:
+O objetivo é minerar as métricas DORA de repositórios populares que usam GitHub Actions e, em paralelo, avaliar a validade das medidas. O escopo do enunciado é de 300 repositórios; este trabalho o estende para **900**, em três amostras independentes, para poder testar reprodutibilidade.
 
 | RQ | Pergunta |
 | :--- | :--- |
 | **RQ01** | Qual a frequência de deploys dos repositórios populares que usam CI/CD? |
 | **RQ02** | Qual o tempo entre um commit e seu respectivo deploy? |
-| **RQ03** | Qual a taxa de falha das mudanças entregues por esses repositórios? |
+| **RQ03** | Qual a taxa de falha das mudanças entregues? |
 | **RQ04** | Qual o tempo de recuperação após uma execução de CI/CD com falha? |
-| **RQ05** | Repositórios com maior frequência de deploy apresentam maior ou menor taxa de falha? |
-| **RQ06** | Quais características dos repositórios estão associadas a um melhor desempenho DORA? |
-| **RQ07** | O quanto a classificação DORA depende da definição operacional escolhida? |
+| **RQ05** | Maior frequência de deploy se associa a maior ou menor taxa de falha? |
+| **RQ06** | Quais características dos repositórios se associam a melhor desempenho? |
+| **RQ07** | O quanto a classificação DORA depende da definição operacional? |
 
 A RQ08 (bônus) trata da evolução temporal das métricas dentro da janela.
 
@@ -52,12 +48,6 @@ Para que a reconstrução não seja racionalização do que foi encontrado, cada
 
 ## 1.6 Contribuições
 
-1. **Dataset público de 900 repositórios** (três amostras independentes de 300) com as quatro métricas DORA, suas variantes e os eventos brutos que permitem recalcular tudo.
-2. **Avaliação de validade das medidas** segundo os seis critérios da IEEE 1061, e não apenas o cálculo das métricas.
-3. A demonstração, por duas vias independentes, de que **o CFR na variante (b) não mede falha**: a heurística reprova contra o gabarito humano (F1 = 0,478, precisão 36,5%) e a correlação com a frequência de deploy desaparece ao condicionar pela oportunidade de observação (seções 2.7 e 3.10.3).
-4. A evidência de que as **faixas DORA não têm poder discriminante** nesta população, e um **índice contínuo** que preserva a informação descartada pelo corte em faixas (seções 3.10.4 e 3.10.7).
-5. Um **ajuste de distribuições** que mostra por que média e desvio-padrão não se aplicam aqui, incluindo a verificação de que o Teorema do Limite Central precisa de n ≈ 300, não de n = 30 (seção 3.10.5).
+Um **dataset público de 900 repositórios** com as quatro métricas e os eventos brutos; uma **avaliação de validade** segundo os seis critérios da IEEE 1061, e não apenas o cálculo das métricas; a demonstração, por duas vias independentes, de que **o CFR na variante (b) não mede falha** (seções 2.7 e 3.7); a evidência de que as **faixas DORA não têm poder discriminante** nesta população, com um índice contínuo como alternativa; e um **ajuste de distribuições** que mostra por que média e desvio-padrão não se aplicam aqui.
 
-## 1.7 Organização
-
-Seção 2: metodologia e validação manual. Seção 3: resultados das RQs e análises de validade. Seção 4: hipóteses contra resultados. Seção 5: ameaças à validade. Seção 6: pacote de replicação.
+As seções seguintes tratam de metodologia e validação manual (2), resultados das RQs e análises de validade (3), hipóteses contra resultados (4), ameaças à validade (5) e pacote de replicação (6).

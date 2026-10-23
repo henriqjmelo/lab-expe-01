@@ -12,63 +12,28 @@ A janela tem 12 meses, de **1º de outubro de 2025 a 30 de setembro de 2026** **
 
 ## 2.3 Seleção dos repositórios e funil
 
-1. **Candidatos.** Foi usada a busca de repositórios com mais de 1.000 estrelas, não arquivados e com *push* depois do início da janela. Como cada consulta devolve no máximo 1.000 resultados, a busca foi fatiada em nove faixas de estrelas (1.000–1.199, 1.200–1.499, 1.500–1.999, 2.000–2.999, 3.000–4.999, 5.000–9.999, 10.000–19.999, 20.000–49.999 e ≥ 50.000).
-2. **Ordem de avaliação.** Os candidatos foram embaralhados com semente fixa (42) e avaliados nessa ordem até a amostra chegar a 300 repositórios. Isso evita que a amostra fique concentrada nos repositórios mais estrelados de cada faixa.
-3. **Filtros**, aplicados do mais barato para o mais caro:
-   - (i) usa GitHub Actions (`actions/workflows` com `total_count > 0`);
-   - (ii) tem ≥ 5 releases publicadas, sem pré-release, na janela;
-   - (iii) tem ≥ 50 workflow runs válidos (`success` ou falha) disparados por `push` no *default branch* na janela.
-
-O funil é gerado automaticamente pelo pipeline (`data/funil.csv`), e cada descarte fica registrado com o motivo em `data/descartes.csv`.
+A busca cobriu repositórios com mais de 1.000 estrelas, não arquivados e com *push* depois do início da janela. Como cada consulta devolve no máximo 1.000 resultados, ela foi fatiada em nove faixas de estrelas. Os candidatos foram embaralhados com semente fixa e avaliados nessa ordem até a amostra chegar a 300, de modo que ela não se concentre nos mais estrelados de cada faixa. Os filtros, aplicados do mais barato ao mais caro, são: (i) usa GitHub Actions; (ii) tem ao menos 5 releases publicadas, sem pré-release, na janela; (iii) tem ao menos 50 workflow runs válidos disparados por *push* no *default branch*.
 
 **Tabela 1 — Funil de seleção** (`data/funil.csv`).
 
-| Etapa | Restantes | Descartados | Motivo do descarte |
+| Etapa | Restantes | Descartados | Motivo |
 | :--- | ---: | ---: | :--- |
 | Candidatos da busca | 8.457 | — | — |
-| Avaliados (ordem aleatória, até o alvo) | 1.108 | 7.349 | não avaliados: alvo de 300 já atingido |
+| Avaliados (ordem aleatória) | 1.108 | 7.349 | alvo de 300 já atingido |
 | Usam GitHub Actions | 937 | 171 | nenhum workflow cadastrado |
-| ≥ 5 releases na janela | 399 | 538 | menos de 5 releases publicadas (sem pré-release) |
-| ≥ 50 runs válidos na janela | 300 | 99 | menos de 50 runs válidos em `push` no *default branch* |
-| **Amostra final** | **300** | 0 | — |
+| ≥ 5 releases na janela | 399 | 538 | menos de 5 releases |
+| ≥ 50 runs válidos | 300 | 99 | menos de 50 runs em `push` |
 
-O filtro mais restritivo é o de releases: 57% dos repositórios que usam Actions publicaram menos de 5 releases em 12 meses. Isso indica que muitos projetos populares entregam por outros meios, como *rolling release*, publicação direta em registros de pacotes ou ausência de versionamento formal. Esse ponto é retomado nas ameaças à validade.
-
-Como cada faixa de estrelas contribui com no máximo 1.000 candidatos, os mais estrelados de cada faixa, a amostra fica deslocada para repositórios mais populares do que uma amostra uniforme de todos os repositórios com mais de 1.000 estrelas. A mediana é de 9.485 estrelas (IQR 2.844–28.694).
+O filtro mais restritivo é o de releases: **57% dos repositórios que usam Actions publicaram menos de 5 releases em 12 meses**, o que indica que muitos projetos populares entregam por *rolling release*, publicação direta em registros de pacotes ou sem versionamento formal. Como cada faixa contribui no máximo com seus 1.000 mais estrelados, a amostra fica deslocada para repositórios populares: mediana de 9.485 estrelas (IQR 2.844–28.694).
 
 ## 2.4 Definições operacionais
 
-Todas as definições seguem a seção 3 do enunciado, comum à turma. Em resumo:
+Seguem a seção 3 do enunciado, comum à turma. **Deploy** é release publicada (`draft = false`), sem pré-release, datada por `published_at`. **Execuções de CI** são workflow runs do *default branch* com `event = push`; `success` conta como sucesso, `failure`, `timed_out` e `startup_failure` como falha, e os demais valores são ignorados.
 
-- **Deploy:** release publicada (`draft = false`), sem pré-release na definição principal. A data do deploy é `published_at`.
-- **Data do commit:** `commit.author.date`.
-- **Execuções de CI:** workflow runs do *default branch* com `event = push`. São consultadas mês a mês, e um mês com mais de 1.000 resultados é dividido ao meio recursivamente até caber. A classificação usa o campo `conclusion`:
-  - `success` conta como sucesso;
-  - `failure`, `timed_out` e `startup_failure` contam como falha;
-  - os demais valores são ignorados.
-
-Métricas por repositório:
-
-- **Deployment frequency (RQ 01):** deploys na janela ÷ semanas da janela.
-- **Lead time (RQ 02):** os commits de cada deploy D vêm de `compare/{deploy anterior}...{D}`, paginado.
-  - (a) Por release: `data(D) − commit mais antigo de D`. O valor do repositório é a mediana entre os deploys.
-  - (b) Por commit: `data(D) − data de cada commit`. O valor do repositório é a mediana de todos os commits.
-  - Ficam fora do cálculo, e são contados à parte:
-    - o primeiro deploy da história;
-    - os *compare* com resposta 404 (tag apagada ou reescrita);
-    - os *compare* com mais de 1.000 commits, ou que a API se recusa a gerar (HTTP 422, *diff* demorado demais). Esse último critério é do grupo: são quase sempre comparações entre linhas de versão diferentes ou entre pacotes distintos de um monorepo, intercalados por data, e não representam o que entrou no deploy.
-- **Change failure rate (RQ 03):**
-  - (a) Proxy de CI: falhas ÷ (falhas + sucessos), com todos os workflows juntos.
-  - (b) Proxy de entrega: o deploy D falhou se um deploy **corretivo** foi publicado em até 7 dias depois dele. Deploys dos últimos 7 dias da janela ficam fora do denominador (censura). O dataset desta versão usa a heurística **v0** (SemVer: mantém `maior.menor` do deploy anterior e sobe só o `patch`). Três outras versões foram implementadas e comparadas de forma descritiva na amostra 1 (`validacao/comparar_versoes.py`, `validacao/heuristica_versoes.md`):
-    - **v1 mensagens:** corretiva se pelo menos metade dos commits da release tem prefixo `fix`/`revert` (Conventional Commits).
-    - **v2 patch + poucos commits:** v0 **e** a release tem no máximo 3 commits.
-    - **v3 combinada:** v0 **ou** v1 **ou** o nome da tag contém `hotfix`/`patch`.
-
-    As quatro divergem muito entre si — a v0 marca 8.186 releases como corretivas, a v1 apenas 1.479 — o que por si só já indicava que a validação contra julgamento humano era necessária. A escolha final foi decidida na seção 2.7: **nenhuma atinge o F1 mínimo**, e a v0 foi mantida como referência.
-- **Tempo de recuperação (RQ 04):** os runs são agrupados por workflow e ordenados por `run_started_at`.
-  - Um episódio começa na primeira falha depois de um sucesso e termina no sucesso seguinte, com duração `updated_at(sucesso) − run_started_at(1ª falha)`. O valor do repositório é a mediana dos episódios fechados, em horas.
-  - Episódios sem sucesso até o fim da janela são **censurados**: não entram na mediana, mas são contados, e a proporção é reportada por repositório.
-  - Falhas no início da janela, antes do primeiro sucesso, não abrem episódio, porque não é possível saber quando a falha começou.
+- **Frequência (RQ01):** deploys na janela ÷ semanas da janela.
+- **Lead time (RQ02):** os commits de cada deploy D vêm de `compare/{anterior}...{D}`. Variante **(a)**, por release: `data(D) − commit mais antigo de D`, com mediana entre deploys. Variante **(b)**, por commit: `data(D) − data de cada commit`, com mediana de todos. Ficam fora o primeiro deploy da história, os *compare* 404 e os com mais de 1.000 commits ou recusados pela API — quase sempre comparações entre linhas de versão distintas, que não representam o que entrou no deploy.
+- **CFR (RQ03):** variante **(a)**, falhas ÷ (falhas + sucessos) de CI; variante **(b)**, o deploy falhou se um deploy corretivo saiu em até 7 dias, com os últimos 7 dias da janela fora do denominador (censura). O dataset usa a heurística **v0** (SemVer: sobe só o *patch*). Outras três foram implementadas e comparadas: **v1** (metade dos commits é `fix`/`revert`), **v2** (v0 e no máximo 3 commits) e **v3** (v0, v1 ou tag com `hotfix`/`patch`). As quatro divergem muito entre si — a v0 marca 8.186 releases como corretivas, a v1 apenas 1.479 — o que já indicava a necessidade de validação humana. A escolha final está na seção 2.7: **nenhuma atinge o F1 mínimo**, e a v0 foi mantida como referência.
+- **Recuperação (RQ04):** runs agrupados por workflow e ordenados por `run_started_at`. Um episódio começa na primeira falha após um sucesso e termina no sucesso seguinte, com duração `updated_at(sucesso) − run_started_at(1ª falha)`; o valor do repositório é a mediana dos episódios fechados. Episódios sem sucesso até o fim da janela são **censurados** e contados à parte. Falhas anteriores ao primeiro sucesso não abrem episódio.
 
 ## 2.5 Variantes para a análise de sensibilidade (RQ 07)
 
@@ -82,51 +47,15 @@ As métricas de velocidade e o CFR (b) são calculados para três unidades de de
 
 Para não esgotar a cota, o lead time de uma unidade não é calculado quando ela tem mais de 300 deploys na janela. Isso acontece sobretudo com tags em monorepos. Esses casos ficam marcados na coluna `lt_<unidade>_omitido`. As combinações C1–C3 da RQ 07 são montadas a partir dessas colunas na S03 (#142).
 
-## 2.6 Dataset
+## 2.6 Dataset e viés de seleção
 
-O dataset final (`data/dataset_dora.csv`) tem uma linha por repositório. Ele traz os metadados usados na RQ 06 (estrelas, linguagem, idade e número de contribuidores), as métricas de cada unidade de deploy e as contagens de qualidade da coleta:
+O dataset final (`data/dataset_dora.csv`) tem uma linha por repositório, com os metadados da RQ06, as métricas em todas as variantes e as contagens de qualidade da coleta. Cada coluna está descrita em `data/DICIONARIO.md`.
 
-- releases ignoradas por *compare* 404 ou grande demais;
-- meses que bateram o teto de 1.000 runs;
-- episódios censurados.
+A amostra 1 tem 300 repositórios em 27 linguagens, idade mediana de 5,8 anos (IQR 2,0–10,9) e 142 contribuidores medianos (IQR 50–335); a coleta somou 17.217 releases e 833.582 workflow runs válidos. Perdas conhecidas: 244 releases ficaram fora do lead time por *compare* acima de 1.000 commits ou recusado pela API, 8 por *compare* 404, 7 repositórios tiveram o lead time omitido por excederem 300 releases na janela, e 139 de 20.077 episódios de falha ficaram censurados.
 
-Cada coluna está descrita em `data/DICIONARIO.md`, com nome, tipo, unidade e fórmula ou campo de origem na API.
+O viés de seleção foi medido comparando os aceitos com cada etapa de descarte (Mann-Whitney e delta de Cliff para estrelas e idade, qui-quadrado para linguagem, com Holm). **Os aceitos têm mais estrelas que os descartados** (9.484,5 contra 2.969,5; δ = 0,292, efeito pequeno; p < 0,001) e são ligeiramente mais jovens (δ = −0,116, desprezível; p = 0,016), e a distribuição de linguagens difere (p < 0,001). O filtro de Actions é o mais seletivo (δ de estrelas = 0,357). A amostra caracteriza, portanto, **projetos populares, ativos e que publicam releases com frequência** — não o ecossistema open-source em geral.
 
-A amostra final tem **300 repositórios** em 27 linguagens. As mais frequentes são TypeScript (61), Python (55), Go (49), Rust (28), C++ (20) e JavaScript (19). A idade mediana é de 5,8 anos (IQR 2,0–10,9), e o número mediano de contribuidores é 142 (IQR 50–335). A coleta somou 17.217 releases, 28.792 tags e 833.582 workflow runs válidos na janela. A Tabela 2 resume a qualidade da coleta.
-
-**Tabela 2 — Contagens de qualidade da coleta.**
-
-| Ocorrência | Quantidade |
-| :--- | :--- |
-| Repositórios com algum mês acima de 1.000 runs (subdividido) | 34 |
-| Dias ainda acima de 1.000 runs após a subdivisão (dados incompletos) | 19 dias em 4 repositórios |
-| Releases ignoradas no lead time por *compare* 404 | 8 |
-| Releases ignoradas no lead time por *compare* com mais de 1.000 commits ou que a API não conseguiu gerar (422) | 244 |
-| Repositórios com lead time de release omitido (mais de 300 releases na janela) | 7 |
-| Episódios de falha de CI censurados (sem recuperação até o fim da janela) | 139 de 20.077, em 74 repositórios |
-
-**Caracterização e viés de seleção.** A Tabela 3 resume os metadados da A1 e da amostra acumulada A1+A2; o detalhamento por linguagem está em `analise/saida/caracterizacao/`.
-
-**Tabela 3 — Metadados das amostras.** Mediana (Q1–Q3).
-
-| Amostra | Repositórios | Estrelas | Idade (anos) | Contribuidores |
-| :--- | ---: | :--- | :--- | :--- |
-| A1 | 300 | 9.484,5 (2.858,5–28.636) | 5,79 (1,96–10,89) | 142 (50,25–335) |
-| A1+A2 | 600 | 9.500 (2.878,75–29.144,5) | 6,24 (2,43–10,17) | 150 (52–343) |
-
-O viés de seleção foi medido comparando os aceitos com cada etapa de descarte, por Mann-Whitney e delta de Cliff para estrelas e idade, qui-quadrado para linguagem, com correção de Holm. **Os aceitos têm mais estrelas que os descartados** (9.484,5 contra 2.969,5; δ = 0,292, efeito pequeno; p < 0,001) e são ligeiramente mais jovens (5,79 contra 7,88 anos; δ = −0,116, desprezível; p = 0,016), e a distribuição de linguagens difere (p < 0,001). O filtro de Actions é o mais seletivo (δ de estrelas = 0,357); o de releases associa-se a estrelas, idade e linguagem (p ≤ 0,001); o de runs mostra diferenças menores mas detectáveis (p ≤ 0,017). A amostra caracteriza, portanto, **projetos populares, ativos e que publicam releases com frequência** — não o ecossistema open-source em geral.
-
-Dois testes de sanidade não encontraram diferença: os 1.108 candidatos avaliados contra os 7.349 não avaliados (δ ≤ 0,017; p = 1 em estrelas, idade e linguagem) e a A1 contra a A2 (δ ≤ 0,019; p = 1). A ordem de avaliação e a composição das duas amostras, portanto, não introduzem viés adicional — o que não remove o viés dos critérios de inclusão, tratado na seção 5.3.
-
-![Distribuições de estrelas e idade entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicoes_estrelas_idade.png)
-
-**Como ler.** Proporção acumulada de repositórios por estrelas (esquerda) e idade (direita), separada entre a amostra aceita e cada etapa de descarte. Deslocamento horizontal indica diferença de distribuição; eixos em escala logarítmica, com o `n` de cada grupo na legenda.
-
-![Distribuição de linguagens entre aceitos e descartados](../analise/saida/caracterizacao/figuras/distribuicao_linguagens.png)
-
-**Como ler.** Cada barra é um grupo do funil e soma 100%, com as oito linguagens mais frequentes entre os aceitos e a categoria "Outras". A inferência correspondente está no parágrafo acima.
-
-Tudo isso se regenera sem acesso à API com `python -m analise.caracterizacao`.
+Dois testes de sanidade não encontraram diferença: os 1.108 candidatos avaliados contra os 7.349 não avaliados (δ ≤ 0,017; p = 1) e a A1 contra a A2 (δ ≤ 0,019; p = 1). A ordem de avaliação e a composição das amostras não introduzem viés adicional, o que não remove o viés dos critérios de inclusão (seção 5.3). Tudo se regenera com `python -m analise.caracterizacao`.
 
 ## 2.7 Validação manual (amostra-ouro)
 

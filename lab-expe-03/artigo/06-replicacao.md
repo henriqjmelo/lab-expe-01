@@ -13,24 +13,11 @@ Conforme a seção 9 do enunciado, o grupo **replicador** deve registrar aqui:
 
 Responsáveis: execução pelo Henrique (#143), comparação e abertura de issues pelo Gabriel (#144).
 
-## 6.2 O lado autor: o que já está pronto para quem for nos replicar
+## 6.2 O lado autor: o que está pronto para quem nos replicar
 
-O grupo autor precisa responder às issues recebidas (#145). Independente do sorteio, os pontos abaixo determinam se este pipeline é replicável, e valem ser conferidos antes:
+Os três datasets, os eventos por repositório e as medidas auxiliares estão versionados no Git, com cada coluna descrita em `data/DICIONARIO.md`: quem replicar **não precisa gastar cota de API nem as ~15 h de coleta**. A execução é por comando único (`python -m pipeline` e `python -m analise`), com dependências fixadas.
 
-**Dados versionados, sem necessidade de recoleta.** Os três datasets, os eventos por repositório e as medidas GraphQL estão no Git. Quem replicar não precisa gastar cota de API nem as ~15 h de coleta: `data/DICIONARIO.md` documenta cada coluna de cada arquivo.
-
-**O cache não vai para o Git.** O diretório `.cache/` tem vários GB e existe apenas na máquina de quem coletou. Isso significa que **a recoleta a partir do zero não é bit a bit reprodutível** — ela depende do estado corrente da API. Reexecutar sobre os dados versionados é; recoletar não é. É a limitação mais provável de aparecer na replicação, e está declarada.
-
-**Comando único.** `python -m pipeline --config config.yaml` para a coleta e `python -m analise` para figuras e tabelas, com as dependências fixadas em `requirements.txt` e `requirements-analise.txt`.
-
-**Pontos frágeis conhecidos**, que provavelmente gerarão issues:
-
-| Ponto | Por quê |
-| :--- | :--- |
-| Token do GitHub | o pipeline exige `GITHUB_TOKEN` no ambiente; sem ele, falha de imediato |
-| Cota de API | uma recoleta completa consome a cota de 5.000 chamadas/hora por horas seguidas |
-| Datas de coleta diferentes | repositórios recebem commits novos; as métricas mudam entre execuções |
-| API de Deployments | cobertura instável entre amostras (seção 3.10.8), o que pode produzir divergência legítima |
+O cache da coleta (vários GB) **não** vai para o Git, então reexecutar sobre os dados versionados é reprodutível, mas **recoletar do zero não é** — depende do estado corrente da API. É a limitação mais provável de aparecer na replicação, e está declarada. Os demais pontos frágeis conhecidos são a exigência de `GITHUB_TOKEN`, o consumo de cota numa recoleta completa, a mudança natural das métricas entre datas de coleta e a cobertura instável da API de Deployments (seção 3.7).
 
 ## 6.3 Link do repositório e do Projects
 

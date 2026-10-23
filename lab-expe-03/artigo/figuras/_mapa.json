@@ -1,0 +1,23 @@
+{
+ "analise/saida/600/figuras/fig02_rq01_frequencia.png": "a600_fig02_rq01_frequencia.png",
+ "analise/saida/600/figuras/fig03_rq02_lead_time.png": "a600_fig03_rq02_lead_time.png",
+ "analise/saida/600/figuras/fig04_rq03_cfr.png": "a600_fig04_rq03_cfr.png",
+ "analise/saida/600/figuras/fig05_rq04_recuperacao.png": "a600_fig05_rq04_recuperacao.png",
+ "analise/saida/600/figuras/fig06_perfil_dora.png": "a600_fig06_perfil_dora.png",
+ "analise/saida/600/figuras/fig07_rq05_velocidade_estabilidade.png": "a600_fig07_rq05_velocidade_estabilidade.png",
+ "analise/saida/600/figuras/fig08_rq06_fatores.png": "a600_fig08_rq06_fatores.png",
+ "analise/saida/600/figuras/fig09_rq07_sensibilidade.png": "a600_fig09_rq07_sensibilidade.png",
+ "analise/saida/caracterizacao/figuras/distribuicao_linguagens.png": "car_distribuicao_linguagens.png",
+ "analise/saida/caracterizacao/figuras/distribuicoes_estrelas_idade.png": "car_distribuicoes_estrelas_idade.png",
+ "analise/saida/figuras/fig02_rq01_frequencia.png": "a300_fig02_rq01_frequencia.png",
+ "analise/saida/figuras/fig03_rq02_lead_time.png": "a300_fig03_rq02_lead_time.png",
+ "analise/saida/figuras/fig04_rq03_cfr.png": "a300_fig04_rq03_cfr.png",
+ "analise/saida/figuras/fig05_rq04_recuperacao.png": "a300_fig05_rq04_recuperacao.png",
+ "analise/saida/figuras/fig06_perfil_dora.png": "a300_fig06_perfil_dora.png",
+ "analise/saida/figuras/fig07_rq05_velocidade_estabilidade.png": "a300_fig07_rq05_velocidade_estabilidade.png",
+ "analise/saida/figuras/fig08_rq06_fatores.png": "a300_fig08_rq06_fatores.png",
+ "analise/saida/figuras/fig09_rq07_sensibilidade.png": "a300_fig09_rq07_sensibilidade.png",
+ "analise/saida/figuras/fig16_rq06_robustez.png": "a300_fig16_rq06_robustez.png",
+ "analise/saida/figuras/fig17_rq08_tendencia_600.png": "a300_fig17_rq08_tendencia_600.png",
+ "analise/saida/figuras/fig18_rq08_trajetoria_600.png": "a300_fig18_rq08_trajetoria_600.png"
+}
