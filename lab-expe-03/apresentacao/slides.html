@@ -1,0 +1,283 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Mineração DORA — Lab03</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"><style>
+@page { size: 1920px 1080px; margin: 0 }
+* { box-sizing: border-box }
+html, body { margin:0; padding:0; background:#fff }
+section { width:1920px; height:1080px; page-break-after:always; overflow:hidden; position:relative }
+section:last-child { page-break-after:auto }
+h1,h2,h3,p,ul,ol { margin:0; padding:0 }
+ul,ol { padding-left:40px }
+li { margin-bottom:8px }
+table { border-collapse:collapse; width:100% }
+th,td { padding:12px 20px; text-align:left; border-bottom:1px solid rgba(90,102,115,.28) }
+tr:last-child td { border-bottom:0 }
+x-shape { display:block }
+x-shape[kind="rounded"] { border-radius:28px }
+x-shape[kind="ellipse"] { border-radius:50% }
+x-shape[kind="arrow-right"] { clip-path: polygon(0 28%, 60% 28%, 60% 0, 100% 50%, 60% 100%, 60% 72%, 0 72%) }
+</style></head><body><section id="cover" data-transition="fade" style="background:#16202B;color:#F7F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C98060">Laboratório de Experimentação de Software · Lab03</p>
+<div style="width:180px;border-top:6px solid #A8441F"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:40px">
+<h1 style="font-family:'Libre Baskerville', Georgia, serif;font-size:104px;font-weight:700;line-height:1.08;color:#F7F5F0">Quando a métrica não mede o que diz medir</h1>
+<p style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:36px;font-weight:400;line-height:1.4;color:#B9C4CE;width:1300px">Mineração das métricas DORA em 900 repositórios open-source — e o que acontece quando os proxies são submetidos a validação humana.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<p style="font-size:30px;font-weight:600;color:#F7F5F0">Guilherme Costa · Henrique Jardim Melo · Gabriel Afonso</p>
+<p style="font-size:26px;font-weight:400;color:#8A99A8">Engenharia de Software, 6º período · PUC Minas</p>
+</div>
+
+</section>
+<section id="problema" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">O problema</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:72px;font-weight:700;line-height:1.12;width:1500px">O DORA foi definido para quem controla o próprio pipeline</h2>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;padding:44px;border:1px solid #DCD7CC;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600;color:#1F5E55">Lá, a definição existe</h3>
+<p style="font-size:30px;line-height:1.45;color:#3E4A57">A equipe sabe, por definição operacional interna, o que conta como <b>deploy</b> e o que conta como <b>falha em produção</b>. Há registro de implantação e registro de incidente.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;padding:44px;border:1px solid #DCD7CC;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600;color:#A8441F">No GitHub, não existe</h3>
+<p style="font-size:30px;line-height:1.45;color:#3E4A57">Não há registro de deploy, não há registro de incidente e não há a quem perguntar. O que existe são <b>rastros</b>: releases, workflow runs, commits e tags.</p>
+</div>
+</div>
+<div style="background:#16202B;padding:40px 48px;border-radius:16px;border-left:10px solid #A8441F">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:40px;line-height:1.35;color:#F7F5F0">Medir DORA aqui não é aplicar uma definição. É <b>escolher proxies</b> — e herdar o erro de cada escolha.</p>
+</div>
+
+</section>
+<section id="desenho" data-section="medicao" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">Desenho do estudo</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12">Três amostras independentes, sem um repositório em comum</h2>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:6px solid #16202B;padding:28px 0 0 0">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:88px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums">900</p>
+<p style="font-size:27px;line-height:1.4;color:#3E4A57">repositórios em 3 amostras de 300, sementes 42 / 2026 / 2027, <b>zero sobreposição</b></p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:6px solid #16202B;padding:28px 0 0 0">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:88px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums">12</p>
+<p style="font-size:27px;line-height:1.4;color:#3E4A57">meses de janela; inclusão exige ≥ 5 releases e ≥ 50 workflow runs válidos</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:6px solid #A8441F;padding:28px 0 0 0">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:88px;font-weight:700;line-height:1;color:#A8441F;font-variant-numeric:tabular-nums">1.080</p>
+<p style="font-size:27px;line-height:1.4;color:#3E4A57">rótulos humanos: 3 avaliadores × 60 repositórios e 300 releases</p>
+</div>
+</div>
+<div style="display:flex;gap:40px;background:#FFFFFF;padding:40px 44px;border:1px solid #DCD7CC;border-radius:16px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-size:28px;font-weight:600;color:#1F5E55">Os proxies escolhidos</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4A57">deploy → release publicada<br>falha → (a) falha de CI · (b) release corretiva em ≤ 7 dias<br>recuperação → 1ª falha após sucesso até o próximo sucesso</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-size:28px;font-weight:600;color:#1F5E55">Engenharia</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4A57">Pipeline próprio, sem bibliotecas de acesso à API. Cache e retomada. Dados versionados: quem replicar <b>não precisa recoletar</b>.</p>
+</div>
+</div>
+
+</section>
+<section id="numeros" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">RQ 01 a RQ 04 · n = 900</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12">Entrega em ciclos, não contínua</h2>
+<table style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:29px;color:#16202B;font-variant-numeric:tabular-nums">
+<tr><th style="width:44%;text-align:left;font-weight:600;color:#5A6673;font-size:24px">Métrica</th><th style="width:28%;text-align:right;font-weight:600;color:#5A6673;font-size:24px">Mediana</th><th style="width:28%;text-align:right;font-weight:600;color:#5A6673;font-size:24px">IQR</th></tr>
+<tr><td>Frequência de deploy</td><td style="text-align:right;font-weight:600">0,35 rel/sem</td><td style="text-align:right;color:#5A6673">0,19 – 0,84</td></tr>
+<tr><td>Lead time (a), por release</td><td style="text-align:right;font-weight:600">12,0 dias</td><td style="text-align:right;color:#5A6673">3,0 – 37,4</td></tr>
+<tr><td>Lead time (b), por commit</td><td style="text-align:right;font-weight:600">9,0 dias</td><td style="text-align:right;color:#5A6673">2,5 – 28,1</td></tr>
+<tr><td>CFR (a) — falha de CI</td><td style="text-align:right;font-weight:600">5,3 %</td><td style="text-align:right;color:#5A6673">2,2 – 11,2</td></tr>
+<tr style="background:#EFE6DC"><td style="color:#A8441F;font-weight:600">CFR (b) — release corretiva</td><td style="text-align:right;font-weight:600;color:#A8441F">25,0 %</td><td style="text-align:right;color:#A8441F">6,2 – 50,3</td></tr>
+<tr><td>Tempo de recuperação</td><td style="text-align:right;font-weight:600">3,1 h</td><td style="text-align:right;color:#5A6673">0,9 – 17,3</td></tr>
+</table>
+<div style="display:flex;gap:40px">
+<p style="flex:1;font-size:28px;line-height:1.45;color:#3E4A57">Uma release a cada vinte dias. Projetos open-source populares com CI configurado <b>não entregam continuamente</b> — entregam em ciclos, e a faixa Elite é ocupada por 2%.</p>
+<p style="flex:1;font-size:28px;line-height:1.45;color:#3E4A57">Os dois proxies de falha divergem por <b>quase cinco vezes</b>. É a linha destacada, e é ela que o resto da apresentação vai desmontar.</p>
+</div>
+
+</section>
+<section id="anomalia" data-transition="fade" style="background:#16202B;color:#F7F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:52px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C98060">RQ 05 · a anomalia</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:72px;font-weight:700;line-height:1.12;color:#F7F5F0">Quem entrega mais parece falhar mais</h2>
+</div>
+<div style="display:flex;gap:56px;align-items:center">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:200px;font-weight:700;line-height:0.9;color:#E08A5F;font-variant-numeric:tabular-nums">+0,60</p>
+<p style="font-size:34px;line-height:1.4;color:#B9C4CE;width:700px">ρ de Spearman entre frequência de deploy e CFR (b), com p &lt; 0,001 e n = 900.</p>
+</div>
+<div style="background:#223040;padding:40px 48px;border-radius:16px;border-left:10px solid #E08A5F">
+<p style="font-size:34px;line-height:1.45;color:#F7F5F0">O programa DORA afirma que velocidade e estabilidade <b>não</b> são um trade-off. Nossos dados pareciam contradizer isso frontalmente.</p>
+</div>
+<p style="font-size:32px;line-height:1.45;color:#B9C4CE;width:1400px">Antes de publicar uma contradição à literatura, fomos testar a métrica. <b style="color:#F7F5F0">Foi a decisão mais produtiva do trabalho.</b></p>
+
+</section>
+<section id="f1" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">O resultado central</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12">Nenhuma versão da heurística passa</h2>
+<div style="display:flex;gap:48px;align-items:center">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:150px;font-weight:700;line-height:0.9;color:#A8441F;font-variant-numeric:tabular-nums">0,478</p>
+<p style="font-size:32px;line-height:1.4;color:#3E4A57;width:780px">F1 da heurística que gerou o <b>CFR (b) de todo o dataset</b>.<br>O mínimo exigido pelo enunciado é <b>0,70</b>.</p>
+</div>
+<table style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:27px;color:#16202B;font-variant-numeric:tabular-nums">
+<tr><th style="width:22%;text-align:left;font-weight:600;color:#5A6673;font-size:23px">Versão</th><th style="width:38%;text-align:left;font-weight:600;color:#5A6673;font-size:23px">Regra</th><th style="width:13%;text-align:right;font-weight:600;color:#5A6673;font-size:23px">Precisão</th><th style="width:13%;text-align:right;font-weight:600;color:#5A6673;font-size:23px">Recall</th><th style="width:14%;text-align:right;font-weight:600;color:#5A6673;font-size:23px">F1</th></tr>
+<tr style="background:#EFE6DC"><td style="font-weight:600;color:#A8441F">v0 · no dataset</td><td>sobe só o patch da versão</td><td style="text-align:right;font-weight:600;color:#A8441F">36,5%</td><td style="text-align:right">69,2%</td><td style="text-align:right;font-weight:600;color:#A8441F">0,478</td></tr>
+<tr><td style="font-weight:600">v1 · mensagens</td><td>metade dos commits é fix ou revert</td><td style="text-align:right;font-weight:600;color:#1F5E55">94,4%</td><td style="text-align:right;color:#A8441F">21,8%</td><td style="text-align:right">0,354</td></tr>
+<tr><td style="font-weight:600">v2 · patch curto</td><td>v0 e no máximo 3 commits</td><td style="text-align:right">59,5%</td><td style="text-align:right">28,2%</td><td style="text-align:right">0,383</td></tr>
+<tr><td style="font-weight:600">v3 · combinada</td><td>v0 ou v1 ou tag com hotfix</td><td style="text-align:right">37,7%</td><td style="text-align:right">73,1%</td><td style="text-align:right;font-weight:600">0,498</td></tr>
+</table>
+<div style="background:#16202B;padding:34px 44px;border-radius:16px;border-left:10px solid #A8441F">
+<p style="font-size:34px;line-height:1.4;color:#F7F5F0"><b>De cada três releases que a v0 acusa, duas são inocentes</b> — atualização de dependência, ajuste de build, publicação periódica. O CFR (b) de 25% da RQ03 carrega esse erro inteiro.</p>
+</div>
+
+</section>
+<section id="kappa" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">E o problema é mais fundo</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12">Nem os humanos concordam entre si</h2>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:6px solid #1F5E55;padding:26px 0 0 0">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:76px;font-weight:700;line-height:1;color:#1F5E55;font-variant-numeric:tabular-nums">0,872</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A57">κ de Fleiss em <b>tipo do projeto</b><br>concordância quase perfeita</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:6px solid #A8441F;padding:26px 0 0 0">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:76px;font-weight:700;line-height:1;color:#A8441F;font-variant-numeric:tabular-nums">0,504</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A57">κ em <b>release é corretiva</b><br>apenas moderada</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:6px solid #A8441F;padding:26px 0 0 0">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:76px;font-weight:700;line-height:1;color:#A8441F;font-variant-numeric:tabular-nums">16,7–37,3%</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A57">prevalência de “sim” entre os três<br>variação de mais de duas vezes</p>
+</div>
+</div>
+<div style="background:#16202B;padding:40px 48px;border-radius:16px;border-left:10px solid #A8441F">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:40px;line-height:1.35;color:#F7F5F0">Uma heurística não pode ser mais precisa que a definição que ela tenta capturar.</p>
+</div>
+<p style="font-size:27px;line-height:1.45;color:#3E4A57;width:1550px">O mesmo protocolo mede <b>0,872</b> quando a pergunta é bem definida. Não é falta de atenção dos avaliadores: é o conceito de “release corretiva” que é ambíguo.</p>
+
+</section>
+<section id="cadencia" data-section="consequencias" data-transition="fade" style="background:#16202B;color:#F7F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C98060">A explicação da anomalia</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12;color:#F7F5F0">O CFR (b) mede cadência, não falha</h2>
+<p style="font-size:32px;line-height:1.45;color:#B9C4CE;width:1500px">Quem publica mais releases tem, por construção, <b style="color:#F7F5F0">mais oportunidade</b> de ter uma release seguida por outra em até sete dias. A associação estava embutida na definição da métrica.</p>
+<div style="display:flex;gap:44px;align-items:center;background:#223040;padding:44px 48px;border-radius:16px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:92px;font-weight:700;line-height:1;color:#8A99A8;font-variant-numeric:tabular-nums">0,604</p>
+<p style="font-size:25px;line-height:1.35;color:#8A99A8;width:300px">ρ bruto<br>frequência × CFR (b)</p>
+</div>
+<x-shape kind="arrow-right" style="width:150px;height:64px;background:#C98060"></x-shape>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:92px;font-weight:700;line-height:1;color:#E08A5F;font-variant-numeric:tabular-nums">−0,039</p>
+<p style="font-size:25px;line-height:1.35;color:#B9C4CE;width:420px">condicionando pela oportunidade de observação (p = 0,52)</p>
+</div>
+<p style="font-size:27px;line-height:1.45;color:#B9C4CE;width:430px">Contra <b style="color:#F7F5F0">ρ = 0,784</b> entre frequência e a própria oportunidade: o que a métrica capta é o ritmo de publicação.</p>
+</div>
+<p style="font-size:28px;line-height:1.45;color:#B9C4CE;width:1550px">Confusão por tamanho do projeto foi testada por estratificação em quartis e correlação parcial, e <b style="color:#F7F5F0">descartada</b>: o ρ cai no máximo 0,059. Não é porte — é a definição.</p>
+
+</section>
+<section id="faixas" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:38px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">RQ 06 · poder discriminante</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12">As faixas separam o que as define — e pouco além</h2>
+<table style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:28px;color:#16202B;font-variant-numeric:tabular-nums">
+<tr><th style="width:52%;text-align:left;font-weight:600;color:#5A6673;font-size:24px">A classificação DORA separa repositórios por…</th><th style="width:18%;text-align:right;font-weight:600;color:#5A6673;font-size:24px">ε²</th><th style="width:30%;text-align:right;font-weight:600;color:#5A6673;font-size:24px">Sobrevive a Holm?</th></tr>
+<tr><td>Estrelas</td><td style="text-align:right">0,008</td><td style="text-align:right;color:#A8441F;font-weight:600">não</td></tr>
+<tr><td>Número de contribuidores</td><td style="text-align:right">0,022</td><td style="text-align:right;color:#A8441F;font-weight:600">não</td></tr>
+<tr><td>Idade do repositório</td><td style="text-align:right">0,109</td><td style="text-align:right;color:#1F5E55;font-weight:600">sim</td></tr>
+<tr style="background:#EFE6DC"><td><i>CFR (b) — componente da própria faixa</i></td><td style="text-align:right;font-weight:600">0,379</td><td style="text-align:right;color:#5A6673">—</td></tr>
+<tr style="background:#EFE6DC"><td><i>Frequência — controle tautológico</i></td><td style="text-align:right;font-weight:600">0,403</td><td style="text-align:right;color:#5A6673">—</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.45;color:#3E4A57;width:1550px">As duas últimas linhas são o controle: a faixa prevê quase tão bem as variáveis que a constroem quanto o controle tautológico. Isso é <b>validade convergente</b>, não poder discriminante — a faixa DORA é, em boa parte, uma relabelagem de variáveis contínuas.</p>
+<div style="display:flex;gap:36px;background:#FFFFFF;padding:36px 40px;border:1px solid #DCD7CC;border-left:10px solid #1F5E55;border-radius:16px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:62px;font-weight:700;line-height:1;color:#1F5E55;font-variant-numeric:tabular-nums">63,2%</p>
+<p style="font-size:24px;line-height:1.35;color:#3E4A57;width:260px">da variância retida pelas faixas</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:62px;font-weight:700;line-height:1;color:#A8441F;font-variant-numeric:tabular-nums">8,2%</p>
+<p style="font-size:24px;line-height:1.35;color:#3E4A57;width:260px">dos pares entre faixas aparecem invertidos</p>
+</div>
+<p style="flex:1;font-size:26px;line-height:1.45;color:#3E4A57"><b>Nossa proposta:</b> um índice contínuo por posto percentílico. O corte em quatro caixas descarta mais de um terço da informação, e as inversões se concentram entre faixas vizinhas — zero entre Elite e Low.</p>
+</div>
+
+</section>
+<section id="sensibilidade" data-transition="fade" style="background:#16202B;color:#F7F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:36px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C98060">RQ 07 e RQ 08 · robustez</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12;color:#F7F5F0">Trocar a definição muda a nota. O tempo, não.</h2>
+<div style="display:flex;gap:44px">
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#223040;padding:38px 40px;border-radius:16px;border-left:10px solid #E08A5F">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#C98060">RQ 07 · sensibilidade à definição</p>
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:86px;font-weight:700;line-height:1;color:#E08A5F;font-variant-numeric:tabular-nums">28 – 36%</p>
+<p style="font-size:27px;line-height:1.4;color:#D5DCE3">dos repositórios <b style="color:#F7F5F0">mudam de categoria DORA</b> só ao trocar a definição operacional — e a proporção não se move de 300 para 600, então <b style="color:#F7F5F0">não é ruído amostral</b>.</p>
+<table style="font-size:23px;color:#B9C4CE;font-variant-numeric:tabular-nums">
+<tr><th style="text-align:left;font-weight:600;color:#8A99A8;font-size:21px;padding:8px 14px">Par de definições</th><th style="text-align:right;font-weight:600;color:#8A99A8;font-size:21px;padding:8px 14px">Mudam</th><th style="text-align:right;font-weight:600;color:#8A99A8;font-size:21px;padding:8px 14px">κ ponderado</th></tr>
+<tr><td style="padding:8px 14px;border-bottom-color:rgba(185,196,206,.22)">C1 × C2</td><td style="text-align:right;padding:8px 14px;border-bottom-color:rgba(185,196,206,.22)">36% → 35%</td><td style="text-align:right;padding:8px 14px;border-bottom-color:rgba(185,196,206,.22)">0,42 → 0,46</td></tr>
+<tr><td style="padding:8px 14px;border-bottom-color:rgba(185,196,206,.22)">C1 × C3</td><td style="text-align:right;padding:8px 14px;border-bottom-color:rgba(185,196,206,.22)">28% → 28%</td><td style="text-align:right;padding:8px 14px;border-bottom-color:rgba(185,196,206,.22)">0,63 → 0,64</td></tr>
+<tr><td style="padding:8px 14px">C2 × C3</td><td style="text-align:right;padding:8px 14px">33% → 34%</td><td style="text-align:right;padding:8px 14px">0,54 → 0,53</td></tr>
+</table>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#223040;padding:38px 40px;border-radius:16px;border-left:10px solid #1F5E55">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#7FB3A8">RQ 08 · bônus, evolução temporal</p>
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:86px;font-weight:700;line-height:1;color:#7FB3A8;font-variant-numeric:tabular-nums">1 de 600</p>
+<p style="font-size:27px;line-height:1.4;color:#D5DCE3">repositórios mantém tendência temporal <b style="color:#F7F5F0">depois da correção de FDR</b>. O teste bruto acusava de 13% a 17% — quase tudo era ruído de múltiplos testes.</p>
+<p style="font-size:25px;line-height:1.45;color:#B9C4CE">Mann-Kendall na série <b style="color:#F7F5F0">mensal</b>, de 12 pontos, e não na trimestral sugerida pelo enunciado: com 4 pontos o menor p possível é 0,089, e o teste nunca poderia dar significativo.</p>
+</div>
+</div>
+<div style="background:#223040;padding:32px 44px;border-radius:16px;border-left:10px solid #C98060">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:38px;line-height:1.35;color:#F7F5F0">A nota DORA de um repositório diz mais sobre a definição escolhida do que sobre o repositório.</p>
+</div>
+</section>
+<section id="hipoteses" data-section="fechamento" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:34px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">Hipóteses × resultados</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12">Cinco das sete foram refutadas</h2>
+<table style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:26px;color:#16202B;font-variant-numeric:tabular-nums">
+<tr><th style="width:10%;text-align:left;font-weight:600;color:#5A6673;font-size:23px">#</th><th style="width:44%;text-align:left;font-weight:600;color:#5A6673;font-size:23px">Esperávamos</th><th style="width:24%;text-align:right;font-weight:600;color:#5A6673;font-size:23px">Encontramos</th><th style="width:22%;text-align:right;font-weight:600;color:#5A6673;font-size:23px">Veredito</th></tr>
+<tr><td style="font-weight:600">H01</td><td>pelo menos 1 release por semana</td><td style="text-align:right">0,35 / semana</td><td style="text-align:right;color:#A8441F;font-weight:600">refutada</td></tr>
+<tr><td style="font-weight:600">H02</td><td>lead time em dias, com (a) maior que (b)</td><td style="text-align:right">13,2 e 8,8 dias</td><td style="text-align:right;color:#1F5E55;font-weight:600">confirmada</td></tr>
+<tr><td style="font-weight:600">H03</td><td>CFR abaixo de 15% e proxies convergentes</td><td style="text-align:right">5,3% × 25,0%</td><td style="text-align:right;color:#A8441F;font-weight:600">refutada</td></tr>
+<tr><td style="font-weight:600">H04</td><td>recuperação em menos de 24 horas</td><td style="text-align:right">2,8 horas</td><td style="text-align:right;color:#1F5E55;font-weight:600">confirmada</td></tr>
+<tr><td style="font-weight:600">H05</td><td>correlação nula ou negativa</td><td style="text-align:right">+0,60</td><td style="text-align:right;color:#A8441F;font-weight:600">refutada</td></tr>
+<tr><td style="font-weight:600">H06</td><td>fatores com efeito ao menos pequeno</td><td style="text-align:right">ε² ≈ 0,01</td><td style="text-align:right;color:#A8441F;font-weight:600">refutada</td></tr>
+<tr><td style="font-weight:600">H07</td><td>menos de 20% mudam de faixa</td><td style="text-align:right">27,7 – 36,0%</td><td style="text-align:right;color:#A8441F;font-weight:600">refutada</td></tr>
+</table>
+<p style="font-size:27px;line-height:1.45;color:#3E4A57;width:1550px">As hipóteses foram <b>reconstruídas após a coleta</b>, não pré-registradas — declarado na seção 1.5 do artigo e tratado como ameaça aberta. O saldo é a auditoria: hipóteses escritas depois do resultado tendem a acertar; estas, na maioria, erram.</p>
+
+</section>
+<section id="ameacas" data-transition="fade" style="background:#F7F5F0;color:#16202B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:34px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#A8441F">Ameaças à validade</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:66px;font-weight:700;line-height:1.12">Quatro categorias, honestamente classificadas</h2>
+<table style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:26px;color:#16202B">
+<tr><th style="width:22%;text-align:left;font-weight:600;color:#5A6673;font-size:23px">Categoria</th><th style="width:48%;text-align:left;font-weight:600;color:#5A6673;font-size:23px">A principal ameaça</th><th style="width:30%;text-align:right;font-weight:600;color:#5A6673;font-size:23px">Situação</th></tr>
+<tr><td style="font-weight:600">Construto</td><td>Release não é deploy; a API de Deployments cobre só 38,8%</td><td style="text-align:right;color:#A8441F;font-weight:600">aberta, por construção</td></tr>
+<tr style="background:#EFE6DC"><td style="font-weight:600">Construto</td><td>O CFR (b) está acoplado à cadência de publicação</td><td style="text-align:right;color:#A8441F;font-weight:600">confirmada e medida</td></tr>
+<tr><td style="font-weight:600">Interna</td><td>Tamanho e popularidade como variável de confusão</td><td style="text-align:right;color:#1F5E55;font-weight:600">testada, não encontrada</td></tr>
+<tr><td style="font-weight:600">Externa</td><td>Amostra de repositórios populares com CI estabelecido</td><td style="text-align:right;color:#A8441F;font-weight:600">aberta, por desenho</td></tr>
+<tr><td style="font-weight:600">Externa</td><td>Estabilidade entre três amostras independentes</td><td style="text-align:right;color:#1F5E55;font-weight:600">mitigada</td></tr>
+<tr><td style="font-weight:600">Conclusão</td><td>Múltiplas comparações sem correção</td><td style="text-align:right;color:#1F5E55;font-weight:600">mitigada · Holm e FDR</td></tr>
+<tr><td style="font-weight:600">Conclusão</td><td>Hipóteses reconstruídas, não pré-registradas</td><td style="text-align:right;color:#A8441F;font-weight:600">aberta</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.45;color:#3E4A57;width:1550px">As duas primeiras mudaram de natureza neste trabalho: <b>eram suspeitas e viraram resultados medidos</b>. Isso não as mitiga — confirma que o CFR (b) deve ser lido como indicador de cadência, não de falha.</p>
+
+</section>
+<section id="conclusao" data-transition="fade" style="background:#16202B;color:#F7F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:26px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C98060">Conclusão</p>
+<h2 style="font-family:'Libre Baskerville', Georgia, serif;font-size:76px;font-weight:700;line-height:1.1;color:#F7F5F0;width:1400px">Os números DORA são fáceis. A validade é que é difícil.</h2>
+<div style="display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;gap:28px;align-items:baseline">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:44px;font-weight:700;color:#E08A5F;width:56px">1</p>
+<p style="font-size:31px;line-height:1.4;color:#D5DCE3;width:1450px">O <b style="color:#F7F5F0">CFR (b) não sobrevive à validação</b> — F1 de 0,478, precisão de 36,5% — e boa parte do que ele mede é ritmo de publicação, não falha.</p>
+</div>
+<div style="display:flex;gap:28px;align-items:baseline">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:44px;font-weight:700;color:#E08A5F;width:56px">2</p>
+<p style="font-size:31px;line-height:1.4;color:#D5DCE3;width:1450px">As <b style="color:#F7F5F0">faixas DORA não discriminam</b> nada além do que as define. Um índice contínuo preserva mais de um terço da informação que elas descartam.</p>
+</div>
+<div style="display:flex;gap:28px;align-items:baseline">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:44px;font-weight:700;color:#E08A5F;width:56px">3</p>
+<p style="font-size:31px;line-height:1.4;color:#D5DCE3;width:1450px">O <b style="color:#F7F5F0">DORA é uma lente entre outras</b>, e lentes igualmente legítimas ordenam os mesmos repositórios de forma substancialmente diferente.</p>
+</div>
+<div style="display:flex;gap:28px;align-items:baseline">
+<p style="font-family:'Libre Baskerville', Georgia, serif;font-size:44px;font-weight:700;color:#E08A5F;width:56px">4</p>
+<p style="font-size:31px;line-height:1.4;color:#D5DCE3;width:1450px">Com 900 repositórios em três amostras independentes, os resultados descritivos <b style="color:#F7F5F0">se reproduzem</b> — todas as medianas dentro do IC de 300 — mas reprodutibilidade não é validade.</p>
+</div>
+</div>
+<div style="display:flex;gap:40px;background:#223040;padding:34px 44px;border-radius:16px">
+<p style="flex:1;font-size:27px;line-height:1.45;color:#D5DCE3"><b style="color:#F7F5F0">Pacote de replicação</b><br>Dataset de 900 repositórios com eventos brutos · 1.080 rótulos humanos · pipeline reprodutível com um comando. Quem replicar não gasta cota de API.</p>
+<p style="flex:1;font-size:27px;line-height:1.45;color:#D5DCE3"><b style="color:#F7F5F0">github.com/henriqjmelo/lab-expe-01</b><br>Guilherme Costa · Henrique Jardim Melo · Gabriel Afonso</p>
+</div>
+
+</section></body></html>
