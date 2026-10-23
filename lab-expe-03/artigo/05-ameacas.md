@@ -1,107 +1,47 @@
 # 5. Ameaças à validade
 
-As ameaças seguem a taxonomia de Cook & Campbell adotada por Wohlin et al. em engenharia de software. Cada uma é apoiada nos resultados da validação manual (seção 2) e das análises de sensibilidade e validade (seções 3.8 e 3.10), e é classificada entre **mitigada**, **parcialmente mitigada** e **aberta**.
+Taxonomia de Cook & Campbell, na adaptação de Wohlin et al. para engenharia de software. Cada ameaça é classificada em **mitigada**, **parcialmente mitigada** ou **aberta**, e apoiada nos resultados da validação manual (seção 2.7) e das análises de validade (seções 3.8 e 3.10).
 
-## 5.1 Validade de construto
+## 5.1 Validade de construto — *medimos o que achamos que medimos?*
 
-*Medimos o que achamos que medimos?*
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Release não é deploy** | aberta, por construção | O GitHub não registra implantação. A API de Deployments cobre só 38,8% dos 900 repositórios, com cobertura que varia entre amostras (seção 3.10.8). É a limitação mais importante do trabalho. |
+| **A heurística de release corretiva não é válida** | **aberta, agora quantificada** | Contra o gabarito humano, nenhuma das quatro versões atinge F1 = 0,70; a que gerou o dataset tem precisão de 36,5% (seção 2.7). |
+| **O CFR (b) está acoplado à cadência** | **confirmada e medida** | A suspeita foi testada: ao condicionar pela oportunidade de observação, ρ cai de 0,604 para −0,039 (p = 0,52). O CFR (b) mede, em boa parte, ritmo de publicação (seção 3.10.3). |
+| **Falha de CI não é falha em produção** | parcialmente mitigada | Os dois proxies diferem por quase cinco vezes (5,3% × 25,0%). Mitigação: reportar as duas variantes lado a lado, nunca escolher uma. |
+| **Mono-método** | parcialmente mitigada | Tudo vem da API do GitHub. Mitigação: medir os mesmos constructos por PRs e issues (CHAOSS, SPACE). Nenhum par alcança ρ = 0,7 (seção 3.10.6). |
+| **Ausência de desfecho externo** | aberta | Não há incidente em produção, satisfação de usuário nem custo de manutenção. Impede avaliar previsibilidade e restringe o poder discriminante a atributos observáveis, não a qualidade. |
 
-### Release não é deploy — **aberta, por construção**
+As duas primeiras linhas mudaram de natureza neste trabalho: eram suspeitas e passaram a ser **resultados medidos**. Isso não as mitiga — ao contrário, confirma que o CFR (b) deve ser lido como indicador de cadência, não de falha.
 
-O GitHub não registra deploy em produção. A frequência de entrega é medida por releases publicadas, e o lead time pelo intervalo entre commit e release. Um projeto que publica release sem implantar, ou que implanta continuamente sem publicar release, é medido errado por este estudo.
+## 5.2 Validade interna — *há fatores não controlados?*
 
-A tentativa de medir deploy diretamente, pela API de Deployments, esbarrou em **cobertura de 38,8% nos 900 repositórios** — e numa cobertura que varia entre amostras de forma detectável (seção 3.10.8). Por isso ela entra como subamostra de validação, não como medida principal. A ameaça permanece aberta e é a limitação mais importante do trabalho.
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Tamanho e popularidade como confusão** | **mitigada** | Testada por dois caminhos: estratificação em quartis e correlação parcial de Spearman. O ρ de 0,562 cai no máximo 0,059 na parcial, e os doze estratos mantêm o sinal (0,381–0,698). As faixas também não separam estrelas (ε² = 0,008) nem contribuidores (ε² = 0,022). |
+| **Repositórios antigos acumulam releases** | parcialmente mitigada | Idade é o único atributo independente que as faixas separam (ε² = 0,109). As métricas são normalizadas pela janela, o que limita a acumulação, e a idade entra como fator na RQ06. |
+| **Heterogeneidade da população** | documentada, não mitigável | Índice de dispersão de 493× em relação à Poisson (seção 3.10.5). Quatro faixas fixas não capturam essa estrutura. |
 
-### Falha de CI não é falha em produção — **parcialmente mitigada**
+## 5.3 Validade externa — *vale além da amostra?*
 
-O CFR (a) mede falha de pipeline. A diferença em relação ao CFR (b), que mede release seguida de corretiva, é de quase cinco vezes (5,3% contra 25,0%), o que mostra que os dois proxies não são intercambiáveis. A mitigação adotada foi reportar as duas variantes lado a lado em todas as análises, em vez de escolher uma.
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Amostra de repositórios populares** | aberta, por desenho | ≥ 1.000 estrelas, ≥ 5 releases e ≥ 50 runs. **Nada aqui se generaliza para projetos corporativos, pequenos ou sem CI/CD estabelecido.** |
+| **Sobrevivência do funil** | documentada | Dos 8.457 candidatos, poucos chegam à amostra; o filtro de releases é o mais severo. Funil e caracterização dos descartados em 2.6 e 3.10.1. |
+| **Estabilidade entre amostras** | **mitigada para as métricas DORA** | Três amostras sem repositório em comum produzem estimativas sobrepostas nas seis métricas, com ICs estreitando 21%–51% (seção 3.10.1). |
+| **…mas não para medidas auxiliares** | aberta | A cobertura da API de Deployments varia entre amostras de forma detectável (p = 0,0048) e sem causa identificada. |
+| **Janela única** | aberta | 12 meses. A RQ08 não encontrou tendência interna, mas outro período pode dar outros valores absolutos. |
 
-### O CFR (b) pode estar acoplado à cadência de publicação — **aberta**
+## 5.4 Validade de conclusão — *a estatística é adequada?*
 
-A correlação entre frequência de deploy e CFR (b) é positiva e forte (ρ = 0,562). O CFR (b) conta releases seguidas de uma corretiva em até 7 dias, e quem publica com mais frequência tem naturalmente mais chance de ter *alguma* release nessa janela. **Parte da associação pode estar embutida na definição da métrica.**
+| Ameaça | Situação | Evidência |
+| :--- | :--- | :--- |
+| **Hipóteses reconstruídas, não pré-registradas** | **aberta** | Ver abaixo. |
+| **Múltiplas comparações** | mitigada | Holm em todas as famílias de testes; FDR na RQ08, onde apenas 1 de 600 repositórios mantém tendência após a correção. |
+| **Pressupostos de normalidade** | mitigada | Nenhuma métrica passa em Shapiro-Wilk (p entre 10⁻¹⁴ e 10⁻³³). Todos os testes são não paramétricos e as estimativas são medianas com IQR. |
+| **Poder em subgrupos** | parcialmente mitigada | O TLC só se aproxima perto de n = 300 nesta população (seção 3.10.5), e os subgrupos da RQ06 são menores. Mitigação: testes não paramétricos e relato obrigatório de tamanho de efeito. A linguagem na RQ06, que só fica significativa com 600, ilustra ganho de poder e não mudança de fenômeno. |
+| **Dados censurados** | mitigada | Episódios sem recuperação na janela e releases dos últimos 7 dias ficam fora dos denominadores, com a proporção censurada reportada. |
+| **Truncamento da paginação** | documentada | Atinge ~3% dos PRs e 8%–10% dos deployments, marcado por repositório; as medidas afetadas são lidas como limite inferior. |
 
-A verificação é possível e não foi feita: bastaria comparar o CFR (b) observado com o esperado sob publicação aleatória na mesma cadência. Fica registrado como limitação conhecida.
-
-### Mono-método — **parcialmente mitigada**
-
-Todas as métricas vêm da mesma fonte, a API do GitHub. A mitigação foi medir os mesmos constructos por caminhos independentes: releases e CI (DORA clássico) contra pull requests e issues (CHAOSS, Flow, SPACE). O resultado foi revelador — **nenhum par de medidas do mesmo constructo alcança ρ = 0,7** (seção 3.10.6), o que indica que a operacionalização escolhida determina boa parte do resultado.
-
-### Ausência de desfecho externo — **aberta**
-
-Não há nenhuma medida de qualidade independente do pipeline: nem incidente em produção, nem satisfação de usuário, nem custo de manutenção. Isso impede avaliar a **previsibilidade** das métricas e limita a avaliação do **poder discriminante** a atributos observáveis, não a qualidade de fato.
-
-## 5.2 Validade interna
-
-*Há fatores não controlados que explicam os resultados?*
-
-### Tamanho e popularidade como variável de confusão — **mitigada**
-
-Repositórios grandes têm mais releases, mais runs, mais contribuidores e mais issues ao mesmo tempo, o que é o padrão que El Emam et al. (2001) encontraram ao controlar o tamanho da classe nas métricas CK.
-
-A ameaça foi **testada por dois caminhos independentes** (seção 3.10.3): estratificação em quartis e correlação parcial de Spearman. O ρ agregado de 0,562 cai no máximo 0,059 na parcial, e os doze estratos mantêm o mesmo sinal, variando entre 0,381 e 0,698. **Verificação feita, confusão não encontrada.**
-
-Reforça o resultado o fato de as faixas DORA não separarem estrelas (ε² = 0,008) nem contribuidores (ε² = 0,022).
-
-### Repositórios antigos acumulam mais releases — **parcialmente mitigada**
-
-A idade é o único atributo independente que as faixas DORA separam (ε² = 0,109, p = 1,2 × 10⁻⁶), ainda que com efeito pequeno. Como as métricas são normalizadas pela janela de 12 meses, o efeito de acumulação histórica é limitado, mas repositórios mais maduros podem ter processos mais estabelecidos. A idade entra como fator na RQ06 e o efeito é reportado.
-
-### Heterogeneidade da população — **documentada, não mitigável**
-
-A contagem de releases tem índice de dispersão de **493×** em relação ao que a Poisson exigiria (seção 3.10.5). A população não é homogênea em ritmo de entrega, e nenhum agrupamento em quatro faixas fixas captura essa estrutura. Isso não é um defeito do estudo, mas precisa ser considerado ao interpretar qualquer média ou classificação.
-
-## 5.3 Validade externa
-
-*Os resultados valem para além da amostra?*
-
-### Amostra de repositórios populares — **aberta, por desenho**
-
-O critério de inclusão exige no mínimo 1.000 estrelas, 5 releases publicadas e 50 workflow runs válidos na janela. Isso seleciona projetos open-source maduros e visíveis. **Nada aqui se generaliza para projetos corporativos, projetos pequenos ou projetos sem CI/CD estabelecido**, e as conclusões devem ser lidas restritas a esse contexto.
-
-### Sobrevivência do funil — **documentada**
-
-Dos 8.457 candidatos da busca, apenas uma fração chega à amostra: o filtro de releases é o mais severo, eliminando a maioria. O funil completo é reportado por amostra (seções 3.10.1 e 2), e a caracterização dos descartados está na seção de viés de seleção.
-
-### Estabilidade entre amostras independentes — **mitigada para as métricas DORA**
-
-Três amostras com sementes distintas e **nenhum repositório em comum** produzem estimativas que se sobrepõem em todas as seis métricas, com os intervalos estreitando de 21% a 51% ao triplicar o n (seção 3.10.1). É evidência de que os resultados não dependem do sorteio.
-
-A mitigação **não se estende** à cobertura da API de Deployments, que varia entre as amostras de forma estatisticamente detectável e sem causa identificada (seção 3.10.8).
-
-### Janela de observação única — **aberta**
-
-Os dados cobrem 12 meses (01/10/2025 a 30/09/2026). A RQ08 não encontrou tendência sistemática dentro da janela, mas nada garante que outro período produziria os mesmos valores absolutos.
-
-## 5.4 Validade de conclusão
-
-*A análise estatística é adequada?*
-
-### Hipóteses reconstruídas, não pré-registradas — **aberta**
-
-As hipóteses informais da seção 1.4 foram escritas em 20/10/2026, depois de a coleta terminar e os resultados estarem disponíveis ao grupo (seção 1.5). Isso abre espaço para HARKing — formular a hipótese já sabendo o resultado — e para viés de confirmação na escolha de quais análises reportar.
-
-Três coisas limitam o dano, nenhuma o elimina. Primeiro, cada hipótese declara a origem da expectativa, e todas vêm do programa DORA, do texto do enunciado ou de raciocínio anterior à coleta; nenhuma foi derivada dos dados. Segundo, cinco das sete foram refutadas (seção 4.0), o que é o oposto do padrão que HARKing produz. Terceiro, as decisões analíticas que poderiam ter sido ajustadas ao resultado têm justificativa verificável sem olhar os dados — a escolha da série mensal em vez da trimestral na RQ08 (seção 3.9), por exemplo, decorre de um fato aritmético sobre o teste de Mann-Kendall (com n = 4, o menor p bilateral possível é ≈ 0,089, qualquer que seja a série), e não de preferência por um resultado.
-
-Ainda assim, a ameaça permanece aberta: não há como provar, depois do fato, que a expectativa era essa. Uma replicação deste desenho deve registrar as hipóteses antes da coleta.
-
-### Múltiplas comparações — **mitigada**
-
-Todas as famílias de testes são corrigidas por **Holm**, e a RQ08, com centenas de testes simultâneos, usa FDR. O efeito da correção é visível e foi reportado: na RQ08, apenas 1 dos 600 repositórios mantém tendência significativa após o FDR.
-
-### Pressupostos de normalidade — **mitigada**
-
-Nenhuma das cinco métricas passa em teste de normalidade (p entre 10⁻¹⁴ e 10⁻³³). Por isso **todos os testes são não paramétricos** — Spearman, Mann-Whitney, Kruskal-Wallis — e as estimativas centrais são medianas com IQR, nunca média e desvio.
-
-### Poder estatístico em subgrupos — **parcialmente mitigada**
-
-A demonstração do Teorema Central do Limite (seção 3.10.5) mostra que, nesta população, a distribuição amostral só se aproxima da normal perto de n = 300. Os testes por subgrupo da RQ06 operam com n muito menor. A mitigação é dupla: testes não paramétricos, que não dependem da aproximação, e **relato obrigatório do tamanho de efeito** (ε² e delta de Cliff) junto do p-valor.
-
-O caso da linguagem na RQ06 ilustra o ponto: o efeito só passa a ser significativo com 600 repositórios, o que é ganho de poder e não mudança de fenômeno.
-
-### Dados censurados — **mitigada**
-
-Episódios de falha que não terminam dentro da janela e releases publicadas nos últimos 7 dias ficam fora dos denominadores, e a proporção censurada é reportada por repositório em vez de ser descartada em silêncio.
-
-### Truncamento da paginação — **documentada**
-
-A coleta GraphQL tem limite por repositório. O truncamento atinge cerca de 3% dos PRs e 8% a 10% dos deployments, e é marcado por repositório, de modo que as medidas afetadas são lidas como limite inferior.
+**Sobre as hipóteses.** As da seção 1.4 foram escritas em 20/10/2026, com os resultados já disponíveis (seção 1.5). Isso abre espaço para HARKing e para viés na escolha do que reportar. Três coisas limitam o dano sem eliminá-lo: cada hipótese declara a origem da expectativa, e nenhuma foi derivada dos dados; cinco das sete foram refutadas, o oposto do padrão que HARKing produz; e as decisões analíticas sensíveis têm justificativa verificável sem olhar os dados — a série mensal da RQ08, por exemplo, decorre de um fato aritmético do teste de Mann-Kendall (com n = 4 o menor p bilateral possível é ≈ 0,089). Ainda assim não há como provar, depois do fato, qual era a expectativa. **Uma replicação deste desenho deve registrar as hipóteses antes da coleta.**

@@ -46,36 +46,28 @@ Isso recontextualiza a RQ03 inteira. A divergência entre o CFR (a) e o CFR (b) 
 
 ### DORA e fluxo por PR são constructos distintos
 
-Esta foi a maior surpresa. A expectativa implícita em boa parte da literatura é que medidas de desempenho de entrega convirjam — que um time "rápido" apareça rápido em qualquer lente. Não é o que acontece.
+A expectativa implícita em boa parte da literatura é que medidas de desempenho convirjam — que um time "rápido" apareça rápido em qualquer lente. Não acontece. O par mais direto, lead time por release contra lead time por PR, compartilha **10% da variância** (ρ = 0,319, n = 574), e o CFR por release contra a taxa de aceitação de PR não tem associação alguma (ρ = 0,044, p = 0,288 após Holm).
 
-O par mais direto, lead time medido por release contra lead time medido por PR, compartilha **10% da variância** (ρ = 0,319, n = 574). E o CFR por release contra a taxa de aceitação de PR não tem associação alguma (ρ = 0,044, p = 0,288 após Holm, n = 597), apesar de ambos pretenderem falar sobre qualidade.
-
-A consequência é direta e incômoda: **o DORA não é *a* medida de desempenho de engenharia, é *uma* medida**, e uma lente igualmente legítima — a do fluxo de trabalho por pull request, nos padrões CHAOSS e SPACE — ordena os mesmos 900 repositórios de maneira substancialmente diferente. Um repositório bem classificado pela cadência de release pode ser lento na revisão de código, e vice-versa.
+A consequência é incômoda: **o DORA não é *a* medida de desempenho de engenharia, é *uma* medida.** Uma lente igualmente legítima — o fluxo por pull request, nos padrões CHAOSS e SPACE — ordena os mesmos repositórios de maneira substancialmente diferente.
 
 ### A recuperação não tem taxa constante
 
-A métrica de tempo de recuperação do DORA é reportada como mediana, o que implicitamente trata todos os episódios de falha como equivalentes. O ajuste de uma Weibull aos episódios mostra que não são: o parâmetro de forma tem mediana 0,557, com β < 1 em 90,3% dos repositórios.
-
-Isso significa **taxa de recuperação decrescente** — quanto mais tempo um episódio de falha já dura, menor a probabilidade de ele terminar no instante seguinte. Falhas curtas se resolvem rápido; o episódio que se arrasta tende a se arrastar muito mais. Duas populações com o mesmo MTTR mediano podem ter dinâmicas opostas, e a mediana não distingue.
+A métrica de recuperação é reportada como mediana, o que trata todos os episódios como equivalentes. O ajuste de Weibull mostra que não são: forma mediana β = 0,557, com β < 1 em **87,8%** dos repositórios. Isso é **taxa de recuperação decrescente** — quanto mais tempo um episódio dura, menor a chance de terminar no instante seguinte. Falhas curtas se resolvem rápido; o episódio que se arrasta tende a se arrastar muito mais. Duas populações com o mesmo MTTR mediano podem ter dinâmicas opostas, e a mediana não distingue.
 
 ### A regra "n ≥ 30" não vale aqui
 
-Com a população tendo assimetria 8,26, a distribuição amostral da média ainda tem assimetria 1,53 em n = 30, e só se aproxima da normal perto de n = 300. A consequência prática recai sobre a RQ06: os testes por subgrupo — quartis de estrelas, linguagens com poucos repositórios — operam exatamente na faixa onde a aproximação não vale, o que reforça o uso de testes não paramétricos e a obrigação de reportar tamanho de efeito junto do p-valor.
+Com assimetria populacional de 8,26, a distribuição amostral da média ainda tem assimetria 1,53 em n = 30, e só se aproxima da normal perto de n = 300. A consequência recai sobre a RQ06: os testes por subgrupo operam exatamente onde a aproximação não vale, o que reforça os testes não paramétricos e o relato obrigatório de tamanho de efeito.
 
-## 4.3 O que o tamanho da amostra mudou, e o que não mudou
+## 4.3 O que o tamanho da amostra mudou
 
-Triplicar a amostra de 300 para 900 **não alterou nenhuma conclusão qualitativa** das RQ01 a RQ05 nem da RQ07. Todas as medianas de 600 e de 900 caíram dentro do intervalo de confiança de 300, e os intervalos estreitaram de 21% a 51%.
+Triplicar de 300 para 900 **não alterou nenhuma conclusão qualitativa** das RQ01–RQ05 nem da RQ07: todas as medianas caíram dentro do IC de 300 e os intervalos estreitaram de 21% a 51%. A exceção é a RQ06, onde a linguagem passa a ter efeito significativo — ganho de poder, não mudança de fenômeno.
 
-A exceção é a RQ06: com 600 repositórios, a linguagem passa a apresentar efeito significativo que em 300 estava abaixo do limiar de detecção. Isso não é a métrica mudando de comportamento, é o teste ganhando poder — e é a razão de reportar sempre o `n` e o tamanho de efeito ao lado do p-valor.
-
-Houve, porém, um resultado na direção oposta. A cobertura da API de Deployments **varia de forma detectável entre as três amostras independentes** (31,3%, 41,7% e 43,3%; qui-quadrado p = 0,0048, tendência de Cochran-Armitage p = 0,0026), e nem o perfil dos repositórios nem a linguagem explicam a diferença. O mesmo desenho amostral que confirma a robustez das métricas DORA detecta a fragilidade de uma medida auxiliar — e esse contraste é o que dá credibilidade ao primeiro resultado.
+Houve um resultado na direção oposta: a cobertura da API de Deployments **varia de forma detectável entre as três amostras** (31,3%, 41,7%, 43,3%; p = 0,0048), sem que perfil ou linguagem expliquem. O mesmo desenho que confirma a robustez das métricas DORA detecta a fragilidade de uma medida auxiliar — e é esse contraste que dá credibilidade ao primeiro resultado.
 
 ## 4.4 O que o estudo não consegue responder
 
-Duas perguntas ficam estruturalmente fora de alcance, e por uma única causa: **todo o processo de entrega é medido por proxies do próprio GitHub**, sem nenhum desfecho externo de qualidade.
+Duas perguntas ficam estruturalmente fora de alcance pela mesma causa: **todo o processo é medido por proxies do próprio GitHub**, sem desfecho externo de qualidade.
 
-**Previsibilidade.** Não é possível verificar se as métricas preveem algum resultado que interesse — incidente em produção, satisfação de usuário, custo de manutenção —, porque nenhum desses desfechos está disponível.
+**Previsibilidade.** Não há como verificar se as métricas preveem algo que interesse — incidente em produção, satisfação de usuário, custo de manutenção — porque nenhum desses desfechos existe nos dados.
 
-**Poder discriminante contra qualidade.** Pelo mesmo motivo, o máximo que se consegue avaliar é se as faixas separam repositórios em atributos observáveis, e não se separam alta de baixa qualidade. O resultado negativo da seção 3.10.4 deve ser lido com essa ressalva: ele mostra que as faixas não separam popularidade nem tamanho de equipe, o que é informativo, mas não equivale a dizer que não separam qualidade.
-
-Fechar essas lacunas exigiria dados de fora do GitHub — relatórios de incidente, pesquisas com mantenedores, dados de uso — e é a direção natural para uma extensão do estudo.
+**Poder discriminante contra qualidade.** Pelo mesmo motivo, só se avalia se as faixas separam atributos observáveis, não se separam alta de baixa qualidade. O resultado negativo da seção 3.10.4 mostra que elas não separam popularidade nem tamanho de equipe — o que é informativo, mas não equivale a dizer que não separam qualidade.

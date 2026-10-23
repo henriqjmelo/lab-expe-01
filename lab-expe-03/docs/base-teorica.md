@@ -175,7 +175,7 @@ Ajustando uma Weibull por repositório aos episódios de falha extraídos de
 
 ```
 β mediano = 0,557     IQR = [0,459; 0,724]
-β < 1 em 90,3% dos repositórios
+β < 1 em 87,8% dos repositórios
 ```
 
 **A taxa de recuperação é decrescente na grande maioria dos repositórios.** A leitura em
