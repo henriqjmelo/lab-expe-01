@@ -14,13 +14,13 @@ Esta seção confronta as hipóteses informais da seção 1.4 com o que os dados
 | **H06** | Fatores do repositório com efeito ao menos pequeno | ε² = 0,008 (estrelas) e 0,022 (contribuidores), nenhum sobrevive a Holm | **Refutada** |
 | **H07** | < 20% mudam de faixa entre definições | 27,7% a 36,0% mudam | **Refutada** |
 
-Cinco refutadas, duas confirmadas. As duas que se confirmaram são as menos informativas: a H02 porque sua segunda metade estava dada na dica do enunciado, e a H04 porque o limiar de 24 h era frouxo. As cinco que caíram são as que carregam o conteúdo deste artigo — e a H05, em particular, caiu de um jeito que obrigou a reinterpretar a própria métrica (seção 3.13).
+Cinco refutadas, duas confirmadas. As duas que se confirmaram são as menos informativas: a H02 porque sua segunda metade estava dada na dica do enunciado, e a H04 porque o limiar de 24 h era frouxo. As cinco que caíram são as que carregam o conteúdo deste artigo — e a H05, em particular, caiu de um jeito que obrigou a reinterpretar a própria métrica (seção 3.10.3).
 
 ## 4.1 O que confirmou a expectativa
 
 **A entrega é bem mais lenta do que o discurso sobre CI/CD sugere.** A mediana de frequência fica em 0,35 release por semana nos 900 repositórios, ou aproximadamente uma release a cada vinte dias. Projetos open-source populares com GitHub Actions configurado não entregam continuamente; entregam em ciclos. A faixa Elite do DORA, que exige entrega diária ou mais, é ocupada por uma minoria pequena.
 
-**As distribuições são fortemente assimétricas à direita.** Era a expectativa, e os dados a confirmam com folga: nenhuma das cinco métricas passa em teste de normalidade, e a média do lead time chega a ser quase seis vezes a mediana. A exigência do enunciado de reportar mediana e IQR deixou de ser convenção e passou a ser um resultado demonstrado (seção 3.12).
+**As distribuições são fortemente assimétricas à direita.** Era a expectativa, e os dados a confirmam com folga: nenhuma das cinco métricas passa em teste de normalidade, e a média do lead time chega a ser quase seis vezes a mediana. A exigência do enunciado de reportar mediana e IQR deixou de ser convenção e passou a ser um resultado demonstrado (seção 3.10.5).
 
 **Os dois proxies de CFR discordam.** A taxa de falha medida por CI (5,3%) e a medida por release corretiva (25,0%) diferem por um fator de quase cinco. Elas não medem a mesma coisa — falha de pipeline não é falha em produção — e a divergência confirma que a escolha de proxy domina o resultado da RQ03.
 
@@ -33,6 +33,16 @@ A expectativa era que as faixas Elite/High/Medium/Low separassem repositórios e
 O que as faixas separam bem são **variantes alternativas das próprias métricas que as definem** — o CFR (b) alcança ε² = 0,379, perto do controle tautológico de 0,403. Isso é validade convergente, não discriminância. A leitura honesta é que a classificação DORA, nesta amostra, é em grande medida uma relabelagem de variáveis contínuas, e não um agrupamento com significado externo.
 
 Esse achado conversa com a superdispersão encontrada na contagem de releases (índice 493×): a população é tão heterogênea em ritmo de entrega que quatro faixas fixas não capturam a estrutura real.
+
+### A heurística de falha reprovou na validação humana
+
+O resultado mais duro do trabalho veio da amostra-ouro. Três pessoas rotularam 300 releases de forma independente, e **nenhuma das quatro versões da heurística de release corretiva alcança o F1 mínimo de 0,70** exigido pelo enunciado. A melhor fica em 0,498; a que gerou o dataset, em 0,478, com precisão de 36,5%.
+
+A expectativa era que a heurística errasse alguma coisa. Não era que errasse dois terços das vezes em que acusa.
+
+Mais revelador ainda é o κ de Fleiss de 0,504 entre os avaliadores humanos, e a prevalência de "sim" variando de 16,7% a 37,3% entre eles. **O problema não é só que a regra automática é ruim: é que o conceito é ambíguo para humanos também.** Uma heurística não pode ser mais precisa que a definição que tenta capturar.
+
+Isso recontextualiza a RQ03 inteira. A divergência entre o CFR (a) e o CFR (b) não é um caso de dois proxies válidos que medem coisas diferentes — é um proxy razoavelmente bem definido (falha de CI) contra um proxy que não sobrevive à validação.
 
 ### DORA e fluxo por PR são constructos distintos
 
@@ -66,6 +76,6 @@ Duas perguntas ficam estruturalmente fora de alcance, e por uma única causa: **
 
 **Previsibilidade.** Não é possível verificar se as métricas preveem algum resultado que interesse — incidente em produção, satisfação de usuário, custo de manutenção —, porque nenhum desses desfechos está disponível.
 
-**Poder discriminante contra qualidade.** Pelo mesmo motivo, o máximo que se consegue avaliar é se as faixas separam repositórios em atributos observáveis, e não se separam alta de baixa qualidade. O resultado negativo da seção 3.12 deve ser lido com essa ressalva: ele mostra que as faixas não separam popularidade nem tamanho de equipe, o que é informativo, mas não equivale a dizer que não separam qualidade.
+**Poder discriminante contra qualidade.** Pelo mesmo motivo, o máximo que se consegue avaliar é se as faixas separam repositórios em atributos observáveis, e não se separam alta de baixa qualidade. O resultado negativo da seção 3.10.4 deve ser lido com essa ressalva: ele mostra que as faixas não separam popularidade nem tamanho de equipe, o que é informativo, mas não equivale a dizer que não separam qualidade.
 
 Fechar essas lacunas exigiria dados de fora do GitHub — relatórios de incidente, pesquisas com mantenedores, dados de uso — e é a direção natural para uma extensão do estudo.

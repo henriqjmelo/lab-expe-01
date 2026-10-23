@@ -30,7 +30,7 @@ O grupo autor precisa responder às issues recebidas (#145). Independente do sor
 | Token do GitHub | o pipeline exige `GITHUB_TOKEN` no ambiente; sem ele, falha de imediato |
 | Cota de API | uma recoleta completa consome a cota de 5.000 chamadas/hora por horas seguidas |
 | Datas de coleta diferentes | repositórios recebem commits novos; as métricas mudam entre execuções |
-| API de Deployments | cobertura instável entre amostras (seção 3.12), o que pode produzir divergência legítima |
+| API de Deployments | cobertura instável entre amostras (seção 3.10.8), o que pode produzir divergência legítima |
 
 ## 6.3 Link do repositório e do Projects
 
