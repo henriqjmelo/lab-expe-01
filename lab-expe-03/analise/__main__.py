@@ -37,8 +37,9 @@ def gerar(df: pd.DataFrame, funil: pd.DataFrame | None, pasta: Path, rotulo: str
     ]
     if "cfr_c_revert" in df.columns:
         est.resumo_alternativas(df).to_csv(tabelas / "medidas_alternativas.csv", index=False)
+        est.correlacao_proxies(df).to_csv(tabelas / "correlacao_proxies_falha.csv")
+        pd.Series(est.rq05_revert(df)).to_csv(tabelas / "rq05_revert_detalhe.csv", header=["valor"])
         gerados += [
-            g.fig_cfr_proxies(df, figuras / "fig13_cfr_proxies.png"),
             g.fig_feedback_ci(df, figuras / "fig14_feedback_ci.png"),
             g.fig_distribuicao_trabalho(df, figuras / "fig15_distribuicao_trabalho.png"),
         ]

@@ -269,6 +269,12 @@ def _degraus(ax, v, p, **kw):
 
 
 def fig_rq03(df: pd.DataFrame, destino: Path) -> Path:
+    if "cfr_c_revert" in df.columns:
+        return fig_cfr_proxies(df, destino)
+    return _fig_rq03_dois_proxies(df, destino)
+
+
+def _fig_rq03_dois_proxies(df: pd.DataFrame, destino: Path) -> Path:
     fig, ax = plt.subplots(figsize=(LARGURA, 3.0))
     ax.grid(axis="y")
     for limite, nome in ((0.15, "Elite ≤ 15%"), (0.30, "High ≤ 30%"), (0.45, "Medium ≤ 45%")):
@@ -364,8 +370,10 @@ def fig_perfil(dist: pd.DataFrame, destino: Path) -> Path:
 
 
 def fig_rq05(df: pd.DataFrame, tabela: pd.DataFrame, destino: Path) -> Path:
-    fig, eixos = plt.subplots(1, 2, figsize=(LARGURA, 3.1), sharex=True)
-    for ax, (_, linha), cor in zip(eixos, tabela.iterrows(), SERIE[:2]):
+    tabela = tabela[tabela["coluna_y"] != "cfr_a_reexec"].reset_index(drop=True)
+    descricao = {c: d for c, _, d in est.PROXIES_FALHA}
+    fig, eixos = plt.subplots(1, len(tabela), figsize=(LARGURA, 3.1), sharex=True)
+    for ax, (_, linha), cor in zip(eixos, tabela.iterrows(), SERIE):
         par = df[["df_release_semana", linha["coluna_y"]]].dropna()
         ax.set_xscale("log")
         ax.grid(axis="y")
@@ -378,14 +386,12 @@ def fig_rq05(df: pd.DataFrame, tabela: pd.DataFrame, destino: Path) -> Path:
         ax.set_ylim(-0.02, 1.02)
         ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: fmt_pct(v)))
         ax.set_xlabel("Releases por semana (log)")
-        ax.set_title(linha["y"] + (" · proxy de CI" if linha["coluna_y"] == "cfr_a" else " · proxy de entrega*"),
-                     fontsize=9.5, pad=6)
+        ax.set_title(f"{linha['y']} · {descricao[linha['coluna_y']]}", fontsize=9, pad=6)
         _ticks_log(ax, [0.1, 0.3, 1, 3, 10, 30], ["0,1", "0,3", "1", "3", "10", "30"])
     eixos[0].set_ylabel("Change failure rate")
     fig.tight_layout()
     cabecalho(eixos[0], "RQ 05 · Velocidade × estabilidade: a correlação depende do proxy de falha",
-              "Spearman entre frequência de deploy e CFR · *heurística v0: mais releases = mais chances de uma "
-              "\"corretiva\" em 7 dias", folga=20)
+              "Spearman entre frequência de deploy e CFR · *heurística v0, preliminar", folga=20)
     return salvar(fig, destino)
 
 
@@ -592,7 +598,7 @@ def fig_cfr_proxies(df: pd.DataFrame, destino: Path) -> Path:
     ax.set_xlabel("Change failure rate")
     ax.set_ylabel("% acumulado de repositórios")
     ax.legend(loc="lower right", fontsize=8)
-    cabecalho(ax, "Três proxies de falha, três retratos: só a release revertida é quase sempre Elite",
+    cabecalho(ax, "RQ 03 · Três proxies de falha, três retratos do mesmo repositório",
               "Distribuição acumulada; o ponto marca a % Elite (≤ 15%) · *heurística v0, preliminar")
     return salvar(fig, destino)
 
