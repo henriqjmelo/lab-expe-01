@@ -730,4 +730,4 @@ O grupo autor precisa responder às issues recebidas (#145). Independente do sor
 ## 6.3 Link do repositório e do Projects
 
 - Repositório: `https://github.com/henriqjmelo/lab-expe-01`
-- GitHub Projects (Lab03): https://github.com/users/guicostak/projects/3
+- GitHub Projects: https://github.com/users/henriqjmelo/projects/2
