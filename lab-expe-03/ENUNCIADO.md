@@ -298,7 +298,7 @@ O relatório tem formato de **artigo científico**, no [template da SBC (Overlea
 7. Link do repositório/GitHub Projects do grupo.
 
 Link do repositório: https://github.com/henriqjmelo/lab-expe-01
-Link do GitHub Projects (Lab03): https://github.com/users/guicostak/projects/3
+Link do GitHub Projects: https://github.com/users/henriqjmelo/projects/2
 
 ### 9. Replicação cruzada (entrega final)
 
