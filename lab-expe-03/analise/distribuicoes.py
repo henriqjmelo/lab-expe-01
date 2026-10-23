@@ -9,6 +9,7 @@ from scipy import stats
 from statsmodels.stats.multitest import multipletests
 
 from analise import estatisticas as est
+from metricas.dora import ELITE, HIGH, LOW, MEDIUM
 from metricas.recuperacao import Run, episodios_do_workflow
 
 ALFA = 0.05
@@ -31,7 +32,7 @@ ATRIBUTOS_DISCRIMINANCIA = (
     ("lt_a_release_dias", "Lead time (a)"),
 )
 
-NOME_FAIXA = {1: "Elite", 2: "High", 3: "Medium", 4: "Low"}
+NOME_FAIXA = {ELITE: "Elite", HIGH: "High", MEDIUM: "Medium", LOW: "Low"}
 
 PARES_CONVERGENCIA = (
     ("lt_b_release_dias", "lt_pr_mediana_horas", "Lead time (b): por release × por PR"),
@@ -55,6 +56,8 @@ PARES_RQ05 = (
 )
 
 NIVEIS_QUARTIL = ("Q1", "Q2", "Q3", "Q4")
+
+FIM_JANELA = "2026-10-01T00:00:00Z"
 
 
 def _serie(valores) -> pd.Series:
@@ -315,6 +318,122 @@ def cobertura_entre_amostras(por_amostra: dict) -> dict:
             "tendencia": bool(p_tendencia < ALFA)}
 
 
+METRICAS_INDICE = (
+    ("df_release_semana", True),
+    ("lt_a_release_dias", False),
+    ("cfr_a", False),
+    ("recuperacao_mediana_horas", False),
+)
+
+
+def aderencia_contagem(contagens, n_faixas: int = 8) -> pd.DataFrame:
+    v = _serie(contagens)
+    if len(v) < 20:
+        return pd.DataFrame()
+    nb = ajuste_binomial_negativa(v)
+    media = float(v.mean())
+    cortes = np.unique(np.quantile(v, np.linspace(0, 1, n_faixas + 1)))
+    if len(cortes) < 3:
+        return pd.DataFrame()
+    cortes[0], cortes[-1] = -np.inf, np.inf
+    observado = np.histogram(v, bins=cortes)[0]
+    linhas = []
+    for nome, acumulada in (("poisson", lambda x: stats.poisson.cdf(x, media)),
+                            ("binomial_negativa",
+                             (lambda x: stats.nbinom.cdf(x, nb["r"], nb["p"]))
+                             if nb["aplicavel"] else None)):
+        if acumulada is None:
+            continue
+        bordas = np.where(np.isinf(cortes), np.nan, cortes)
+        probabilidades = []
+        for i in range(len(cortes) - 1):
+            lo = 0 if np.isnan(bordas[i]) else np.floor(bordas[i])
+            hi = np.inf if np.isnan(bordas[i + 1]) else np.floor(bordas[i + 1]) - 1
+            probabilidades.append((1.0 if np.isinf(hi) else acumulada(hi)) - acumulada(lo - 1))
+        esperado = np.array(probabilidades) * len(v)
+        esperado = np.where(esperado < 1e-9, 1e-9, esperado)
+        qui2 = float(((observado - esperado) ** 2 / esperado).sum())
+        gl = len(observado) - 1 - (1 if nome == "poisson" else 2)
+        linhas.append({"modelo": nome, "n": len(v), "faixas": len(observado),
+                       "qui2": qui2, "gl": gl,
+                       "p": float(stats.chi2.sf(qui2, gl)) if gl > 0 else None,
+                       "r": nb["r"], "p_nb": nb["p"]})
+    return pd.DataFrame(linhas)
+
+
+def indice_percentil(df: pd.DataFrame, metricas: tuple = METRICAS_INDICE) -> pd.DataFrame:
+    postos = {}
+    for coluna, maior_e_melhor in metricas:
+        if coluna not in df:
+            continue
+        posto = df[coluna].rank(pct=True)
+        postos[coluna] = posto if maior_e_melhor else 1 - posto
+    if not postos:
+        return pd.DataFrame()
+    tabela = pd.DataFrame(postos)
+    return pd.DataFrame({"indice": tabela.mean(axis=1),
+                         "n_metricas": tabela.notna().sum(axis=1)})
+
+
+def perda_por_faixa(indice: pd.Series, faixas: pd.Series) -> pd.DataFrame:
+    dados = pd.DataFrame({"indice": indice, "faixa": faixas}).dropna()
+    if dados.empty:
+        return pd.DataFrame()
+    total = float(dados["indice"].var(ddof=1))
+    por_faixa = dados.groupby("faixa")["indice"]
+    dentro = float((por_faixa.transform("mean") - dados["indice"]).pow(2).sum() / (len(dados) - 1))
+    linhas = [{"faixa": nome, "n": int(g.size), "mediana": float(g.median()),
+               "minimo": float(g.min()), "maximo": float(g.max()),
+               "amplitude": float(g.max() - g.min())} for nome, g in por_faixa]
+    tabela = pd.DataFrame(linhas)
+    tabela["variancia_total"] = total
+    tabela["variancia_dentro"] = dentro
+    tabela["prop_retida_pela_faixa"] = 1 - dentro / total if total > 0 else None
+    return tabela
+
+
+def taxa_oportunidade(releases: pd.DataFrame, fim_janela: str, dias: int = 7) -> pd.DataFrame:
+    rel = releases.copy()
+    rel["published_at"] = pd.to_datetime(rel["published_at"], utc=True)
+    rel = rel.sort_values(["owner", "repo", "published_at"])
+    fim = pd.Timestamp(fim_janela, tz="UTC")
+    linhas = []
+    for (owner, repo), grupo in rel.groupby(["owner", "repo"], sort=False):
+        t = grupo["published_at"].reset_index(drop=True)
+        if len(t) < 2:
+            continue
+        ate_proxima = (t.shift(-1) - t).dt.total_seconds() / 86400
+        avaliavel = (fim - t).dt.total_seconds() / 86400 > dias
+        n_avaliadas = int(avaliavel.sum())
+        if n_avaliadas == 0:
+            continue
+        com_oportunidade = int((avaliavel & (ate_proxima <= dias)).sum())
+        linhas.append({"owner": owner, "repo": repo, "n_avaliadas": n_avaliadas,
+                       "n_com_oportunidade": com_oportunidade,
+                       "oportunidade": com_oportunidade / n_avaliadas})
+    return pd.DataFrame(linhas)
+
+
+def acoplamento_cadencia(df: pd.DataFrame, oportunidade: pd.DataFrame,
+                         frequencia: str = "df_release_semana",
+                         cfr: str = "cfr_b_release") -> pd.DataFrame:
+    m = df[["owner", "repo", frequencia, cfr]].merge(oportunidade, on=["owner", "repo"]).dropna(
+        subset=[frequencia, cfr, "oportunidade"])
+    if m.empty:
+        return pd.DataFrame()
+    m = m.assign(condicional=(m[cfr] / m["oportunidade"].replace(0, np.nan)))
+    linhas = [
+        {"serie": "oportunidade", **convergencia(m[frequencia], m["oportunidade"])},
+        {"serie": "cfr_bruto", **convergencia(m[frequencia], m[cfr])},
+        {"serie": "cfr_condicional", **convergencia(m[frequencia], m["condicional"])},
+    ]
+    tabela = pd.DataFrame(linhas)
+    tabela["violacoes"] = int((m[cfr] > m["oportunidade"] + 1e-9).sum())
+    tabela["mediana"] = [float(m["oportunidade"].median()), float(m[cfr].median()),
+                         float(m["condicional"].median())]
+    return tabela
+
+
 def quartis(valores) -> pd.Series:
     serie = pd.Series(np.asarray(valores, dtype="float64"))
     return pd.qcut(serie, 4, labels=list(NIVEIS_QUARTIL), duplicates="drop")
@@ -411,6 +530,26 @@ def main(argv: list[str] | None = None) -> int:
         conv.to_csv(args.saida / "distribuicoes_convergencia.csv", index=False)
         print(f"{args.saida}/distribuicoes_convergencia.csv: {len(conv)} par(es), "
               f"{int(conv['n'].max())} repositorios")
+
+    aderencia = aderencia_contagem(df["n_release"])
+    if not aderencia.empty:
+        aderencia.to_csv(args.saida / "distribuicoes_aderencia.csv", index=False)
+        print(f"{args.saida}/distribuicoes_aderencia.csv: {len(aderencia)} modelo(s)")
+
+    indice = indice_percentil(df)
+    if not indice.empty:
+        perda = perda_por_faixa(indice["indice"], faixas)
+        perda.to_csv(args.saida / "distribuicoes_indice.csv", index=False)
+        print(f"{args.saida}/distribuicoes_indice.csv: {len(perda)} faixa(s)")
+
+    releases = args.dataset.parent / "eventos" / "releases.csv"
+    if releases.exists():
+        rel = pd.read_csv(releases)
+        rel = rel[(rel["na_janela"]) & (~rel["prerelease"])]
+        acoplamento = acoplamento_cadencia(df, taxa_oportunidade(rel, FIM_JANELA))
+        if not acoplamento.empty:
+            acoplamento.to_csv(args.saida / "distribuicoes_acoplamento.csv", index=False)
+            print(f"{args.saida}/distribuicoes_acoplamento.csv: {len(acoplamento)} linha(s)")
 
     conjunto = pd.concat(juntadas, ignore_index=True) if juntadas else df
     confusao = pd.concat([tabela_confusao(conjunto, x, y) for x, y, _ in PARES_RQ05

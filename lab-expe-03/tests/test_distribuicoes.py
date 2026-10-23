@@ -7,6 +7,8 @@ import pytest
 from analise.distribuicoes import (
     ajuste_binomial_negativa,
     ajuste_weibull,
+    acoplamento_cadencia,
+    aderencia_contagem,
     centro,
     cobertura_entre_amostras,
     convergencia,
@@ -15,12 +17,15 @@ from analise.distribuicoes import (
     dispersao,
     duracoes_por_repositorio,
     faixas_dora,
+    indice_percentil,
     juntar_medidas,
     medias_amostrais,
     normalidade,
+    perda_por_faixa,
     quartis,
     poder_discriminante,
     resumo_weibull,
+    taxa_oportunidade,
     tabela_centro,
     tabela_contagem,
     tabela_confusao,
@@ -200,9 +205,13 @@ def test_tipo_muda_quando_a_combinacao_muda():
     assert tipo_do_atributo("lt_b_release_dias", ("lt_a_release_dias",)) == "operacionalizacao"
 
 
-def test_faixas_dora_traduz_os_codigos():
-    faixas = faixas_dora(pd.DataFrame({"geral": [1, 2, 3, 4]}))
+def test_faixas_dora_traduz_os_codigos_na_direcao_certa():
+    from metricas.dora import ELITE, HIGH, LOW, MEDIUM
+    faixas = faixas_dora(pd.DataFrame({"geral": [ELITE, HIGH, MEDIUM, LOW]}))
     assert list(faixas) == ["Elite", "High", "Medium", "Low"]
+    assert ELITE > LOW
+    assert faixas_dora(pd.DataFrame({"geral": [1, 2, 3, 4]})).tolist() == [
+        "Low", "Medium", "High", "Elite"]
 
 
 def test_discriminancia_corrige_por_holm_e_deixa_o_controle_de_fora():
@@ -382,6 +391,103 @@ def test_cobertura_entre_amostras_com_coluna_constante():
 
 def test_cobertura_entre_amostras_com_uma_so():
     assert cobertura_entre_amostras({"A1": [True, False]})["p_qui2"] is None
+
+
+def test_aderencia_prefere_poisson_em_amostra_poisson():
+    amostra = np.random.default_rng(41).poisson(6.0, size=500)
+    t = aderencia_contagem(amostra).set_index("modelo")
+    assert t.loc["poisson", "p"] > 0.01
+
+
+def test_aderencia_prefere_binomial_negativa_em_amostra_superdispersa():
+    rng = np.random.default_rng(42)
+    amostra = rng.negative_binomial(2, 0.05, size=500)
+    t = aderencia_contagem(amostra).set_index("modelo")
+    assert t.loc["binomial_negativa", "qui2"] < t.loc["poisson", "qui2"]
+    assert t.loc["binomial_negativa", "r"] > 0
+
+
+def test_aderencia_sem_dados_suficientes():
+    assert aderencia_contagem([1, 2, 3]).empty
+
+
+def test_indice_percentil_inverte_as_metricas_em_que_menor_e_melhor():
+    df = pd.DataFrame({"df_release_semana": [1.0, 2.0, 3.0],
+                       "lt_a_release_dias": [30.0, 20.0, 10.0]})
+    i = indice_percentil(df, (("df_release_semana", True), ("lt_a_release_dias", False)))
+    assert i["indice"].is_monotonic_increasing
+    assert i["n_metricas"].tolist() == [2, 2, 2]
+
+
+def test_indice_percentil_usa_as_metricas_disponiveis():
+    df = pd.DataFrame({"df_release_semana": [1.0, 2.0, np.nan],
+                       "cfr_a": [0.1, 0.2, 0.3]})
+    i = indice_percentil(df, (("df_release_semana", True), ("cfr_a", False)))
+    assert i["n_metricas"].tolist() == [2, 2, 1]
+    assert i["indice"].notna().all()
+
+
+def test_perda_por_faixa_mede_quanto_a_categorizacao_retem():
+    indice = pd.Series([0.1, 0.15, 0.2, 0.8, 0.85, 0.9])
+    faixas = pd.Series(["Low"] * 3 + ["Elite"] * 3)
+    t = perda_por_faixa(indice, faixas)
+    assert t["prop_retida_pela_faixa"].iloc[0] > 0.9
+    assert set(t["faixa"]) == {"Low", "Elite"}
+
+
+def test_perda_por_faixa_quando_a_faixa_nao_separa_nada():
+    indice = pd.Series([0.1, 0.9, 0.1, 0.9])
+    faixas = pd.Series(["A", "A", "B", "B"])
+    assert perda_por_faixa(indice, faixas)["prop_retida_pela_faixa"].iloc[0] < 0.1
+
+
+def _releases(owner, repo, datas):
+    return pd.DataFrame({"owner": owner, "repo": repo, "published_at": datas})
+
+
+def test_taxa_oportunidade_conta_releases_seguidas_em_ate_sete_dias():
+    rel = _releases("o", "r", ["2026-01-01T00:00:00Z", "2026-01-04T00:00:00Z",
+                               "2026-01-20T00:00:00Z", "2026-02-10T00:00:00Z"])
+    t = taxa_oportunidade(rel, "2026-10-01T00:00:00Z").iloc[0]
+    assert t["n_avaliadas"] == 4
+    assert t["n_com_oportunidade"] == 1
+    assert t["oportunidade"] == pytest.approx(0.25)
+
+
+def test_taxa_oportunidade_censura_as_ultimas_releases_da_janela():
+    rel = _releases("o", "r", ["2026-01-01T00:00:00Z", "2026-09-29T00:00:00Z"])
+    t = taxa_oportunidade(rel, "2026-10-01T00:00:00Z").iloc[0]
+    assert t["n_avaliadas"] == 1
+
+
+def test_taxa_oportunidade_ignora_repositorio_com_uma_release():
+    assert taxa_oportunidade(_releases("o", "r", ["2026-01-01T00:00:00Z"]),
+                             "2026-10-01T00:00:00Z").empty
+
+
+def test_acoplamento_detecta_associacao_que_some_ao_condicionar():
+    rng = np.random.default_rng(31)
+    n = 200
+    freq = rng.uniform(0.1, 5.0, n)
+    oport = np.clip(freq / 6, 0.02, 0.95)
+    cfr = oport * 0.8
+    df = pd.DataFrame({"owner": "o", "repo": [f"r{i}" for i in range(n)],
+                       "df_release_semana": freq, "cfr_b_release": cfr})
+    op = pd.DataFrame({"owner": "o", "repo": [f"r{i}" for i in range(n)],
+                       "n_avaliadas": 10, "n_com_oportunidade": 4, "oportunidade": oport})
+    t = acoplamento_cadencia(df, op).set_index("serie")
+    assert t.loc["oportunidade", "rho"] > 0.9
+    assert t.loc["cfr_bruto", "rho"] > 0.9
+    assert abs(t.loc["cfr_condicional", "rho"]) < 0.2
+    assert int(t["violacoes"].iloc[0]) == 0
+
+
+def test_acoplamento_vazio_quando_nao_ha_cruzamento():
+    df = pd.DataFrame({"owner": ["o"], "repo": ["a"], "df_release_semana": [1.0],
+                       "cfr_b_release": [0.1]})
+    op = pd.DataFrame({"owner": ["o"], "repo": ["b"], "n_avaliadas": [5],
+                       "n_com_oportunidade": [2], "oportunidade": [0.4]})
+    assert acoplamento_cadencia(df, op).empty
 
 
 def test_discriminancia_marca_separacao_real():
