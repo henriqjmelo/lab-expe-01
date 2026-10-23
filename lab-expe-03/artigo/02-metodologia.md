@@ -1,6 +1,6 @@
 # 2. Metodologia
 
-> Rascunho da issue #139, a ser revisado por Henrique e Gabriel antes de ir para o Overleaf. Os números da coleta são os do `data/` desta versão. Os trechos marcados com **[PENDENTE]** dependem das issues #137 (kappa) e #138 (F1 da heurística) ou das datas da janela.
+> Rascunho da issue #139, a ser revisado por Henrique e Gabriel antes de ir para o Overleaf. Os números da coleta são os do `data/` desta versão. O único item em aberto são as datas exatas da janela, a confirmar com o professor.
 
 ## 2.1 Fonte de dados
 
@@ -71,7 +71,7 @@ Métricas por repositório:
     | v2 (patch + poucos commits) | 2,4% | 0,0% – 21,6% | 1.903 |
     | v3 (combinada) | 25,0% | 6,0% – 57,2% | 8.597 |
 
-    A v0 sozinha já marca um quarto das releases como corretivas, bem acima do CFR (a) (mediana 2,6%, seção 3.1); a v1, baseada só na mensagem do commit, é bem mais conservadora. **[PENDENTE: escolher a versão final (#138) a partir da precisão, recall e F1 contra a amostra-ouro, quando o consenso da #137 existir, e atualizar esta tabela e o dataset.]**
+    A v0 sozinha já marca um quarto das releases como corretivas, bem acima do CFR (a) (mediana 2,6%, seção 3.1); a v1, baseada só na mensagem do commit, é bem mais conservadora. A escolha da versão final foi decidida contra o gabarito humano na seção 2.7: nenhuma das quatro atinge o F1 mínimo, e a v0 foi mantida como referência.
 - **Tempo de recuperação (RQ 04):** os runs são agrupados por workflow e ordenados por `run_started_at`.
   - Um episódio começa na primeira falha depois de um sucesso e termina no sucesso seguinte, com duração `updated_at(sucesso) − run_started_at(1ª falha)`. O valor do repositório é a mediana dos episódios fechados, em horas.
   - Episódios sem sucesso até o fim da janela são **censurados**: não entram na mediana, mas são contados, e a proporção é reportada por repositório.
@@ -141,11 +141,37 @@ Os testes, medianas e tamanhos de efeito podem ser regenerados sem acesso à API
 
 ## 2.7 Validação manual (amostra-ouro)
 
-1. **Sorteio.** Foram sorteados 60 repositórios da amostra final com semente fixa. **[PENDENTE: semente e lista (#137).]**
-2. **Rotulagem independente.** Cada integrante rotulou sozinho, sem consultar os demais nem ver a saída da heurística, três dimensões:
-   - (i) tipo do projeto (biblioteca/framework, aplicação/serviço, ferramenta CLI ou outro);
-   - (ii) se as releases representam entregas reais ao usuário (sim/não/incerto);
-   - (iii) para 5 releases sorteadas por repositório, se a release é corretiva.
-3. **Concordância.** Foi medida pelo kappa de Fleiss por dimensão e interpretada segundo Landis e Koch (1977). **[PENDENTE: valores de κ (#137).]**
-4. **Consenso.** As divergências foram resolvidas por consenso, seguindo o protocolo de desempate registrado no repositório.
-5. **Avaliação da heurística.** A heurística de release corretiva foi avaliada contra o consenso por precisão, recall e F1. Com F1 < 0,70, ela foi refinada e reavaliada, e cada versão foi documentada. **[PENDENTE: P/R/F1 por versão (#138).]**
+**Sorteio.** Foram sorteados 60 repositórios da amostra 1 com semente fixa (`sample(n=60, random_state=42)`) e, para cada um, até 5 releases da janela com um `random.Random(42)` novo por repositório, num total de 300 releases. O sorteio é reprodutível por `python -m analise.amostra_ouro` e a lista está em `validacao/amostra_ouro_repos.csv` e `validacao/amostra_ouro_releases.csv`.
+
+**Rotulagem independente.** Os três integrantes rotularam sozinhos, sem consultar os demais nem ver a saída da heurística, três dimensões: (i) tipo do projeto; (ii) se as releases representam entregas reais ao usuário; (iii) se cada release sorteada é corretiva. São 360 julgamentos por pessoa, 1.080 no total, em `validacao/rotulos_<nome>_*.csv`.
+
+**Concordância.** Medida pelo kappa de Fleiss por dimensão (Tabela 4), interpretada segundo Landis e Koch (1977). A concordância bruta é reportada junto porque o kappa desconta a concordância esperada por acaso e, quando uma categoria domina, pode colapsar mesmo com acordo alto — é o que ocorre em `releases_reais`.
+
+**Tabela 4 — Concordância entre os três avaliadores.**
+
+| Dimensão | n | κ de Fleiss | Interpretação | Os 3 iguais | Maioria 2/3 | Categoria dominante |
+| :--- | ---: | ---: | :--- | ---: | ---: | :--- |
+| Tipo do projeto | 60 | 0,872 | quase perfeita | 86,7% | 100% | aplicação/serviço (41,7%) |
+| Releases são entrega real | 60 | 0,157 | leve | 90,0% | 98,3% | sim (95,6%) |
+| Release é corretiva | 300 | 0,504 | moderada | 71,0% | 100% | não (73,4%) |
+
+O κ de 0,157 em `releases_reais` **não** significa desacordo: os três concordaram em 90% dos repositórios. Significa que quase todos os repositórios receberam o mesmo rótulo (`sim` em 95,6% dos julgamentos), de modo que o acaso já explicaria quase toda a concordância observada. A medida é pouco informativa nessa dimensão, e a leitura correta é a concordância bruta.
+
+O κ de 0,504 em `corretiva` é o número que importa, e é apenas moderado. Três pessoas lendo as mesmas notas de release e a mesma lista de commits divergiram em 29% dos casos. A prevalência de "sim" variou de 16,7% a 37,3% entre avaliadores. Isso é evidência direta de que **o próprio conceito de "release corretiva" é ambíguo**, e não apenas difícil de automatizar.
+
+**Consenso.** Resolvido por maioria de 2 em 3, com o protocolo em `validacao/PROTOCOLO.md`. Houve maioria em 100% das releases e dos tipos de projeto; apenas 1 repositório ficou sem maioria em `releases_reais` e segue marcado para decisão em reunião. O gabarito final tem 78 releases corretivas e 222 não corretivas (26,0% de prevalência), em `validacao/consenso_releases.csv`.
+
+**Avaliação da heurística.** Quatro versões foram testadas contra o consenso (Tabela 5). **Nenhuma atinge o F1 mínimo de 0,70 exigido pelo enunciado.**
+
+**Tabela 5 — Heurística de release corretiva contra o gabarito humano (n = 300).**
+
+| Versão | Regra | Precisão | Recall | F1 |
+| :--- | :--- | ---: | ---: | ---: |
+| v0 `semver_patch` | sobe só o *patch* da versão | 36,5% | 69,2% | 0,478 |
+| v1 `mensagens` | ≥ metade dos commits é `fix:`/revert | 94,4% | 21,8% | 0,354 |
+| v2 `patch_poucos_commits` | v0 **e** ≤ 3 commits | 59,5% | 28,2% | 0,383 |
+| **v3 `combinada`** | v0 **ou** v1 **ou** tag com `hotfix`/`patch` | 37,7% | 73,1% | **0,498** |
+
+A v0, que gerou o `cfr_b_release` de todo o dataset, tem **precisão de 36,5%**: de cada três releases que ela marca como corretivas, duas não são, segundo o consenso humano. A v1 inverte o erro — precisão de 94,4% com recall de 21,8%, ou seja, quando acusa quase sempre acerta, mas deixa passar quatro de cada cinco correções reais. A v3, melhor por F1, supera a v0 por apenas 0,020, e as duas produzem medianas de CFR (b) praticamente iguais (25,0% em ambas).
+
+Por isso **a v0 foi mantida como definição de referência**: trocá-la pela v3 exigiria recalcular as três amostras sem ganho de validade mensurável. A decisão e seu custo estão registrados aqui e discutidos na seção 5.1, onde a validade de construto do CFR (b) deixa de ser uma suspeita e passa a ser um resultado medido. As quatro versões e o detalhamento estão em `validacao/heuristica_versoes.md` e `validacao/avaliacao_heuristica.csv`.

@@ -162,7 +162,9 @@ def main(argv: list[str] | None = None) -> int:
     kappas, consenso_repos, consenso_releases = executar(args.pasta)
     print(kappas.to_string(index=False))
     print(f"Consenso: {len(consenso_repos)} repositórios, {len(consenso_releases)} releases")
-    print(f"Itens que exigem decisão manual: {int(consenso_repos['discussao_necessaria'].sum())} repositórios e "
+    print(f"Itens que exigem decisão manual: "
+          f"{int(consenso_repos['discussao_necessaria_tipo'].sum())} em tipo_projeto, "
+          f"{int(consenso_repos['discussao_necessaria_releases'].sum())} em releases_reais e "
           f"{int(consenso_releases['discussao_necessaria'].sum())} releases")
     return 0
 

@@ -13,7 +13,8 @@ F1_MINIMO = 0.70
 
 
 def avaliar_versao(marcacoes: pd.DataFrame, consenso: pd.DataFrame) -> dict:
-    comparado = consenso.merge(marcacoes, on=["owner", "repo", "tag_name"], how="inner")
+    marcacoes = marcacoes.assign(full_name=marcacoes["owner"] + "/" + marcacoes["repo"])
+    comparado = consenso.merge(marcacoes, on=["full_name", "tag_name"], how="inner")
     if comparado.empty:
         return {"n": 0, "precisao": None, "recall": None, "f1": None}
     y_real = (comparado["corretiva"].astype(str).str.strip().str.lower() == "sim").astype(int)
