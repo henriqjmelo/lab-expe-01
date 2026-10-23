@@ -12,8 +12,18 @@ from validacao.comparar_versoes import marcacoes_por_release
 F1_MINIMO = 0.70
 
 
+def _com_full_name(df: pd.DataFrame) -> pd.DataFrame:
+    if "full_name" in df.columns:
+        return df
+    return df.assign(full_name=df["owner"] + "/" + df["repo"])
+
+
 def avaliar_versao(marcacoes: pd.DataFrame, consenso: pd.DataFrame) -> dict:
-    comparado = consenso.merge(marcacoes, on=["owner", "repo", "tag_name"], how="inner")
+    marcacoes = _com_full_name(marcacoes)
+    consenso = _com_full_name(consenso)
+    comparado = consenso.merge(
+        marcacoes[["full_name", "tag_name", "marcada"]], on=["full_name", "tag_name"], how="inner"
+    )
     if comparado.empty:
         return {"n": 0, "precisao": None, "recall": None, "f1": None}
     y_real = (comparado["corretiva"].astype(str).str.strip().str.lower() == "sim").astype(int)
