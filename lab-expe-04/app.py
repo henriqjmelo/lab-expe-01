@@ -13,7 +13,9 @@ import streamlit as st
 
 RAIZ = Path(__file__).resolve().parent
 sys.path.insert(0, str(RAIZ / "src"))
+sys.path.insert(0, str(RAIZ))  # dashboard_demo e analysis importam "src.<modulo>"
 
+import dashboard_demo
 import g1
 import graficos
 import params
@@ -160,11 +162,24 @@ trocar cada valor pelo seu **posto** — ele enxerga ordem, não distância.
 divididos em {num(params.ALFA * 50, 1)}% por cauda, além de ±{num(ex["t_critico"], 3)}. Fica nas
 pontas porque esses são os valores de t improváveis caso não houvesse associação nenhuma.
 
-**O p-valor do exemplo.** Num conjunto da situação B com r latente {num(ex["r_latente"], 1)},
-saiu r = {num(ex["r"], 3)}, t = {num(ex["t"], 3)} e p = {num(ex["p"], 4)} — a área amarela.
-Esse p diz que, **se H₀ fosse verdadeira**, um t tão ou mais extremo apareceria em
-{num(ex["p"] * 100, 2)}% das amostras. Ele **não** diz que há {num(ex["p"] * 100, 2)}% de chance
-de H₀ ser verdadeira, nem mede o tamanho do efeito.
+**O p-valor do exemplo.** É o conjunto da tabela abaixo ({ex["conjunto"]}, n = {ex["n"]},
+correlação latente 0,3, semente {params.SEED}): o Pearson deu r = {num(ex["r"], 3)},
+t = {num(ex["t"], 3)} e p = {num(ex["p"], 4)} — a área amarela do gráfico. Esse p diz que,
+**se H₀ fosse verdadeira**, um t tão ou mais extremo apareceria em {num(ex["p"] * 100, 2)}% das
+amostras. Ele **não** diz que há {num(ex["p"] * 100, 2)}% de chance de H₀ ser verdadeira, nem
+mede o tamanho do efeito.
+"""
+)
+
+dashboard_demo.renderizar_exemplo(st)
+
+st.markdown(
+    f"""
+**Os dois testes discordam neste conjunto.** Com os mesmos {ex["n"]} pares, o Pearson rejeita H₀
+(p = {num(ex["p"], 3)}) e o Spearman não (p = {num(ex["p_spearman"], 3)}). Não é erro de nenhum
+dos dois: eles medem coisas diferentes, e com n = {ex["n"]} a distância entre medir valores e
+medir postos já basta para cair em lados opostos de 0,05. Qual dos dois é mais confiável aqui é
+exatamente o que a S02 vai medir.
 """
 )
 st.divider()
