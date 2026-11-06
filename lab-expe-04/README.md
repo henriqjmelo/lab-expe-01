@@ -53,8 +53,12 @@ lab-expe-04/
   src/
     params.py          constantes + parâmetros estimados dos dados reais
     estilo.py          cores e estilo compartilhados dos gráficos
+    generate.py        gerador das situações A (normal) e B (lognormal)
+    analysis.py        aplica Pearson e Spearman a um conjunto e interpreta
     g1.py              G1: histogramas real × simulado
     graficos.py        G2: distribuição de t sob H₀, rejeição e p-valor
+    dashboard_demo.py  bloco da seção 3: tabela dos dois testes no exemplo
+  tests/               pytest do gerador e da análise
   results/             PNGs gerados (g1.png, g2.png)
 ```
 
@@ -67,6 +71,21 @@ python src/params.py      # resumo dos dados reais e os parâmetros da situaçã
 python src/g1.py          # grava results/g1.png
 python src/graficos.py    # imprime r, t e p do exemplo e grava results/g2.png
 ```
+
+## Testes
+
+```bash
+python -m pytest tests -q
+```
+
+Cobrem o gerador das duas situações e a aplicação dos dois testes a um conjunto.
+
+## O conjunto de exemplo da S01
+
+O exemplo que aparece na seção 3 do dashboard e tem o p-valor marcado no G2 é **um só**,
+definido em `analysis.gerar_exemplo()`: situação A, n = 30, correlação latente 0,3, semente 42.
+Nele o Pearson rejeita H₀ (r = 0,374; p = 0,042) e o Spearman não (ρ = 0,247; p = 0,188) — é o
+primeiro sinal de que a escolha do teste muda a conclusão.
 
 ## As duas situações simuladas
 
