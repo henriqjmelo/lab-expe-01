@@ -31,6 +31,7 @@ Este repositório reúne **todos os laboratórios da disciplina** ao longo do se
 | Lab01 | [lab-expe-01/](lab-expe-01/) | Características de repositórios populares do GitHub + setup do Kanban | Concluído |
 | Lab02 | [lab-expe-02/](lab-expe-02/) | Assistentes de IA vs. codificação manual: experimento controlado | Em andamento (S02/S03) |
 | Lab03 | [lab-expe-03/](lab-expe-03/) | Métricas DORA (deployment frequency, lead time, CFR, recuperação) em repositórios populares | Em andamento (S01) |
+| Lab04 | [lab-expe-04/](lab-expe-04/) | Testes de hipótese por simulação: Pearson × Spearman com dashboard | Em andamento (S01) |
 
 ---
 
