@@ -6,6 +6,8 @@ sao 28 graus de liberdade e o corte bicaudal de 5% fica em +-2,048.
 
     python src/graficos.py     # grava results/g2.png
 """
+import sys
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -16,29 +18,18 @@ from scipy import stats
 import estilo
 import params
 
+# analysis.py importa "src.generate", entao a raiz do projeto precisa estar no path
+# tambem quando este arquivo roda direto (python src/graficos.py).
+if str(params.RAIZ) not in sys.path:
+    sys.path.insert(0, str(params.RAIZ))
+
+import analysis
+
 GL = params.N_SIM - 2
 T_CRITICO = float(stats.t.ppf(1 - params.ALFA / 2, GL))
 
 COR_REJEICAO = "#c44536"
 COR_PVALOR = "#e9c46a"
-
-# Efeito do conjunto de exemplo. Qualquer valor de params.EFEITOS serve; 0,5 foi
-# escolhido porque cai dentro da regiao de rejeicao e deixa a area visivel.
-R_EXEMPLO = 0.5
-
-
-def exemplo_situacao_b(r: float = R_EXEMPLO, n: int = params.N_SIM, seed: int = params.SEED):
-    """Um unico conjunto de n pares (LOC, defeitos) da situacao B, so para o exemplo do G2.
-
-    Provisorio: quando o gerador oficial (generate.py, Issue #187) entrar, basta passar
-    o t observado direto para figura_g2(t_obs=...) e esta funcao deixa de ser usada.
-    """
-    rng = np.random.default_rng(seed)
-    z = rng.multivariate_normal([0.0, 0.0], [[1.0, r], [r, 1.0]], n)
-    loc = np.exp(params.LOC_LOG_MU + params.LOC_LOG_SIGMA * z[:, 0])
-    defeitos = np.exp(params.DEF_LOG_MU + params.DEF_LOG_SIGMA * z[:, 1])
-    return loc, defeitos
-
 
 def t_de_pearson(r: float, n: int = params.N_SIM) -> float:
     """Converte o r de Pearson na estatistica t que o teste compara com a t(n - 2)."""
@@ -46,16 +37,23 @@ def t_de_pearson(r: float, n: int = params.N_SIM) -> float:
 
 
 def exemplo_do_g2() -> dict:
-    """r, t e p-valor do conjunto de exemplo, usados no G2 e no texto do dashboard."""
-    loc, defeitos = exemplo_situacao_b()
-    r_obs = float(stats.pearsonr(loc, defeitos).statistic)
-    t_obs = t_de_pearson(r_obs)
+    """r, t e p-valor do conjunto de exemplo da S01, usados no G2 e no dashboard.
+
+    E o mesmo conjunto da Issue #188 (analysis.gerar_exemplo): situacao A, n = 30,
+    correlacao latente 0,3 e semente 42. Usar o conjunto oficial faz o p-valor marcado
+    no G2 ser exatamente o da tabela dos dois testes na secao 3 do dashboard.
+    """
+    _, resultados = analysis.gerar_exemplo()
+    por_teste = resultados.set_index("teste")
+    pearson, spearman = por_teste.loc["Pearson"], por_teste.loc["Spearman"]
     return {
-        "r": r_obs,
-        "t": t_obs,
-        "p": float(2 * stats.t.sf(abs(t_obs), GL)),
-        "r_latente": R_EXEMPLO,
-        "n": params.N_SIM,
+        "r": float(pearson["estatistica"]),
+        "t": t_de_pearson(float(pearson["estatistica"]), n=int(pearson["n"])),
+        "p": float(pearson["p_valor"]),
+        "r_spearman": float(spearman["estatistica"]),
+        "p_spearman": float(spearman["p_valor"]),
+        "conjunto": str(resultados["conjunto"].iloc[0]),
+        "n": int(pearson["n"]),
         "gl": GL,
         "t_critico": T_CRITICO,
     }
@@ -123,8 +121,9 @@ def figura_g2(t_obs: float | None = None):
 
 if __name__ == "__main__":
     ex = exemplo_do_g2()
-    print(f"exemplo da situacao B: r latente = {ex['r_latente']}, n = {ex['n']}")
-    print(f"r observado = {ex['r']:+.4f}  t = {ex['t']:+.4f}  p = {ex['p']:.4f}")
+    print(f"conjunto de exemplo (Issue #188): {ex['conjunto']}, n = {ex['n']}")
+    print(f"Pearson  r = {ex['r']:+.4f}  t = {ex['t']:+.4f}  p = {ex['p']:.4f}")
+    print(f"Spearman r = {ex['r_spearman']:+.4f}              p = {ex['p_spearman']:.4f}")
     print(f"t critico t({ex['gl']}) bicaudal 5% = +-{ex['t_critico']:.4f}")
     saida = params.RAIZ / "results" / "g2.png"
     figura_g2().savefig(saida, bbox_inches="tight")
