@@ -18,9 +18,12 @@ sys.path.insert(0, str(RAIZ))  # dashboard_demo e analysis importam "src.<modulo
 
 import dados_reais
 import dashboard_demo
+import dashboard_alfa
+import dashboard_g3
 import g1
 import graficos
 import params
+from src.analise_alfa import comparar_alfa
 
 URL_REPO = "https://github.com/henriqjmelo/lab-expe-01"
 URL_PROJECTS = "https://github.com/users/henriqjmelo/projects/1"
@@ -80,13 +83,11 @@ st.markdown(
     f"**Par P5: Pearson × Spearman** &nbsp;·&nbsp; tamanho da classe (LOC) × nº de defeitos "
     f"&nbsp;·&nbsp; semente fixa `{params.SEED}`"
 )
-link_dash = f"[Dashboard publicado]({URL_DASHBOARD})" if URL_DASHBOARD else "Dashboard: roda local (`streamlit run app.py`)"
-st.markdown(f"[Repositório]({URL_REPO}) &nbsp;·&nbsp; [GitHub Projects]({URL_PROJECTS}) &nbsp;·&nbsp; {link_dash}")
+st.markdown(f"[Repositório]({URL_REPO}) &nbsp;·&nbsp; [GitHub Projects]({URL_PROJECTS})")
 st.divider()
 
 # ------------------------------------------------------------ seção 1
 st.header("1. Cenário")
-
 st.subheader("A pergunta")
 st.markdown("> **Classes maiores concentram mais defeitos?**")
 
@@ -100,9 +101,8 @@ with col_a:
 with col_b:
     st.markdown(
         "**Teste bicaudal.** A literatura prevê associação positiva, mas uma associação "
-        "*negativa* seria um achado relevante — indicaria que classes grandes recebem mais "
-        "revisão. Fixar a direção antes de olhar os dados gastaria os 5% numa cauda só, "
-        "então mantemos 2,5% em cada uma."
+        "*negativa* também seria relevante. Como não fixamos previamente a direção, dividimos "
+        "α = 0,05 em 2,5% para cada cauda."
     )
 
 st.subheader("De onde vieram os dados reais")
@@ -206,10 +206,8 @@ st.divider()
 
 # ------------------------------------------------------------ seção 4
 st.header("4. Erro tipo I")
-st.caption(
-    "Entra na Issue #195 (G3: erro tipo I dos dois testes em cada situação, com a linha de 5%). "
-    "Depende também da situação B, Issue #194."
-)
+erro_i = dashboard_g3.renderizar(st, graficos, num)
+dashboard_alfa.renderizar(st, graficos, comparar_alfa, num)
 st.divider()
 
 # ------------------------------------------------------------ seção 5
@@ -219,41 +217,40 @@ if not SITUACOES:
 else:
     st.pyplot(figura_g4(), width="stretch")
     sim = simulacoes()
-    sem_efeito = sim[sim["r_latente"] == 0].set_index("teste")["taxa_005"]
-    com_efeito = sim[sim["r_latente"] > 0].pivot_table(
-        index=["situacao", "r_latente"], columns="teste", values="taxa_005")
-    folga = (com_efeito["Pearson"] - com_efeito["Spearman"])
-    situacao_pico, r_pico = folga.abs().idxmax()
-    maior = com_efeito.loc[(situacao_pico, r_pico)]
-    teto = com_efeito.index.get_level_values("r_latente").max()
-    no_teto = com_efeito.xs(teto, level="r_latente").iloc[0]
     repeticoes = f'{int(sim["repeticoes"].iloc[0]):,}'.replace(",", " ")
-
-    st.markdown(
-        f"""
-**O que a curva é.** Cada linha é a proporção de rejeições em {repeticoes} repetições, conforme
-a correlação latente cresce de 0 a {num(teto, 1)}. O ponto em r = 0 não é poder: ali não existe efeito nenhum, então
-a altura da curva é o **erro tipo I** — e os dois ficam calibrados, em
-{num(sem_efeito["Pearson"] * 100, 2)}% e {num(sem_efeito["Spearman"] * 100, 2)}%.
-
-**Quem detecta melhor.** Na situação {situacao_pico} o **Pearson vence em toda a faixa**, com a
-maior distância em r = {num(r_pico, 1)}: {num(maior["Pearson"] * 100, 1)}% contra
-{num(maior["Spearman"] * 100, 1)}%, {num(abs(folga.loc[(situacao_pico, r_pico)]) * 100, 1)} pontos
-percentuais. Era o esperado — a situação A é normal, e com normalidade o Pearson é o teste ótimo;
-o Spearman paga parte do poder por trocar valores por postos. Só no maior efeito testado
-(r = {num(teto, 1)}) o Pearson passa da referência de 80% de poder
-({num(no_teto["Pearson"] * 100, 1)}%), e o Spearman ainda não chega lá
-({num(no_teto["Spearman"] * 100, 1)}%) — com n = {int(sim["n"].iloc[0])}, efeitos pequenos
-passam despercebidos pelos dois.
-"""
-    )
-    if "B" not in SITUACOES:
-        st.warning(
-            "**Falta a situação B.** A Issue #194 (Q3, dados lognormais assimétricos) ainda não "
-            "foi simulada. É justamente onde o grupo espera a virada a favor do Spearman, e é ela "
-            "que decide a recomendação final. O gráfico acima inclui a situação B automaticamente "
-            "assim que `results/situacao_B.csv` existir."
+    st.markdown(f"**O que a curva é.** Cada linha mostra a proporção de rejeições em {repeticoes} repetições.")
+    efeitos = sorted(sim.loc[sim["r_latente"] > 0, "r_latente"].unique())
+    teto = max(efeitos)
+    sem_efeito = sim.loc[sim["r_latente"] == 0].set_index(["situacao", "teste"])["taxa_005"]
+    frases = []
+    for situacao, bloco in sim.loc[sim["r_latente"] > 0].groupby("situacao", sort=True):
+        poder = bloco.pivot(index="r_latente", columns="teste", values="taxa_005").sort_index()
+        diferenca = poder["Pearson"] - poder["Spearman"]
+        if (diferenca > 0).all():
+            leitura = "Pearson teve maior poder em todos os efeitos avaliados"
+        elif (diferenca < 0).all():
+            leitura = "Spearman teve maior poder em todos os efeitos avaliados"
+        else:
+            ultimo_pearson = diferenca.index[diferenca > 0].max()
+            primeiro_spearman = diferenca.index[diferenca < 0].min()
+            leitura = (
+                f"Pearson foi maior até r={num(ultimo_pearson, 1)}; Spearman foi maior "
+                f"a partir de r={num(primeiro_spearman, 1)}"
+            )
+        final = poder.loc[teto]
+        frases.append(
+            f"Na situação {situacao}, {leitura}; em r={num(teto, 1)}, Pearson = "
+            f"{num(final['Pearson'] * 100, 1)}% e Spearman = {num(final['Spearman'] * 100, 1)}%."
         )
+    erro_i_g4 = "; ".join(
+        f"{situacao}/{teste}: {num(taxa * 100, 2)}%"
+        for (situacao, teste), taxa in sem_efeito.items()
+    )
+    st.markdown(
+        f"Em r=0, as curvas representam erro tipo I: {erro_i_g4}. Para r>0, mostram poder. "
+        + " ".join(frases)
+        + f" Com n={int(sim['n'].iloc[0])}, efeitos pequenos continuam difíceis de detectar; o teste mais potente depende da distribuição."
+    )
 
 # ------------------------------------------------------------ seção 6
 st.header("6. Dados reais")
@@ -311,4 +308,45 @@ st.divider()
 
 # ------------------------------------------------------------ seção 7
 st.header("7. Conclusão")
-st.caption("Entra na Issue #200. O que esperávamos × o que encontramos, e qual teste recomendamos.")
+b = sim[sim["situacao"] == "B"].pivot(index="r_latente", columns="teste", values="taxa_005").sort_index()
+a = sim[sim["situacao"] == "A"].pivot(index="r_latente", columns="teste", values="taxa_005").sort_index()
+r_spearman_maior = b.index[(b.index > 0) & (b["Spearman"] > b["Pearson"])].to_numpy(dtype=float)
+faixa_spearman_b = (
+    f"a partir de r={num(float(r_spearman_maior.min()), 1)}"
+    if len(r_spearman_maior) else "em nenhum efeito positivo testado"
+)
+pearson_b_r01 = b.loc[0.1]
+spearman_b_rmax = float(b.loc[b.index.max(), "Spearman"])
+pearson_b_rmax = float(b.loc[b.index.max(), "Pearson"])
+pearson_a_superior = bool((a.loc[a.index > 0, "Pearson"] > a.loc[a.index > 0, "Spearman"]).all())
+erro_min, erro_max = float(erro_i["taxa_005"].min()), float(erro_i["taxa_005"].max())
+
+st.subheader("Expectativa × resultado")
+st.markdown(
+    f"A expectativa registrada antes da S02 era que Spearman fosse mais robusto na situação B assimétrica. "
+    f"Os resultados confirmam isso {faixa_spearman_b}: em r máximo, Spearman alcança "
+    f"{num(spearman_b_rmax * 100, 1)}% de poder contra {num(pearson_b_rmax * 100, 1)}% do Pearson. "
+    f"Em r=0,1, porém, Pearson tem {num(pearson_b_r01['Pearson'] * 100, 1)}% e Spearman "
+    f"{num(pearson_b_r01['Spearman'] * 100, 1)}%. Na situação A normal, "
+    f"{'Pearson tem maior poder em todos os efeitos avaliados' if pearson_a_superior else 'a vantagem de poder depende do efeito'}. "
+    f"Com α=0,05, as taxas de erro tipo I ficaram entre {num(erro_min * 100, 2)}% e {num(erro_max * 100, 2)}%."
+)
+
+st.subheader("Recomendação para este cenário")
+st.markdown(
+    f"Como o KC1 real é bastante assimétrico e a pergunta busca uma associação monotônica entre LOC e defeitos, "
+    f"recomendamos **Spearman como análise principal**, acompanhado de Pearson como análise complementar da relação linear. "
+    f"A simulação mostra a troca relevante: Pearson é mais eficiente sob a normalidade simulada, enquanto Spearman detecta "
+    f"melhor a associação moderada/forte na situação lognormal. Se a pergunta exigisse especificamente uma associação linear, "
+    f"os dados fossem aproximadamente normais e não houvesse outliers influentes, Pearson seria a escolha preferível. "
+    f"A decisão deve considerar a forma e o significado da relação, não apenas qual p-valor é menor."
+)
+
+st.subheader("Limitações")
+st.markdown(
+    f"A situação B usa uma transformação lognormal de uma normal bivariada latente; ela preserva os postos, mas não reproduz "
+    f"os {p['classes_sem_defeito']} zeros ({num(p['prop_sem_defeito'] * 100, 1)}%) observados no KC1. Por isso, ela não representa "
+    f"integralmente a distribuição real de defeitos. Além disso, n=30 é uma amostra pequena, a simulação controla uma relação "
+    f"sintética e mede desempenho apenas para os efeitos de r=0 a r=0,5 escolhidos; não prova causalidade nem garante que "
+    f"a recomendação se generalize a outros sistemas ou tamanhos amostrais."
+)
