@@ -13,6 +13,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy import stats
 
 import estilo
@@ -119,12 +120,104 @@ def figura_g2(t_obs: float | None = None):
     return fig
 
 
+# ------------------------------------------------------------------ G4
+PASTA_RESULTADOS = params.RAIZ / "results"
+COR_TESTE = {"Pearson": estilo.COR_PEARSON, "Spearman": estilo.COR_SPEARMAN}
+TRACO_SITUACAO = {"A": "-", "B": "--"}
+NOME_SITUACAO = {"A": "situação A (normal)", "B": "situação B (lognormal)"}
+
+
+def carregar_simulacoes(situacoes=("A", "B")) -> pd.DataFrame:
+    """Le os results/situacao_<X>.csv que ja existirem.
+
+    A situacao A vem da Issue #193 e a B da #194. Enquanto a #194 nao entrar, o G4
+    desenha so o que existe, em vez de quebrar.
+    """
+    quadros = [pd.read_csv(caminho)
+               for s in situacoes
+               if (caminho := PASTA_RESULTADOS / f"situacao_{s}.csv").exists()]
+    if not quadros:
+        raise FileNotFoundError(
+            f"Nenhum results/situacao_*.csv em {PASTA_RESULTADOS}. Rode python src/simulate.py.")
+    return pd.concat(quadros, ignore_index=True)
+
+
+def situacoes_disponiveis() -> list[str]:
+    return [s for s in ("A", "B") if (PASTA_RESULTADOS / f"situacao_{s}.csv").exists()]
+
+
+def vantagem_por_situacao(dados: pd.DataFrame, coluna: str = "taxa_005") -> dict[str, str]:
+    """Quem tem mais poder em cada situacao, olhando so os efeitos maiores que zero."""
+    resumo = {}
+    com_efeito = dados[dados["r_latente"] > 0]
+    for situacao, bloco in com_efeito.groupby("situacao"):
+        tabela = bloco.pivot_table(index="r_latente", columns="teste", values=coluna)
+        if {"Pearson", "Spearman"} - set(tabela.columns):
+            continue
+        diferenca = tabela["Pearson"] - tabela["Spearman"]
+        if (diferenca > 0).all():
+            resumo[situacao] = "Pearson acima em todos os efeitos"
+        elif (diferenca < 0).all():
+            resumo[situacao] = "Spearman acima em todos os efeitos"
+        else:
+            troca = float(diferenca.abs().idxmin())
+            resumo[situacao] = f"a vantagem troca perto de r = {troca:.1f}".replace(".", ",")
+    return resumo
+
+
+def figura_g4(coluna: str = "taxa_005"):
+    """Curvas de poder: proporcao de rejeicoes x tamanho do efeito, por teste e situacao."""
+    estilo.aplicar()
+    dados = carregar_simulacoes()
+    alfa = params.ALFA if coluna == "taxa_005" else params.ALFA_EXTRA
+
+    fig, ax = plt.subplots(figsize=(9.5, 5.2))
+    for (situacao, teste), bloco in dados.groupby(["situacao", "teste"]):
+        bloco = bloco.sort_values("r_latente")
+        ax.plot(bloco["r_latente"], bloco[coluna],
+                color=COR_TESTE.get(teste, "#555555"),
+                ls=TRACO_SITUACAO.get(situacao, ":"),
+                marker="o", ms=4.5, lw=2,
+                label=f"{teste} — {NOME_SITUACAO.get(situacao, situacao)}")
+
+    ax.axhline(alfa, color="#8d99ae", ls=":", lw=1.2)
+    ax.text(0.98, alfa + 0.022, f"α = {alfa:.0%} — em r = 0 a curva é o erro tipo I".replace(".", ","),
+            fontsize=8, color="#5c6672", ha="right", transform=ax.get_yaxis_transform())
+    ax.axhline(0.80, color="#8d99ae", ls=":", lw=1.2)
+    ax.text(0.01, 0.82, "poder de 80%, a referência usual", fontsize=8, color="#5c6672")
+
+    vantagem = vantagem_por_situacao(dados, coluna)
+    detalhe = "; ".join(f"situação {s}: {t}" for s, t in vantagem.items())
+    repeticoes = int(dados["repeticoes"].iloc[0])
+    ax.set_title(f"G4: poder dos dois testes × tamanho do efeito ({detalhe})", fontweight="bold",
+                 fontsize=11)
+    ax.set_xlabel("Correlação latente usada para gerar os dados (r, adimensional)")
+    ax.set_ylabel(f"Proporção de rejeições em {repeticoes:_} repetições".replace("_", " "))
+    ax.set_ylim(0, 1.04)
+    ax.set_xticks(sorted(dados["r_latente"].unique()))
+    ax.legend(loc="upper left", fontsize=8.5)
+    fig.tight_layout()
+    return fig
+
+
 if __name__ == "__main__":
     ex = exemplo_do_g2()
     print(f"conjunto de exemplo (Issue #188): {ex['conjunto']}, n = {ex['n']}")
     print(f"Pearson  r = {ex['r']:+.4f}  t = {ex['t']:+.4f}  p = {ex['p']:.4f}")
     print(f"Spearman r = {ex['r_spearman']:+.4f}              p = {ex['p_spearman']:.4f}")
     print(f"t critico t({ex['gl']}) bicaudal 5% = +-{ex['t_critico']:.4f}")
-    saida = params.RAIZ / "results" / "g2.png"
+    saida = PASTA_RESULTADOS / "g2.png"
     figura_g2().savefig(saida, bbox_inches="tight")
     print("gravado:", saida)
+
+    disponiveis = situacoes_disponiveis()
+    if disponiveis:
+        print(f"\nG4 com as situacoes {', '.join(disponiveis)}", end="")
+        print(" (falta a B, Issue #194)" if "B" not in disponiveis else "")
+        for s, t in vantagem_por_situacao(carregar_simulacoes()).items():
+            print(f"  situacao {s}: {t}")
+        saida_g4 = PASTA_RESULTADOS / "g4.png"
+        figura_g4().savefig(saida_g4, bbox_inches="tight")
+        print("gravado:", saida_g4)
+    else:
+        print("\nG4 pulado: nenhum results/situacao_*.csv ainda")
