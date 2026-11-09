@@ -128,11 +128,7 @@ NOME_SITUACAO = {"A": "situação A (normal)", "B": "situação B (lognormal)"}
 
 
 def carregar_simulacoes(situacoes=("A", "B")) -> pd.DataFrame:
-    """Le os results/situacao_<X>.csv que ja existirem.
-
-    A situacao A vem da Issue #193 e a B da #194. Enquanto a #194 nao entrar, o G4
-    desenha so o que existe, em vez de quebrar.
-    """
+    """Le e concatena os CSVs de simulação existentes para as situações pedidas."""
     quadros = [pd.read_csv(caminho)
                for s in situacoes
                if (caminho := PASTA_RESULTADOS / f"situacao_{s}.csv").exists()]
@@ -144,6 +140,49 @@ def carregar_simulacoes(situacoes=("A", "B")) -> pd.DataFrame:
 
 def situacoes_disponiveis() -> list[str]:
     return [s for s in ("A", "B") if (PASTA_RESULTADOS / f"situacao_{s}.csv").exists()]
+
+
+def tabela_erro_tipo_i(dados: pd.DataFrame | None = None) -> pd.DataFrame:
+    dados = carregar_simulacoes() if dados is None else dados
+    nulo = dados[dados["r_latente"] == 0.0]
+    return nulo[["situacao", "teste", "repeticoes", "taxa_005", "taxa_001"]].sort_values(
+        ["situacao", "teste"]
+    ).reset_index(drop=True)
+
+
+def figura_g3(dados: pd.DataFrame | None = None):
+    """Erro tipo I por teste e situação, com IC aproximado de ±0,4 p.p."""
+    estilo.aplicar()
+    taxas = tabela_erro_tipo_i(dados)
+    fig, ax = plt.subplots(figsize=(8.8, 4.8))
+    situacoes = [s for s in ("A", "B") if s in set(taxas["situacao"])]
+    centros = np.arange(len(situacoes), dtype=float)
+    largura = 0.30
+    yerr = 0.004
+    for indice, teste in enumerate(("Pearson", "Spearman")):
+        bloco = taxas[taxas["teste"] == teste].set_index("situacao").reindex(situacoes)
+        posicoes = centros + (indice - 0.5) * largura
+        valores = bloco["taxa_005"].to_numpy(dtype=float)
+        ax.bar(
+            posicoes, valores, width=largura * 0.9, color=COR_TESTE[teste], label=teste,
+            yerr=np.full(len(valores), yerr), capsize=4, edgecolor="white", linewidth=0.7,
+        )
+        for x, valor in zip(posicoes, valores):
+            ax.annotate(f"{valor:.2%}".replace(".", ","), (x, valor), xytext=(0, 7),
+                        textcoords="offset points", ha="center", fontsize=8)
+    ax.axhline(params.ALFA, color="#c44536", linestyle="--", linewidth=1.5,
+               label="α nominal = 5%")
+    ax.set_xticks(centros, [f"Situação {s}\n({'normal' if s == 'A' else 'lognormal'})" for s in situacoes])
+    ax.set_ylim(0, max(0.075, float(taxas["taxa_005"].max()) + 0.015))
+    ax.set_ylabel("Proporção de rejeições quando r = 0")
+    ax.set_xlabel("Distribuição usada para simular os dados")
+    ax.set_title("G3: erro tipo I fica próximo do nível nominal de 5%", loc="left", fontweight="bold")
+    ax.grid(axis="y", alpha=0.25)
+    ax.legend(loc="upper left", ncols=3, fontsize=8.5)
+    ax.text(0.99, 0.02, "Barras de erro: ±0,4 ponto percentual", transform=ax.transAxes,
+            ha="right", va="bottom", fontsize=8, color="#5c6672")
+    fig.tight_layout()
+    return fig
 
 
 def vantagem_por_situacao(dados: pd.DataFrame, coluna: str = "taxa_005") -> dict[str, str]:
@@ -212,6 +251,9 @@ if __name__ == "__main__":
 
     disponiveis = situacoes_disponiveis()
     if disponiveis:
+        saida_g3 = PASTA_RESULTADOS / "g3.png"
+        figura_g3().savefig(saida_g3, bbox_inches="tight")
+        print("gravado:", saida_g3)
         print(f"\nG4 com as situacoes {', '.join(disponiveis)}", end="")
         print(" (falta a B, Issue #194)" if "B" not in disponiveis else "")
         for s, t in vantagem_por_situacao(carregar_simulacoes()).items():
