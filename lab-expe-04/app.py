@@ -9,12 +9,14 @@ As secoes 1 a 3 sao da S01. As secoes 4 a 7 entram na S02 e na entrega final.
 import sys
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 
 RAIZ = Path(__file__).resolve().parent
 sys.path.insert(0, str(RAIZ / "src"))
 sys.path.insert(0, str(RAIZ))  # dashboard_demo e analysis importam "src.<modulo>"
 
+import dados_reais
 import dashboard_demo
 import g1
 import graficos
@@ -33,6 +35,11 @@ def resumo_real() -> dict:
 
 
 @st.cache_data
+def testar_reais() -> pd.DataFrame:
+    return dados_reais.testar_dados_reais()
+
+
+@st.cache_data
 def exemplo_g2() -> dict:
     return graficos.exemplo_do_g2()
 
@@ -45,6 +52,19 @@ def figura_g1():
 @st.cache_resource
 def figura_g2():
     return graficos.figura_g2()
+
+
+@st.cache_data
+def simulacoes():
+    return graficos.carregar_simulacoes()
+
+
+@st.cache_resource
+def figura_g4():
+    return graficos.figura_g4()
+
+
+SITUACOES = graficos.situacoes_disponiveis()
 
 
 def num(valor: float, casas: int = 2) -> str:
@@ -184,12 +204,111 @@ exatamente o que a S02 vai medir.
 )
 st.divider()
 
-# ------------------------------------- seções 4 a 7 (S02 e entrega final)
-for titulo, issue, texto in [
-    ("4. Erro tipo I", "#195", "Q1 e Q3: erro tipo I dos dois testes em cada situação, com a linha de 5% (G3)."),
-    ("5. Poder", "#197", "Q2 e Q3: curvas de poder dos dois testes × tamanho do efeito (G4)."),
-    ("6. Dados reais", "#199", "Estatística, p-valor, tamanho do efeito e conclusão de cada teste nas 145 classes do KC1."),
-    ("7. Conclusão", "#200", "O que esperávamos × o que encontramos, e qual teste recomendamos."),
-]:
-    st.header(titulo)
-    st.caption(f"Entra na Issue {issue}. {texto}")
+# ------------------------------------------------------------ seção 4
+st.header("4. Erro tipo I")
+st.caption(
+    "Entra na Issue #195 (G3: erro tipo I dos dois testes em cada situação, com a linha de 5%). "
+    "Depende também da situação B, Issue #194."
+)
+st.divider()
+
+# ------------------------------------------------------------ seção 5
+st.header("5. Poder")
+if not SITUACOES:
+    st.caption("Entra na Issue #197. Rode `python src/simulate.py` para gerar os resultados.")
+else:
+    st.pyplot(figura_g4(), width="stretch")
+    sim = simulacoes()
+    sem_efeito = sim[sim["r_latente"] == 0].set_index("teste")["taxa_005"]
+    com_efeito = sim[sim["r_latente"] > 0].pivot_table(
+        index=["situacao", "r_latente"], columns="teste", values="taxa_005")
+    folga = (com_efeito["Pearson"] - com_efeito["Spearman"])
+    situacao_pico, r_pico = folga.abs().idxmax()
+    maior = com_efeito.loc[(situacao_pico, r_pico)]
+    teto = com_efeito.index.get_level_values("r_latente").max()
+    no_teto = com_efeito.xs(teto, level="r_latente").iloc[0]
+    repeticoes = f'{int(sim["repeticoes"].iloc[0]):,}'.replace(",", " ")
+
+    st.markdown(
+        f"""
+**O que a curva é.** Cada linha é a proporção de rejeições em {repeticoes} repetições, conforme
+a correlação latente cresce de 0 a {num(teto, 1)}. O ponto em r = 0 não é poder: ali não existe efeito nenhum, então
+a altura da curva é o **erro tipo I** — e os dois ficam calibrados, em
+{num(sem_efeito["Pearson"] * 100, 2)}% e {num(sem_efeito["Spearman"] * 100, 2)}%.
+
+**Quem detecta melhor.** Na situação {situacao_pico} o **Pearson vence em toda a faixa**, com a
+maior distância em r = {num(r_pico, 1)}: {num(maior["Pearson"] * 100, 1)}% contra
+{num(maior["Spearman"] * 100, 1)}%, {num(abs(folga.loc[(situacao_pico, r_pico)]) * 100, 1)} pontos
+percentuais. Era o esperado — a situação A é normal, e com normalidade o Pearson é o teste ótimo;
+o Spearman paga parte do poder por trocar valores por postos. Só no maior efeito testado
+(r = {num(teto, 1)}) o Pearson passa da referência de 80% de poder
+({num(no_teto["Pearson"] * 100, 1)}%), e o Spearman ainda não chega lá
+({num(no_teto["Spearman"] * 100, 1)}%) — com n = {int(sim["n"].iloc[0])}, efeitos pequenos
+passam despercebidos pelos dois.
+"""
+    )
+    if "B" not in SITUACOES:
+        st.warning(
+            "**Falta a situação B.** A Issue #194 (Q3, dados lognormais assimétricos) ainda não "
+            "foi simulada. É justamente onde o grupo espera a virada a favor do Spearman, e é ela "
+            "que decide a recomendação final. O gráfico acima inclui a situação B automaticamente "
+            "assim que `results/situacao_B.csv` existir."
+        )
+
+# ------------------------------------------------------------ seção 6
+st.header("6. Dados reais")
+real = testar_reais()
+pe = real.set_index("teste").loc["Pearson"]
+sp = real.set_index("teste").loc["Spearman"]
+
+
+def fmt_p(valor: float) -> str:
+    return "< 0,001" if valor < 0.001 else num(valor, 3)
+
+
+def fmt_ic(linha) -> str:
+    return f"[{num(linha['ic95_inf'], 2)}; {num(linha['ic95_sup'], 2)}]"
+
+
+st.markdown(
+    f"Os dois testes aplicados às **{int(pe['n'])} classes reais** do KC1: LOC × número de defeitos, "
+    f"bicaudal, α = {num(params.ALFA, 2)}, {int(pe['gl'])} graus de liberdade."
+)
+tabela_real = pd.DataFrame({
+    "Teste": real["teste"],
+    "n": real["n"],
+    "Estatística (r ou ρ)": real["estatistica"].map(lambda v: num(v, 3)),
+    "t": real["t"].map(lambda v: num(v, 2)),
+    "p-valor": real["p_valor"].map(fmt_p),
+    "IC 95%": [fmt_ic(l) for _, l in real.iterrows()],
+    "r² (variância compartilhada)": real["r2"].map(lambda v: f"{num(v * 100, 1)}%"),
+    "Tamanho do efeito": real["tamanho_efeito"],
+    "Decisão (α = 0,05)": real["decisao"],
+})
+st.dataframe(tabela_real, hide_index=True, width="stretch")
+st.markdown(
+    f"""
+**Conclusão.** Os dois testes rejeitam H₀ com folga: há associação positiva entre o tamanho da
+classe e o número de defeitos (Pearson r = {num(pe["estatistica"], 2)}, Spearman
+ρ = {num(sp["estatistica"], 2)}, ambos com p {fmt_p(max(pe["p_valor"], sp["p_valor"]))}). O efeito é
+**{pe["tamanho_efeito"]}** pelos dois critérios (|r| ≥ 0,5, rótulos de Cohen), mas não é
+determinístico: o LOC explica cerca de {num(pe["r2"] * 100, 0)}% da variação dos defeitos pelo Pearson
+e {num(sp["r2"] * 100, 0)}% da variação dos postos pelo Spearman; o resto vem de outros fatores.
+
+**Por que os dois números diferem.** O Pearson ({num(pe["estatistica"], 2)}) fica acima do Spearman
+({num(sp["estatistica"], 2)}), e os intervalos de confiança se sobrepõem em boa parte
+({fmt_ic(pe)} contra {fmt_ic(sp)}). A explicação mais provável é a assimetria: poucas classes
+enormes com muitos defeitos puxam o r de Pearson, enquanto o Spearman só enxerga a ordem. Há
+ainda {p["classes_sem_defeito"]} classes ({num(p["prop_sem_defeito"] * 100, 1)}%) empatadas em zero
+defeito, o que reduz a resolução dos postos e deixa o p-valor do Spearman aproximado. Com n = {int(pe["n"])}
+a decisão não muda por nenhum dos dois caminhos; o que muda é a magnitude estimada.
+
+**Correlação não é causa.** Classes grandes têm mais código onde errar, e o KC1 não separa esse
+efeito de outros, como complexidade ou idade da classe.
+"""
+)
+st.divider()
+
+# ------------------------------------------------------------ seção 7
+st.header("7. Conclusão")
+st.caption("Entra na Issue #200. O que esperávamos × o que encontramos, e qual teste recomendamos.")

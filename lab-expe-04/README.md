@@ -55,11 +55,15 @@ lab-expe-04/
     estilo.py          cores e estilo compartilhados dos gráficos
     generate.py        gerador das situações A (normal) e B (lognormal)
     analysis.py        aplica Pearson e Spearman a um conjunto e interpreta
+    simulate.py        motor vetorizado (10.000 × 30): erro tipo I e poder -> results/situacao_*.csv
+    dados_reais.py     Pearson e Spearman nas 145 classes reais (seção 6)
     g1.py              G1: histogramas real × simulado
-    graficos.py        G2: distribuição de t sob H₀, rejeição e p-valor
+    graficos.py        G2: distribuição de t sob H₀, rejeição e p-valor; G4: curvas de poder
     dashboard_demo.py  bloco da seção 3: tabela dos dois testes no exemplo
-  tests/               pytest do gerador e da análise
-  results/             PNGs gerados (g1.png, g2.png)
+  tests/               pytest do gerador, da análise, do motor e dos dados reais
+  results/             PNGs (g1.png, g2.png, g4.png) e CSVs da simulação (situacao_A.csv, situacao_B.csv)
+  docs/
+    oral.md            roteiro das 15 perguntas da apresentação, por integrante
 ```
 
 ## Scripts avulsos
@@ -69,7 +73,10 @@ lab-expe-04/
 ```bash
 python src/params.py      # resumo dos dados reais e os parâmetros da situação B
 python src/g1.py          # grava results/g1.png
-python src/graficos.py    # imprime r, t e p do exemplo e grava results/g2.png
+python src/graficos.py    # grava results/g2.png e, se houver CSV de simulação, results/g4.png
+python src/simulate.py    # simula A e B (10.000 repetições, seed 42) e grava results/situacao_*.csv
+python src/simulate.py --situacao A    # só uma das situações
+python src/dados_reais.py # Pearson e Spearman nas 145 classes reais
 ```
 
 ## Testes
@@ -78,7 +85,16 @@ python src/graficos.py    # imprime r, t e p do exemplo e grava results/g2.png
 python -m pytest tests -q
 ```
 
-Cobrem o gerador das duas situações e a aplicação dos dois testes a um conjunto.
+Cobrem o gerador das duas situações, a aplicação dos dois testes a um conjunto, o motor de simulação
+(p-valores conferidos linha a linha contra `scipy.stats`) e os testes nos dados reais.
+
+## Resultados da simulação (`results/situacao_*.csv`)
+
+Uma linha por efeito (r latente) e por teste: 6 efeitos × 2 testes por situação. Colunas:
+`situacao`, `r_latente`, `teste`, `n`, `repeticoes`, `rejeicoes_005`, `taxa_005`, `rejeicoes_001`,
+`taxa_001` e `estatistica_media`. Com `r_latente = 0` a taxa é o **erro tipo I** (Q1); com
+`r_latente > 0` é o **poder** (Q2). As taxas em α = 0,01 saem dos mesmos p-valores, para a análise extra.
+O Spearman é igual nas situações A e B: `exp()` não muda a ordem dos valores, então os postos são os mesmos.
 
 ## O conjunto de exemplo da S01
 
@@ -102,7 +118,7 @@ registrado em `src/params.py` (`JUSTIFICATIVA`) e na seção 2 do dashboard.
 
 | Sprint | Entrega | Issues |
 | :--- | :--- | :--- |
-| S01 | dados reais, cenário, gerador, 2 testes em 1 conjunto, G1 e G2, dashboard seções 1–3 | #184–#191 |
+| S01 | dados reais, cenário, gerador, 2 testes em 1 conjunto, G1 e G2, dashboard seções 1–3 | #184–#191 (concluída) |
 | S02 | Q1, Q2 e Q3, G3 e G4, dashboard seções 4 e 5 | #192–#198 |
 | Final | dashboard seções 6 e 7, revisão, roteiro oral | #199–#204 |
 
