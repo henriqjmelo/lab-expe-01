@@ -57,9 +57,12 @@ lab-expe-04/
     analysis.py        aplica Pearson e Spearman a um conjunto e interpreta
     simulate.py        motor vetorizado (10.000 × 30): erro tipo I e poder -> results/situacao_*.csv
     dados_reais.py     Pearson e Spearman nas 145 classes reais (seção 6)
+    analise_alfa.py    reaplica α = 0,01 aos mesmos resultados simulados (análise extra)
     g1.py              G1: histogramas real × simulado
-    graficos.py        G2: distribuição de t sob H₀, rejeição e p-valor; G4: curvas de poder
+    graficos.py        G2: t sob H₀, rejeição e p-valor; G3: erro tipo I; G4: curvas de poder
     dashboard_demo.py  bloco da seção 3: tabela dos dois testes no exemplo
+    dashboard_g3.py    bloco da seção 4: G3 e sua leitura
+    dashboard_alfa.py  bloco da seção 4: tabela comparando α = 0,05 e α = 0,01
   tests/               pytest do gerador, da análise, do motor e dos dados reais
   results/             PNGs (g1.png, g2.png, g3.png, g4.png) e CSVs da simulação (situacao_A.csv, situacao_B.csv)
   docs/
@@ -103,6 +106,23 @@ definido em `analysis.gerar_exemplo()`: situação A, n = 30, correlação laten
 Nele o Pearson rejeita H₀ (r = 0,374; p = 0,042) e o Spearman não (ρ = 0,247; p = 0,188) — é o
 primeiro sinal de que a escolha do teste muda a conclusão.
 
+## O achado principal
+
+Os dois testes ficam calibrados sob H₀ em α = 0,05 (erro tipo I entre 5,07% e 5,16% nas duas
+situações), mas o poder depende da distribuição:
+
+| | situação A (normal) | situação B (lognormal) |
+| :--- | :--- | :--- |
+| quem detecta mais | **Pearson** em toda a faixa | **Spearman** a partir de r = 0,2 |
+| poder em r = 0,5 | Pearson 82,5% × Spearman 77,2% | Pearson 48,5% × Spearman 77,2% |
+
+O Spearman tem **exatamente os mesmos números nas duas situações**: a situação B só aplica `exp()`
+aos valores latentes da A, e `exp()` não muda a ordem dos valores — logo os postos, e com eles a
+decisão do teste, são os mesmos. Por isso o G4 desenha uma curva só para ele, em vez de duas
+linhas sobrepostas. Quem perde com a assimetria é o Pearson, que cai de 82,5% para 48,5% de poder.
+Em α = 0,01 o Pearson da situação B também fica mal calibrado (2,69% de erro tipo I contra 1%
+esperado). Daí a recomendação da seção 7: **Spearman como análise principal** neste cenário.
+
 ## As duas situações simuladas
 
 | Situação | Como os dados são gerados | Para que serve |
@@ -119,8 +139,8 @@ registrado em `src/params.py` (`JUSTIFICATIVA`) e na seção 2 do dashboard.
 | Sprint | Entrega | Issues |
 | :--- | :--- | :--- |
 | S01 | dados reais, cenário, gerador, 2 testes em 1 conjunto, G1 e G2, dashboard seções 1–3 | #184–#191 (concluída) |
-| S02 | Q1, Q2 e Q3, G3 e G4, dashboard seções 4 e 5 | #192–#198 |
-| Final | dashboard seções 6 e 7, revisão, roteiro oral | #199–#204 |
+| S02 | Q1, Q2 e Q3, G3 e G4, dashboard seções 4 e 5, análise extra em α = 0,01 | #192–#198 (concluída) |
+| Final | dashboard seções 6 e 7, revisão, roteiro oral | #199–#204 (concluída) |
 
 ## Convenções
 

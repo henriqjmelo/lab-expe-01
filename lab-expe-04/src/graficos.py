@@ -204,37 +204,89 @@ def vantagem_por_situacao(dados: pd.DataFrame, coluna: str = "taxa_005") -> dict
     return resumo
 
 
+def curvas_do_g4(dados: pd.DataFrame, coluna: str = "taxa_005") -> list[dict]:
+    """Monta as curvas do G4, juntando numa so as que forem numericamente iguais.
+
+    O Spearman cai nesse caso: a situacao B apenas aplica exp() aos valores latentes da A,
+    e exp() nao muda a ordem dos valores, entao os postos — e com eles a decisao do teste —
+    sao os mesmos nas duas. Desenhar duas linhas sobrepostas esconderia uma delas e deixaria
+    a legenda prometendo uma curva que nao aparece no grafico.
+    """
+    curvas = []
+    for teste, bloco_teste in dados.groupby("teste"):
+        por_situacao = {s: b.sort_values("r_latente")
+                        for s, b in bloco_teste.groupby("situacao")}
+        situacoes = sorted(por_situacao)
+        valores = [por_situacao[s][coluna].to_numpy(dtype=float) for s in situacoes]
+        iguais = len(situacoes) > 1 and all(np.allclose(valores[0], v) for v in valores[1:])
+        if iguais:
+            bloco = por_situacao[situacoes[0]]
+            curvas.append({
+                "teste": teste, "situacoes": situacoes, "traco": "-",
+                "x": bloco["r_latente"].to_numpy(dtype=float), "y": valores[0],
+                "rotulo": f"{teste} — situações {' e '.join(situacoes)} (curvas idênticas)",
+            })
+            continue
+        for situacao, y in zip(situacoes, valores):
+            bloco = por_situacao[situacao]
+            curvas.append({
+                "teste": teste, "situacoes": [situacao],
+                "traco": TRACO_SITUACAO.get(situacao, ":"),
+                "x": bloco["r_latente"].to_numpy(dtype=float), "y": y,
+                "rotulo": f"{teste} — {NOME_SITUACAO.get(situacao, situacao)}",
+            })
+    return curvas
+
+
+def troca_de_vantagem(dados: pd.DataFrame, situacao: str, coluna: str = "taxa_005"):
+    """Primeiro efeito positivo em que o Spearman passa o Pearson, ou None se nao passa."""
+    bloco = dados[(dados["situacao"] == situacao) & (dados["r_latente"] > 0)]
+    tabela = bloco.pivot_table(index="r_latente", columns="teste", values=coluna).sort_index()
+    if {"Pearson", "Spearman"} - set(tabela.columns):
+        return None
+    virou = tabela.index[tabela["Spearman"] > tabela["Pearson"]]
+    return float(virou.min()) if len(virou) else None
+
+
 def figura_g4(coluna: str = "taxa_005"):
     """Curvas de poder: proporcao de rejeicoes x tamanho do efeito, por teste e situacao."""
     estilo.aplicar()
     dados = carregar_simulacoes()
     alfa = params.ALFA if coluna == "taxa_005" else params.ALFA_EXTRA
 
-    fig, ax = plt.subplots(figsize=(9.5, 5.2))
-    for (situacao, teste), bloco in dados.groupby(["situacao", "teste"]):
-        bloco = bloco.sort_values("r_latente")
-        ax.plot(bloco["r_latente"], bloco[coluna],
-                color=COR_TESTE.get(teste, "#555555"),
-                ls=TRACO_SITUACAO.get(situacao, ":"),
-                marker="o", ms=4.5, lw=2,
-                label=f"{teste} — {NOME_SITUACAO.get(situacao, situacao)}")
+    fig, ax = plt.subplots(figsize=(9.8, 5.6))
+    for curva in curvas_do_g4(dados, coluna):
+        ax.plot(curva["x"], curva["y"],
+                color=COR_TESTE.get(curva["teste"], "#555555"),
+                ls=curva["traco"], marker="o", ms=4.5, lw=2, label=curva["rotulo"])
 
     ax.axhline(alfa, color="#8d99ae", ls=":", lw=1.2)
-    ax.text(0.98, alfa + 0.022, f"α = {alfa:.0%} — em r = 0 a curva é o erro tipo I".replace(".", ","),
-            fontsize=8, color="#5c6672", ha="right", transform=ax.get_yaxis_transform())
+    ax.text(0.015, alfa - 0.042, f"α = {alfa:.0%} — em r = 0 a curva é o erro tipo I".replace(".", ","),
+            fontsize=8, color="#5c6672", ha="left", transform=ax.get_yaxis_transform())
     ax.axhline(0.80, color="#8d99ae", ls=":", lw=1.2)
-    ax.text(0.01, 0.82, "poder de 80%, a referência usual", fontsize=8, color="#5c6672")
+    ax.text(0.015, 0.815, "poder de 80%, a referência usual", fontsize=8, color="#5c6672",
+            ha="left", transform=ax.get_yaxis_transform())
 
-    vantagem = vantagem_por_situacao(dados, coluna)
-    detalhe = "; ".join(f"situação {s}: {t}" for s, t in vantagem.items())
+    # Marca onde o Spearman passa o Pearson: e a virada que decide a recomendacao do grupo.
+    for situacao in situacoes_disponiveis():
+        r_virada = troca_de_vantagem(dados, situacao, coluna)
+        if r_virada is None:
+            continue
+        ax.axvline(r_virada, color="#6a4c93", ls="-.", lw=1.1, alpha=0.7)
+        ax.annotate(f"situação {situacao}: daqui em diante\no Spearman detecta mais",
+                    xy=(r_virada, 0.60), xytext=(7, 0), textcoords="offset points",
+                    fontsize=8.5, color="#6a4c93", va="center")
+
+    detalhe = "; ".join(f"situação {s}: {t}" for s, t in vantagem_por_situacao(dados, coluna).items())
     repeticoes = int(dados["repeticoes"].iloc[0])
-    ax.set_title(f"G4: poder dos dois testes × tamanho do efeito ({detalhe})", fontweight="bold",
-                 fontsize=11)
+    ax.set_title("G4: qual teste detecta mais depende da distribuição dos dados",
+                 fontweight="bold", fontsize=12, loc="left", pad=22)
+    ax.text(0, 1.015, detalhe, transform=ax.transAxes, fontsize=9, color="#5c6672")
     ax.set_xlabel("Correlação latente usada para gerar os dados (r, adimensional)")
     ax.set_ylabel(f"Proporção de rejeições em {repeticoes:_} repetições".replace("_", " "))
     ax.set_ylim(0, 1.04)
     ax.set_xticks(sorted(dados["r_latente"].unique()))
-    ax.legend(loc="upper left", fontsize=8.5)
+    ax.legend(loc="upper left", fontsize=8.5, framealpha=0.95)
     fig.tight_layout()
     return fig
 
