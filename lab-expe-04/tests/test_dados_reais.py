@@ -3,12 +3,13 @@ import pandas as pd
 from scipy import stats
 
 from src import params
-from src.dados_reais import classificar_efeito, testar_dados_reais
+from src.dados_reais import classificar_efeito
+from src.dados_reais import testar_dados_reais as rodar_testes_reais
 
 
 def test_resultados_batem_com_o_scipy_nas_145_classes():
     df = params.carregar_reais()
-    res = testar_dados_reais(df).set_index("teste")
+    res = rodar_testes_reais(df).set_index("teste")
     pearson = stats.pearsonr(df[params.COL_LOC], df[params.COL_DEF])
     spearman = stats.spearmanr(df[params.COL_LOC], df[params.COL_DEF])
 
@@ -21,7 +22,7 @@ def test_resultados_batem_com_o_scipy_nas_145_classes():
 
 
 def test_ic95_contem_a_estimativa_e_r2_e_o_quadrado():
-    res = testar_dados_reais()
+    res = rodar_testes_reais()
     assert (res["ic95_inf"] < res["estatistica"]).all()
     assert (res["estatistica"] < res["ic95_sup"]).all()
     assert np.allclose(res["r2"], res["estatistica"] ** 2)
@@ -35,4 +36,4 @@ def test_classificacao_do_tamanho_do_efeito():
 def test_dados_sem_associacao_nao_rejeitam():
     rng = np.random.default_rng(1)
     df = pd.DataFrame({params.COL_LOC: rng.normal(size=200), params.COL_DEF: rng.normal(size=200)})
-    assert (testar_dados_reais(df)["decisao"] == "não rejeita H₀").all()
+    assert (rodar_testes_reais(df)["decisao"] == "não rejeita H₀").all()
