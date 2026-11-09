@@ -61,7 +61,7 @@ lab-expe-04/
     graficos.py        G2: distribuição de t sob H₀, rejeição e p-valor; G4: curvas de poder
     dashboard_demo.py  bloco da seção 3: tabela dos dois testes no exemplo
   tests/               pytest do gerador, da análise, do motor e dos dados reais
-  results/             PNGs (g1.png, g2.png, g4.png) e CSVs da simulação (situacao_A.csv, situacao_B.csv)
+  results/             PNGs (g1.png, g2.png, g3.png, g4.png) e CSVs da simulação (situacao_A.csv, situacao_B.csv)
   docs/
     oral.md            roteiro das 15 perguntas da apresentação, por integrante
 ```
@@ -73,7 +73,7 @@ lab-expe-04/
 ```bash
 python src/params.py      # resumo dos dados reais e os parâmetros da situação B
 python src/g1.py          # grava results/g1.png
-python src/graficos.py    # grava results/g2.png e, se houver CSV de simulação, results/g4.png
+python src/graficos.py    # grava results/g2.png, g3.png e, se houver CSV de simulação, results/g4.png
 python src/simulate.py    # simula A e B (10.000 repetições, seed 42) e grava results/situacao_*.csv
 python src/simulate.py --situacao A    # só uma das situações
 python src/dados_reais.py # Pearson e Spearman nas 145 classes reais

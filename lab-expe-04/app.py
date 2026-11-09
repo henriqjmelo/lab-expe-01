@@ -217,32 +217,39 @@ if not SITUACOES:
 else:
     st.pyplot(figura_g4(), width="stretch")
     sim = simulacoes()
-    sem_efeito = sim[sim["r_latente"] == 0].set_index("teste")["taxa_005"]
-    com_efeito = sim[sim["r_latente"] > 0].pivot_table(
-        index=["situacao", "r_latente"], columns="teste", values="taxa_005")
-    folga = (com_efeito["Pearson"] - com_efeito["Spearman"])
-    situacao_pico, r_pico = folga.abs().idxmax()
-    maior = com_efeito.loc[(situacao_pico, r_pico)]
-    teto = com_efeito.index.get_level_values("r_latente").max()
-    no_teto = com_efeito.xs(teto, level="r_latente").iloc[0]
     repeticoes = f'{int(sim["repeticoes"].iloc[0]):,}'.replace(",", " ")
+    st.markdown(f"**O que a curva é.** Cada linha mostra a proporção de rejeições em {repeticoes} repetições.")
+    efeitos = sorted(sim.loc[sim["r_latente"] > 0, "r_latente"].unique())
+    teto = max(efeitos)
+    sem_efeito = sim.loc[sim["r_latente"] == 0].set_index(["situacao", "teste"])["taxa_005"]
+    frases = []
+    for situacao, bloco in sim.loc[sim["r_latente"] > 0].groupby("situacao", sort=True):
+        poder = bloco.pivot(index="r_latente", columns="teste", values="taxa_005").sort_index()
+        diferenca = poder["Pearson"] - poder["Spearman"]
+        if (diferenca > 0).all():
+            leitura = "Pearson teve maior poder em todos os efeitos avaliados"
+        elif (diferenca < 0).all():
+            leitura = "Spearman teve maior poder em todos os efeitos avaliados"
+        else:
+            ultimo_pearson = diferenca.index[diferenca > 0].max()
+            primeiro_spearman = diferenca.index[diferenca < 0].min()
+            leitura = (
+                f"Pearson foi maior até r={num(ultimo_pearson, 1)}; Spearman foi maior "
+                f"a partir de r={num(primeiro_spearman, 1)}"
+            )
+        final = poder.loc[teto]
+        frases.append(
+            f"Na situação {situacao}, {leitura}; em r={num(teto, 1)}, Pearson = "
+            f"{num(final['Pearson'] * 100, 1)}% e Spearman = {num(final['Spearman'] * 100, 1)}%."
+        )
+    erro_i_g4 = "; ".join(
+        f"{situacao}/{teste}: {num(taxa * 100, 2)}%"
+        for (situacao, teste), taxa in sem_efeito.items()
+    )
     st.markdown(
-        f"""
-**O que a curva é.** Cada linha é a proporção de rejeições em {repeticoes} repetições, conforme
-a correlação latente cresce de 0 a {num(teto, 1)}. O ponto em r = 0 não é poder: ali não existe efeito nenhum, então
-a altura da curva é o **erro tipo I** — e os dois ficam calibrados, em
-{num(sem_efeito["Pearson"] * 100, 2)}% e {num(sem_efeito["Spearman"] * 100, 2)}%.
-
-**Quem detecta melhor.** Na situação {situacao_pico} o **Pearson vence em toda a faixa**, com a
-maior distância em r = {num(r_pico, 1)}: {num(maior["Pearson"] * 100, 1)}% contra
-{num(maior["Spearman"] * 100, 1)}%, {num(abs(folga.loc[(situacao_pico, r_pico)]) * 100, 1)} pontos
-percentuais. Era o esperado — a situação A é normal, e com normalidade o Pearson é o teste ótimo;
-o Spearman paga parte do poder por trocar valores por postos. Só no maior efeito testado
-(r = {num(teto, 1)}) o Pearson passa da referência de 80% de poder
-({num(no_teto["Pearson"] * 100, 1)}%), e o Spearman ainda não chega lá
-({num(no_teto["Spearman"] * 100, 1)}%) — com n = {int(sim["n"].iloc[0])}, efeitos pequenos
-passam despercebidos pelos dois.
-"""
+        f"Em r=0, as curvas representam erro tipo I: {erro_i_g4}. Para r>0, mostram poder. "
+        + " ".join(frases)
+        + f" Com n={int(sim['n'].iloc[0])}, efeitos pequenos continuam difíceis de detectar; o teste mais potente depende da distribuição."
     )
 
 # ------------------------------------------------------------ seção 6
