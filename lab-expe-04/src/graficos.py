@@ -168,19 +168,21 @@ def figura_g3(dados: pd.DataFrame | None = None):
             yerr=np.full(len(valores), yerr), capsize=4, edgecolor="white", linewidth=0.7,
         )
         for x, valor in zip(posicoes, valores):
-            ax.annotate(f"{valor:.2%}".replace(".", ","), (x, valor), xytext=(0, 7),
-                        textcoords="offset points", ha="center", fontsize=8)
+            ax.annotate(f"{valor:.2%}".replace(".", ","), (x, valor + yerr), xytext=(0, 6),
+                        textcoords="offset points", ha="center", fontsize=8.5,
+                        fontweight="bold", color="#2b2d42")
     ax.axhline(params.ALFA, color="#c44536", linestyle="--", linewidth=1.5,
                label="α nominal = 5%")
     ax.set_xticks(centros, [f"Situação {s}\n({'normal' if s == 'A' else 'lognormal'})" for s in situacoes])
-    ax.set_ylim(0, max(0.075, float(taxas["taxa_005"].max()) + 0.015))
+    ax.set_ylim(0, max(0.080, float(taxas["taxa_005"].max()) + 0.020))
     ax.set_ylabel("Proporção de rejeições quando r = 0")
     ax.set_xlabel("Distribuição usada para simular os dados")
     ax.set_title("G3: erro tipo I fica próximo do nível nominal de 5%", loc="left", fontweight="bold")
     ax.grid(axis="y", alpha=0.25)
     ax.legend(loc="upper left", ncols=3, fontsize=8.5)
-    ax.text(0.99, 0.02, "Barras de erro: ±0,4 ponto percentual", transform=ax.transAxes,
-            ha="right", va="bottom", fontsize=8, color="#5c6672")
+    ax.text(0.99, 0.03, "Barras de erro: ±0,4 ponto percentual, a margem de 10 000 repetições",
+            transform=ax.transAxes, ha="right", va="bottom", fontsize=8, color="#5c6672",
+            bbox=dict(facecolor="white", alpha=0.9, edgecolor="#dee2e6", boxstyle="round,pad=0.35"))
     fig.tight_layout()
     return fig
 
