@@ -18,16 +18,15 @@ sys.path.insert(0, str(RAIZ))  # dashboard_demo e analysis importam "src.<modulo
 
 import dados_reais
 import dashboard_demo
+import analise_alfa
 import dashboard_alfa
 import dashboard_g3
 import g1
 import graficos
 import params
-from src.analise_alfa import comparar_alfa
 
 URL_REPO = "https://github.com/henriqjmelo/lab-expe-01"
 URL_PROJECTS = "https://github.com/users/henriqjmelo/projects/1"
-URL_DASHBOARD = None  # publicar na entrega final e preencher aqui
 
 st.set_page_config(page_title="Lab04 — Pearson × Spearman", layout="wide")
 
@@ -206,8 +205,12 @@ st.divider()
 
 # ------------------------------------------------------------ seção 4
 st.header("4. Erro tipo I")
-erro_i = dashboard_g3.renderizar(st, graficos, num)
-dashboard_alfa.renderizar(st, graficos, comparar_alfa, num)
+if not SITUACOES:
+    erro_i = None
+    st.caption("Depende de `results/situacao_*.csv`. Rode `python src/simulate.py`.")
+else:
+    erro_i = dashboard_g3.renderizar(st, graficos, num)
+    dashboard_alfa.renderizar(st, graficos, analise_alfa.comparar_alfa, num)
 st.divider()
 
 # ------------------------------------------------------------ seção 5
@@ -218,39 +221,63 @@ else:
     st.pyplot(figura_g4(), width="stretch")
     sim = simulacoes()
     repeticoes = f'{int(sim["repeticoes"].iloc[0]):,}'.replace(",", " ")
-    st.markdown(f"**O que a curva é.** Cada linha mostra a proporção de rejeições em {repeticoes} repetições.")
-    efeitos = sorted(sim.loc[sim["r_latente"] > 0, "r_latente"].unique())
-    teto = max(efeitos)
     sem_efeito = sim.loc[sim["r_latente"] == 0].set_index(["situacao", "teste"])["taxa_005"]
+    teto = float(sim.loc[sim["r_latente"] > 0, "r_latente"].max())
+    erro_i_g4 = "; ".join(f"{s}/{t} = {num(v * 100, 2)}%" for (s, t), v in sem_efeito.items())
+
     frases = []
     for situacao, bloco in sim.loc[sim["r_latente"] > 0].groupby("situacao", sort=True):
-        poder = bloco.pivot(index="r_latente", columns="teste", values="taxa_005").sort_index()
+        poder = bloco.pivot_table(index="r_latente", columns="teste", values="taxa_005").sort_index()
         diferenca = poder["Pearson"] - poder["Spearman"]
+        virada = graficos.troca_de_vantagem(sim, situacao)
         if (diferenca > 0).all():
-            leitura = "Pearson teve maior poder em todos os efeitos avaliados"
+            leitura = "o **Pearson** detecta mais em toda a faixa"
         elif (diferenca < 0).all():
-            leitura = "Spearman teve maior poder em todos os efeitos avaliados"
+            leitura = "o **Spearman** detecta mais em toda a faixa"
+        elif virada is not None:
+            leitura = f"a vantagem troca de lado: o **Spearman** passa o Pearson a partir de r = {num(virada, 1)}"
         else:
-            ultimo_pearson = diferenca.index[diferenca > 0].max()
-            primeiro_spearman = diferenca.index[diferenca < 0].min()
-            leitura = (
-                f"Pearson foi maior até r={num(ultimo_pearson, 1)}; Spearman foi maior "
-                f"a partir de r={num(primeiro_spearman, 1)}"
-            )
+            leitura = "a vantagem troca de lado ao longo da faixa"
         final = poder.loc[teto]
         frases.append(
-            f"Na situação {situacao}, {leitura}; em r={num(teto, 1)}, Pearson = "
-            f"{num(final['Pearson'] * 100, 1)}% e Spearman = {num(final['Spearman'] * 100, 1)}%."
+            f"Na situação {situacao} {leitura}. No maior efeito testado (r = {num(teto, 1)}) o Pearson "
+            f"chega a {num(final['Pearson'] * 100, 1)}% e o Spearman a {num(final['Spearman'] * 100, 1)}%."
         )
-    erro_i_g4 = "; ".join(
-        f"{situacao}/{teste}: {num(taxa * 100, 2)}%"
-        for (situacao, teste), taxa in sem_efeito.items()
-    )
+
     st.markdown(
-        f"Em r=0, as curvas representam erro tipo I: {erro_i_g4}. Para r>0, mostram poder. "
-        + " ".join(frases)
-        + f" Com n={int(sim['n'].iloc[0])}, efeitos pequenos continuam difíceis de detectar; o teste mais potente depende da distribuição."
+        f"""
+**O que a curva é.** Cada linha é a proporção de rejeições em {repeticoes} repetições, conforme a
+correlação latente cresce de 0 a {num(teto, 1)}. O ponto em r = 0 não é poder: ali não existe efeito
+algum, então a altura da curva é o **erro tipo I** — {erro_i_g4}, todos perto dos 5% nominais
+(é o mesmo número do G3, na seção 4).
+
+**Quem detecta melhor.** {" ".join(frases)}
+"""
     )
+
+    juntas = [c for c in graficos.curvas_do_g4(sim) if len(c["situacoes"]) > 1]
+    for curva in juntas:
+        st.info(
+            f"**Por que o {curva['teste']} aparece com uma curva só.** As situações "
+            f"{' e '.join(curva['situacoes'])} dão exatamente os mesmos números para ele, então as duas "
+            f"linhas ficariam sobrepostas. O motivo é o desenho da simulação: a situação B aplica `exp()` "
+            f"aos mesmos valores latentes da A, e `exp()` não muda a **ordem** dos valores. Como o "
+            f"{curva['teste']} só olha postos, ele recebe exatamente a mesma entrada nas duas — é a "
+            f"definição de robustez a transformações monotônicas, visível no gráfico."
+        )
+
+    no_teto = (sim[sim["r_latente"] == teto]
+               .set_index(["situacao", "teste"])["taxa_005"])
+    if ("A", "Pearson") in no_teto.index and ("B", "Pearson") in no_teto.index:
+        st.markdown(
+            f"""
+**O que isso decide.** A assimetria não mexe no Spearman e derruba o Pearson: em r = {num(teto, 1)} o
+Pearson cai de {num(no_teto[("A", "Pearson")] * 100, 1)}% na situação A para
+{num(no_teto[("B", "Pearson")] * 100, 1)}% na B. É esse resultado que sustenta a recomendação da
+seção 7. Com n = {int(sim["n"].iloc[0])}, porém, efeitos pequenos continuam passando despercebidos
+pelos dois testes.
+"""
+        )
 
 # ------------------------------------------------------------ seção 6
 st.header("6. Dados reais")
@@ -308,26 +335,33 @@ st.divider()
 
 # ------------------------------------------------------------ seção 7
 st.header("7. Conclusão")
-b = sim[sim["situacao"] == "B"].pivot(index="r_latente", columns="teste", values="taxa_005").sort_index()
-a = sim[sim["situacao"] == "A"].pivot(index="r_latente", columns="teste", values="taxa_005").sort_index()
-r_spearman_maior = b.index[(b.index > 0) & (b["Spearman"] > b["Pearson"])].to_numpy(dtype=float)
+if not SITUACOES or erro_i is None:
+    st.caption("Depende de `results/situacao_*.csv`. Rode `python src/simulate.py`.")
+    st.stop()
+
+a = sim[sim["situacao"] == "A"].pivot_table(index="r_latente", columns="teste", values="taxa_005").sort_index()
+b = sim[sim["situacao"] == "B"].pivot_table(index="r_latente", columns="teste", values="taxa_005").sort_index()
+efeitos_b = b.index[b.index > 0]
+r_spearman_maior = efeitos_b[b.loc[efeitos_b, "Spearman"] > b.loc[efeitos_b, "Pearson"]]
 faixa_spearman_b = (
-    f"a partir de r={num(float(r_spearman_maior.min()), 1)}"
+    f"a partir de r = {num(float(r_spearman_maior.min()), 1)}"
     if len(r_spearman_maior) else "em nenhum efeito positivo testado"
 )
-pearson_b_r01 = b.loc[0.1]
-spearman_b_rmax = float(b.loc[b.index.max(), "Spearman"])
-pearson_b_rmax = float(b.loc[b.index.max(), "Pearson"])
+r_piso = float(efeitos_b.min())
+b_no_piso = b.loc[r_piso]
+r_teto_b = float(efeitos_b.max())
+spearman_b_rmax = float(b.loc[r_teto_b, "Spearman"])
+pearson_b_rmax = float(b.loc[r_teto_b, "Pearson"])
 pearson_a_superior = bool((a.loc[a.index > 0, "Pearson"] > a.loc[a.index > 0, "Spearman"]).all())
 erro_min, erro_max = float(erro_i["taxa_005"].min()), float(erro_i["taxa_005"].max())
 
 st.subheader("Expectativa × resultado")
 st.markdown(
     f"A expectativa registrada antes da S02 era que Spearman fosse mais robusto na situação B assimétrica. "
-    f"Os resultados confirmam isso {faixa_spearman_b}: em r máximo, Spearman alcança "
+    f"Os resultados confirmam isso {faixa_spearman_b}: em r = {num(r_teto_b, 1)}, Spearman alcança "
     f"{num(spearman_b_rmax * 100, 1)}% de poder contra {num(pearson_b_rmax * 100, 1)}% do Pearson. "
-    f"Em r=0,1, porém, Pearson tem {num(pearson_b_r01['Pearson'] * 100, 1)}% e Spearman "
-    f"{num(pearson_b_r01['Spearman'] * 100, 1)}%. Na situação A normal, "
+    f"No menor efeito testado (r = {num(r_piso, 1)}), porém, o Pearson ainda fica à frente: "
+    f"{num(b_no_piso['Pearson'] * 100, 1)}% contra {num(b_no_piso['Spearman'] * 100, 1)}%. Na situação A normal, "
     f"{'Pearson tem maior poder em todos os efeitos avaliados' if pearson_a_superior else 'a vantagem de poder depende do efeito'}. "
     f"Com α=0,05, as taxas de erro tipo I ficaram entre {num(erro_min * 100, 2)}% e {num(erro_max * 100, 2)}%."
 )
