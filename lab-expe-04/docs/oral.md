@@ -66,10 +66,39 @@ Respostas de cerca de 30 segundos (70 a 80 palavras faladas), cada uma apontando
 
 "Na situação A, que é a bem comportada, o Pearson tem mais poder em toda a faixa. E a diferença muda, sim. Em r igual a 0,1 os dois praticamente empatam, perto de 8%. A distância máxima aparece em r igual a 0,4: Pearson 61,3% contra 55,8% do Spearman, quase 6 pontos. Em 0,5 volta a encolher, porque as duas curvas sobem para o teto. Faz sentido: com normalidade o Pearson é o teste ótimo, e o Spearman paga um pedaço do poder por usar postos."
 
-> **Pendente:** a situação B (Issue #194) ainda não foi simulada. Quando o `results/situacao_B.csv`
-> entrar, esta resposta precisa dizer **se a vantagem troca de lado** — é o ponto que decide a
-> recomendação do grupo, e é o que a pergunta 15 cobra. O G4 passa a desenhar as curvas da B
-> sozinho; só o texto falado precisa ser refeito.
+Na situação B, a vantagem troca: Pearson fica ligeiramente acima em r=0,1 (9,2% contra 7,8%), mas Spearman supera o Pearson de r=0,2 até r=0,5; no efeito máximo, 77,2% contra 48,5%. O G4 mostra ambas as situações, com linhas sólidas para A e tracejadas para B.
+
+## Henrique — perguntas 9, 11, 12, 13 e 15
+
+### 9. No G3, algum teste se afastou de 5%? Ele ficou liberal ou conservador, e por quê?
+
+*Mostrar: seção 4, G3.*
+
+"Com α=0,05, nenhum teste se afastou de forma relevante: as taxas de erro tipo I ficaram entre 5,07% e 5,16% nas situações normal e lognormal, dentro da margem visual de aproximadamente 0,4 ponto percentual. Portanto, ambos ficaram perto dos 5% nominais. O achado muda no α=0,01: o Pearson na situação B rejeitou 2,69% das vezes, acima do 1% esperado, sinal de que a aproximação t fica menos bem calibrada com as marginais muito assimétricas."
+
+### 11. Que violação de pressuposto vocês simularam, e por que ela afeta mais um teste?
+
+*Mostrar: seção 2, G1, e seção 5, G4.*
+
+"Na situação B transformamos os valores latentes normais com exponencial, produzindo marginais lognormais assimétricas, como as do KC1. O Pearson trabalha sobre os valores brutos e é sensível à assimetria; sob essa transformação a associação linear em escala original enfraquece e seu poder cai. O Spearman usa postos e a exponencial preserva a ordem, então sua estatística e curva de poder ficam iguais às da situação A neste desenho. A limitação é que a lognormal nunca gera zero defeitos, embora 58,6% das classes reais sejam zero."
+
+### 12. Se usássemos α=0,01 em vez de 0,05, o que mudaria no G3 e no G4?
+
+*Mostrar: tabela de α=0,01 abaixo do G3.*
+
+"O corte mais rigoroso reduz falso positivo, mas também reduz poder, porque exige um p-valor menor para rejeitar H₀. Na situação A, o erro tipo I fica perto de 1%: Pearson 1,05% e Spearman 1,16%. Na situação B, Spearman também fica em 1,16%, mas Pearson sobe para 2,69%, revelando pior calibração da aproximação t sob assimetria. Em r=0,5, por exemplo, o poder cai de 82,5% para 62,0% no Pearson da situação A e de 77,2% para 54,7% no Spearman."
+
+### 13. A simulação confirmou o que o grupo esperava antes de simular?
+
+*Mostrar: seção 1, hipótese prévia, e seção 5, G4.*
+
+"Em grande parte, sim. Esperávamos que Pearson fosse melhor no caso normal e Spearman se beneficiasse da assimetria. Na situação A, Pearson teve mais poder em todos os efeitos positivos. Na situação B, Spearman passou a ter mais poder a partir de r=0,2; em r=0,1 o Pearson ainda ficou ligeiramente à frente. Isso é coerente com Spearman preservar os postos sob transformação monotônica, enquanto a associação linear medida pelo Pearson é reduzida na escala lognormal."
+
+### 15. Qual teste vocês recomendam, quando mudariam a recomendação e qual é a principal limitação?
+
+*Mostrar: seção 7, conclusão.*
+
+"Para LOC e defeitos do KC1, que são muito assimétricos e levantam uma pergunta sobre associação monotônica, recomendamos Spearman como análise principal e Pearson como complemento para associação linear. Se os dados fossem aproximadamente normais, sem outliers influentes, e o interesse fosse especificamente linear, escolheríamos Pearson, que teve maior poder na situação A. A limitação principal é que a situação B lognormal não reproduz as classes sem defeitos, quase 59% do KC1; além disso, a simulação usa n=30 e não permite inferir causalidade."
 
 ## Pontos de atenção para a pergunta de follow-up
 
