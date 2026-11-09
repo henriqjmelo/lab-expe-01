@@ -124,7 +124,7 @@ O dashboard deve ter as seções abaixo, nesta ordem:
 - Deve abrir com um único comando descrito no README, ou estar publicado (ex.: GitHub Pages, Streamlit Community Cloud).
 - O link do dashboard e do repositório/GitHub Projects do grupo devem aparecer no topo do dashboard.
 
-Link do repositório/GitHub Projects: `<preencher>`
+Link do repositório/GitHub Projects: <https://github.com/henriqjmelo/lab-expe-01> · <https://github.com/users/henriqjmelo/projects/1>
 
 ---
 
