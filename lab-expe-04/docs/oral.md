@@ -34,6 +34,43 @@ Respostas de cerca de 30 segundos (70 a 80 palavras faladas), cada uma apontando
 
 "Sim, os dois rejeitam H₀ com p menor que 0,001. O Pearson deu 0,69 e o Spearman 0,57, ambos efeito grande. O tamanho explica cerca de metade da variação dos defeitos pelo Pearson e um terço pelo Spearman. Na prática importa: tamanho é uma métrica barata para priorizar revisão. Mas não prova causa, porque classes grandes têm mais código onde errar."
 
+## Guilherme — perguntas 5, 6, 7, 8 e 10
+
+### 5. O que cada um dos dois testes compara de fato (médias, postos, proporções...)?
+
+*Mostrar: seção 3, o parágrafo "O que cada teste compara".*
+
+"Os dois medem associação, mas não a mesma coisa. O Pearson compara o quanto tamanho e defeitos variam juntos em valor: é associação linear sobre os números crus. O Spearman faz a mesma conta depois de trocar cada valor pelo seu posto, então mede se a ordem acompanha — associação monotônica. Na prática: para o Pearson, uma classe de 3.000 linhas vale vinte vezes uma de 150; para o Spearman ela é só a maior da fila."
+
+### 6. No G2: o que é a distribuição da estatística sob H₀, e por que a região de rejeição fica onde fica?
+
+*Mostrar: seção 3, G2 (a curva azul e o zoom da cauda).*
+
+"A curva é a distribuição da estatística do teste quando H₀ é verdadeira. O Pearson converte o r num t: r vezes raiz de n menos 2, dividido por raiz de 1 menos r ao quadrado. Com n igual a 30, isso segue uma t de Student com 28 graus de liberdade. A região de rejeição fica nas duas pontas porque é lá que estão os valores de t improváveis caso não houvesse associação nenhuma: 2,5% de cada lado, além de mais ou menos 2,048."
+
+### 7. O que significa o p-valor do exemplo mostrado no G2? E o que ele não significa?
+
+*Mostrar: seção 3, a área amarela do G2 e a tabela logo abaixo.*
+
+"No exemplo o Pearson deu p igual a 0,042, que é a área amarela. Significa: se H₀ fosse verdadeira, um t tão ou mais extremo quanto o nosso apareceria em 4,2% das amostras. O que ele não significa: não é a probabilidade de H₀ ser verdadeira, não é a chance de estarmos errados ao rejeitar, e não mede tamanho de efeito. Prova disso é o mesmo conjunto: o Spearman deu 0,188 e não rejeita."
+
+### 8. No cenário de vocês, o que seria um erro tipo I e um erro tipo II? Qual seria mais grave?
+
+*Mostrar: seção 1, a tabela "O que seria errar, aqui".*
+
+"Erro tipo I seria concluir que classes maiores têm mais defeitos quando não têm: o time passaria a priorizar revisão e refatoração por tamanho, gastando esforço num critério que não prevê nada. Erro tipo II seria existir a associação e o teste não detectar: aí se joga fora um indicador de risco barato, porque o tamanho já está medido. Para nós o tipo I é mais grave: ele cria uma política custosa e difícil de reverter, enquanto o tipo II só mantém o time onde já está."
+
+### 10. No G4, qual teste tem mais poder? A diferença muda conforme o tamanho do efeito?
+
+*Mostrar: seção 5, G4.*
+
+"Na situação A, que é a bem comportada, o Pearson tem mais poder em toda a faixa. E a diferença muda, sim. Em r igual a 0,1 os dois praticamente empatam, perto de 8%. A distância máxima aparece em r igual a 0,4: Pearson 61,3% contra 55,8% do Spearman, quase 6 pontos. Em 0,5 volta a encolher, porque as duas curvas sobem para o teto. Faz sentido: com normalidade o Pearson é o teste ótimo, e o Spearman paga um pedaço do poder por usar postos."
+
+> **Pendente:** a situação B (Issue #194) ainda não foi simulada. Quando o `results/situacao_B.csv`
+> entrar, esta resposta precisa dizer **se a vantagem troca de lado** — é o ponto que decide a
+> recomendação do grupo, e é o que a pergunta 15 cobra. O G4 passa a desenhar as curvas da B
+> sozinho; só o texto falado precisa ser refeito.
+
 ## Pontos de atenção para a pergunta de follow-up
 
 - **Pearson maior que Spearman nos dados reais.** A explicação provável é a assimetria: poucas classes enormes com muitos defeitos puxam o Pearson. Os dois intervalos de confiança de 95% se sobrepõem ([0,59; 0,77] e [0,44; 0,68]), então a diferença entre eles não é conclusiva.
