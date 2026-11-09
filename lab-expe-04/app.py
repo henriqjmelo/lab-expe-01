@@ -363,7 +363,7 @@ st.markdown(
     f"No menor efeito testado (r = {num(r_piso, 1)}), porém, o Pearson ainda fica à frente: "
     f"{num(b_no_piso['Pearson'] * 100, 1)}% contra {num(b_no_piso['Spearman'] * 100, 1)}%. Na situação A normal, "
     f"{'Pearson tem maior poder em todos os efeitos avaliados' if pearson_a_superior else 'a vantagem de poder depende do efeito'}. "
-    f"Com α=0,05, as taxas de erro tipo I ficaram entre {num(erro_min * 100, 2)}% e {num(erro_max * 100, 2)}%."
+    f"Com α = 0,05, as taxas de erro tipo I ficaram entre {num(erro_min * 100, 2)}% e {num(erro_max * 100, 2)}%."
 )
 
 st.subheader("Recomendação para este cenário")
@@ -380,7 +380,7 @@ st.subheader("Limitações")
 st.markdown(
     f"A situação B usa uma transformação lognormal de uma normal bivariada latente; ela preserva os postos, mas não reproduz "
     f"os {p['classes_sem_defeito']} zeros ({num(p['prop_sem_defeito'] * 100, 1)}%) observados no KC1. Por isso, ela não representa "
-    f"integralmente a distribuição real de defeitos. Além disso, n=30 é uma amostra pequena, a simulação controla uma relação "
-    f"sintética e mede desempenho apenas para os efeitos de r=0 a r=0,5 escolhidos; não prova causalidade nem garante que "
+    f"integralmente a distribuição real de defeitos. Além disso, n = 30 é uma amostra pequena, a simulação controla uma relação "
+    f"sintética e mede desempenho apenas para os efeitos de r = 0 a r = 0,5 escolhidos; não prova causalidade nem garante que "
     f"a recomendação se generalize a outros sistemas ou tamanhos amostrais."
 )
