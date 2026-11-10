@@ -5,7 +5,7 @@ número de defeitos? Dados reais do **KC1 (NASA), nível de classe**, 145 classe
 
 | | |
 | :--- | :--- |
-| Dashboard | roda local com o comando único abaixo (publicação pendente, entrega final) |
+| Dashboard | comando único abaixo; para publicar, ver [Publicar no Streamlit Community Cloud](#publicar-no-streamlit-community-cloud) |
 | Repositório | <https://github.com/henriqjmelo/lab-expe-01> |
 | GitHub Projects | <https://github.com/users/henriqjmelo/projects/1> |
 | Enunciado | [`ENUNCIADO.md`](ENUNCIADO.md) |
@@ -24,6 +24,31 @@ dados reais e desenha os gráficos na hora, sem depender de nenhum PNG gerado an
 
 Python 3.12 ou superior (testado em 3.14.7). As versões das bibliotecas estão fixadas em
 [`requirements.txt`](requirements.txt).
+
+## Publicar no Streamlit Community Cloud
+
+O enunciado aceita **comando único no README _ou_ dashboard publicado**, mas a seção 4 também pede
+o link do dashboard no topo da página — então vale publicar. O repositório já está pronto para isso:
+
+1. <https://share.streamlit.io> → **Create app** → **Deploy a public app from GitHub**.
+2. Repository `henriqjmelo/lab-expe-01`, branch `main`, **Main file path `lab-expe-04/app.py`**.
+3. Em **Advanced settings**, escolher **Python 3.13** (ou 3.12). O padrão da plataforma vem mudando,
+   e as versões fixadas aqui foram testadas em 3.14.7 local; se o build falhar, a primeira coisa a
+   conferir é essa opção e o log de instalação.
+4. Deploy. O app sobe sem nenhum passo extra: `data/kc1_class.csv` e os dois `results/situacao_*.csv`
+   estão versionados, e o dashboard só lê esses arquivos — não roda a simulação na inicialização.
+5. Copiar a URL gerada para `URL_DASHBOARD`, no topo do [`app.py`](app.py), e commitar. O link passa
+   a aparecer no cabeçalho do dashboard, ao lado do repositório e do Projects.
+
+Dois detalhes da plataforma que este repositório já respeita:
+
+- **O Cloud roda a partir da raiz do repositório**, mesmo com o `app.py` numa subpasta. Todos os
+  caminhos do projeto são ancorados em `Path(__file__)`, nunca no diretório atual, então funcionam
+  igual nas duas situações.
+- **O arquivo de dependências é procurado primeiro na pasta do entrypoint** e só depois na raiz.
+  O [`requirements.txt`](requirements.txt) está ao lado do `app.py`, que é onde deve ficar.
+  O [`.streamlit/config.toml`](.streamlit/config.toml) segue a mesma regra e fixa o tema claro,
+  para os gráficos (fundo branco) não destoarem da página.
 
 ## Reprodutibilidade
 
@@ -50,6 +75,8 @@ lab-expe-04/
   data/
     kc1_class.csv      dados reais: 145 classes
     README.md          fonte do dataset e como foi obtido
+  .streamlit/
+    config.toml        tema do dashboard (lido também pelo Streamlit Cloud)
   src/
     params.py          constantes + parâmetros estimados dos dados reais
     estilo.py          cores e estilo compartilhados dos gráficos

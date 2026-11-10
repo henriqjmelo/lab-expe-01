@@ -1,0 +1,13 @@
+# Config do app, lida pelo Streamlit Community Cloud por ficar ao lado do app.py
+# (um config.toml na pasta do entrypoint tem precedencia sobre o da raiz do repo).
+
+[theme]
+# Tema claro fixo: os quatro graficos sao gerados pelo Matplotlib com fundo
+# branco, entao no tema escuro eles apareceriam como retangulos claros no meio
+# de uma pagina escura. Fixando o claro, pagina e graficos combinam para todo
+# mundo que abrir o link.
+base = "light"
+primaryColor = "#1f77b4"
+
+[browser]
+gatherUsageStats = false
