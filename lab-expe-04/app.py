@@ -27,6 +27,10 @@ import params
 
 URL_REPO = "https://github.com/henriqjmelo/lab-expe-01"
 URL_PROJECTS = "https://github.com/users/henriqjmelo/projects/1"
+# Preencher com a URL do Streamlit Community Cloud depois do primeiro deploy.
+# O enunciado (seção 4) pede o link do dashboard no topo da página. Enquanto
+# estiver vazio, o topo informa o comando único, que é a alternativa aceita.
+URL_DASHBOARD = ""
 
 st.set_page_config(page_title="Lab04 — Pearson × Spearman", layout="wide")
 
@@ -82,7 +86,12 @@ st.markdown(
     f"**Par P5: Pearson × Spearman** &nbsp;·&nbsp; tamanho da classe (LOC) × nº de defeitos "
     f"&nbsp;·&nbsp; semente fixa `{params.SEED}`"
 )
-st.markdown(f"[Repositório]({URL_REPO}) &nbsp;·&nbsp; [GitHub Projects]({URL_PROJECTS})")
+links = [f"[Repositório]({URL_REPO})", f"[GitHub Projects]({URL_PROJECTS})"]
+links.append(
+    f"[Dashboard publicado]({URL_DASHBOARD})" if URL_DASHBOARD
+    else "Dashboard: roda local com `streamlit run app.py`"
+)
+st.markdown(" &nbsp;·&nbsp; ".join(links))
 st.divider()
 
 # ------------------------------------------------------------ seção 1
