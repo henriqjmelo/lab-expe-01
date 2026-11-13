@@ -30,7 +30,7 @@ URL_PROJECTS = "https://github.com/users/henriqjmelo/projects/1"
 # Preencher com a URL do Streamlit Community Cloud depois do primeiro deploy.
 # O enunciado (seção 4) pede o link do dashboard no topo da página. Enquanto
 # estiver vazio, o topo informa o comando único, que é a alternativa aceita.
-URL_DASHBOARD = ""
+URL_DASHBOARD = "https://lab-expe-01-be7jrem4xjxjbshdmy9ocq.streamlit.app"
 
 st.set_page_config(page_title="Lab04 — Pearson × Spearman", layout="wide")
 
