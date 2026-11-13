@@ -56,6 +56,8 @@ Vale para `data/pilot.csv`, `data/full.csv`, `data/processed/clean.csv` e `data/
 | `raw_file` | caminho | saída bruta em `data/raw/` |
 | `gc_log_file` | caminho | log de GC em `data/raw/` |
 
+Regras que o validador (`scripts/validate_schema.py`) aplica além da tabela: `timestamp` em UTC (`Z` ou `+00:00`); em runs com `failed` = 1 as métricas (`exec_ms`, `gc_pause_max_ms`, `cpu_s`, `rss_peak_mb`) podem ficar vazias, mas `failure_reason` é obrigatório; `rep` fica em 1..N; `raw_file` e `gc_log_file` são relativos à pasta passada em `--base-dir`.
+
 ## 4. Arquivos: quem produz e quem consome
 
 | Arquivo | Produz | Consome |
