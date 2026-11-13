@@ -100,7 +100,6 @@ lab-expe-04/
   results/             PNGs (g1.png, g2.png, g3.png, g4.png) e CSVs da simulação (situacao_A.csv, situacao_B.csv)
   docs/
     oral.md            roteiro das 15 perguntas da apresentação, por integrante
-    roteiro-apresentacao.md  guia do grupo: o que foi feito, o passeio pelo dashboard e o checklist do dia
 ```
 
 ## Scripts avulsos
