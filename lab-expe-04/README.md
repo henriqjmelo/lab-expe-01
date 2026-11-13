@@ -5,7 +5,7 @@ número de defeitos? Dados reais do **KC1 (NASA), nível de classe**, 145 classe
 
 | | |
 | :--- | :--- |
-| Dashboard | comando único abaixo; para publicar, ver [Publicar no Streamlit Community Cloud](#publicar-no-streamlit-community-cloud) |
+| Dashboard | <https://lab-expe-01-be7jrem4xjxjbshdmy9ocq.streamlit.app> (ou o comando único abaixo) |
 | Repositório | <https://github.com/henriqjmelo/lab-expe-01> |
 | GitHub Projects | <https://github.com/users/henriqjmelo/projects/1> |
 | Enunciado | [`ENUNCIADO.md`](ENUNCIADO.md) |
@@ -38,7 +38,13 @@ o link do dashboard no topo da página — então vale publicar. O repositório 
 4. Deploy. O app sobe sem nenhum passo extra: `data/kc1_class.csv` e os dois `results/situacao_*.csv`
    estão versionados, e o dashboard só lê esses arquivos — não roda a simulação na inicialização.
 5. Copiar a URL gerada para `URL_DASHBOARD`, no topo do [`app.py`](app.py), e commitar. O link passa
-   a aparecer no cabeçalho do dashboard, ao lado do repositório e do Projects.
+   a aparecer no cabeçalho do dashboard, ao lado do repositório e do Projects. **Feito:**
+   <https://lab-expe-01-be7jrem4xjxjbshdmy9ocq.streamlit.app>
+
+> **Atenção no dia da apresentação.** No plano gratuito o app **hiberna depois de um tempo sem
+> acesso**: quem abrir o link frio vê a tela "Zzzz — this app has gone to sleep" e precisa clicar
+> para acordar, o que levou cerca de um minuto no teste. **Abra o link uns 5 minutos antes de
+> apresentar** para ele já estar de pé quando o professor acessar.
 
 Dois detalhes da plataforma que este repositório já respeita:
 
