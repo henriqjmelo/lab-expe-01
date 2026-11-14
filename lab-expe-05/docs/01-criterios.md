@@ -14,10 +14,10 @@ Legenda da coluna *Verificação*:
 | Afirmação | Evidência | URL | Verificação |
 | :--- | :--- | :--- | :--- |
 | O OpenJDK é o projeto de referência do Java SE, com site, builds e documentação oficiais | Site do OpenJDK e página de builds do JDK 25 | <https://jdk.java.net/25/> e <https://openjdk.org/projects/jdk/25/> | conferir (acesso automatizado retornou HTTP 403) |
-| O código do OpenJDK é open source (GPLv2 com Classpath Exception) | "OpenJDK code is under GPLv2 with Classpath Exception" | <https://adoptium.net/about/> | lido |
+| O código do OpenJDK é open source (GPLv2 com Classpath Exception) | A página da Adoptium informa que o código do OpenJDK é licenciado sob GPL v2 com Classpath Exception | <https://adoptium.net/about/> | lido |
 | Existe uma distribuição binária mantida e gratuita do OpenJDK: **Eclipse Temurin**, do projeto Eclipse Adoptium | Imagem oficial `eclipse-temurin` no Docker Hub, "Maintained by: Adoptium" | <https://hub.docker.com/_/eclipse-temurin> | lido |
 
-A imagem usada no estudo será a oficial do Eclipse Temurin JDK 25, com tag e digest fixados na issue S01-B1.
+A imagem usada no estudo será a oficial do Eclipse Temurin JDK 25 (tag `eclipse-temurin:25`, exemplo citado na página do Docker Hub), com a tag exata e o **digest** fixados na issue S01-B1.
 
 ## 2. Em operação
 
@@ -27,7 +27,7 @@ A imagem usada no estudo será a oficial do Eclipse Temurin JDK 25, com tag e di
 | O JDK 25 é uma versão **mantida hoje**, com release recente | Último build Temurin 25: **`jdk-25.0.5+8`**, atualizado em **22/10/2026** | <https://api.adoptium.net/v3/assets/latest/25/hotspot?os=linux&architecture=x64&image_type=jdk> | lido |
 | Existem versões **não LTS mais novas** que o JDK 25 | `most_recent_feature_release` = 27 e `tip_version` = 28 (JDK 26 e 27 já existem) | mesma API de `available_releases` | lido |
 | O JDK 25 foi lançado em setembro de 2025 | Data de disponibilidade geral (GA) | <https://openjdk.org/projects/jdk/25/> | conferir |
-| O ZGC está em uso em produção em escala | Netflix migrou de G1 para o ZGC geracional a partir do JDK 21 (relato do próprio Netflix, republicado em 06/03/2024) | <https://inside.java/2024/03/06/generational-zgc-netflix> | imprensa (resultados da busca; abrir o post antes de citar números) |
+| O ZGC está em uso em produção em escala | Netflix migrou de G1 para o ZGC geracional a partir do JDK 21 (relato do próprio Netflix, republicado em 06/03/2024) | <https://inside.java/2024/03/06/generational-zgc-netflix> | lido na revisão do PR (o post não mostra data nem autor; a data vem da URL do inside.java); abrir o post antes de citar números de pausa |
 | Há adoção de versões recentes em produção | JetBrains, 2025: versões Java usadas regularmente: **21 = 40 %, 17 = 39 %, 8 = 31 %, 11 = 17 %, 24 = 14 %** (múltipla escolha) | <https://lp.jetbrains.com/the-state-of-java-2025> | lido |
 
 ### Por que o JDK 25 e o par G1 × ZGC
@@ -84,4 +84,4 @@ Existem JDKs mais novos (26, 27) e haverá novas atualizações do 25. **O estud
 ## 8. Pergunta que o professor pode fazer
 
 **"Vocês estudam a JVM, não o repositório. Que evidência mostra que isso é software em operação?"**
-O JDK 25 é a LTS mais recente segundo a Adoptium, com build de 22/10/2026; a imagem oficial passa de 100 milhões de pulls; há relato de operação em escala do ZGC (Netflix); e levantamentos de 2025 mostram Java 17 e 21 em uso regular por cerca de 40 % dos respondentes da JetBrains. O objeto é o software rodando, e é isso que o estudo mede.
+O JDK 25 é a LTS mais recente segundo a Adoptium, com build de 22/10/2026; a imagem oficial passa de 100 milhões de pulls; há relato de operação em escala do ZGC (Netflix); e o levantamento da JetBrains de 2025 mostra Java 21 e Java 17 em uso regular por cerca de 40 % dos respondentes. O objeto é o software rodando, e é isso que o estudo mede.
