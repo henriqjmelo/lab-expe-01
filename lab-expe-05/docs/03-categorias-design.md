@@ -21,7 +21,7 @@
 - **"Experimento" com unidades que não são pessoas.** As unidades experimentais são invocações de JVM, que não têm heterogeneidade própria como participantes humanos. A randomização aqui **não** equilibra características das unidades: ela impede que o tratamento coincida com deriva da máquina (temperatura, processos em segundo plano). A defesa de "experimento" e não "quase-experimento" é que o grupo atribui o tratamento a cada execução e controla a ordem.
 - **Transversal, mas não instantâneo.** A coleta leva horas, e mudanças na máquina ao longo desse tempo são uma ameaça interna, tratadas por blocos randomizados e pelo gráfico de repetição × tempo.
 - **Nível de evidência.** "Moderado" é uma classificação a discutir: o controle é alto, mas há replicação em outra máquina só de um subconjunto (S02-A2).
-- **Explicativa, mas sem mecanismo.** O estudo mostra **que** os coletores diferem e quanto, não **por que** (isso exigiria análise do funcionamento interno de cada coletor).
+- **Explicativa, mas sem mecanismo.** O estudo mostrará **que** os coletores diferem e quanto, não **por que** (isso exigiria análise do funcionamento interno de cada coletor).
 
 ## 3. Design do experimento
 
@@ -36,13 +36,14 @@ Fatorial completo **coletor (2) × heap (2) × benchmark (4) = 16 células**.
 | Benchmark | 4 | 2 sensíveis a latência e 2 de vazão (definidos na S01-B2) |
 
 - **Repetições:** N invocações de JVM por célula, **N = 30 provisório** (a S01-C3 confirma ou pede mais blocos). Total provisório: 16 × 30 = **480 runs**. O piloto são 5 repetições por célula: **80 runs**.
-- **Unidade experimental:** **uma invocação de JVM** (um processo `java` que executa o benchmark com k iterações internas). A medida é a **iteração final**, depois do aquecimento do JIT. A iteração do benchmark não é a unidade, porque as iterações dentro de uma mesma invocação compartilham o estado da JVM e não são independentes.
+- **Unidade experimental:** **uma invocação de JVM** (um processo `java` que executa o benchmark com **k iterações internas**, valor a decidir no piloto: S01-B3 e S01-C3, contrato seção 8). A medida é a **iteração final**, depois do aquecimento do JIT. A iteração do benchmark não é a unidade, porque as iterações dentro de uma mesma invocação compartilham o estado da JVM e não são independentes.
 - **Comparações de interesse:** o coletor é comparado **dentro de cada par heap × benchmark**: **8 pares**, 4 deles com p99 (benchmarks com latência). Daí os **12 testes confirmatórios** do contrato.
 
 ### 3.2 Randomização
 
 - Um **bloco** é uma repetição de cada uma das 16 células. Dentro de cada bloco a **ordem das 16 execuções é embaralhada** com semente registrada (coluna `seed`).
 - Motivo: evitar que um coletor rode sempre antes ou depois do outro, o que confundiria o coletor com horário, temperatura ou cache do SO.
+- O desenho é de **blocos completos randomizados**: cada bloco roda todas as 16 células uma vez, e o que se randomiza é a **ordem** dentro do bloco.
 - O bloco como unidade de coleta também permite parar, retomar e estender a coleta sem refazer nada (ver o contrato, seção 6).
 
 ### 3.3 Instrumentação
