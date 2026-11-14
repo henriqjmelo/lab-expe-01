@@ -157,3 +157,29 @@ def test_linha_de_comando_devolve_codigo_de_saida(tmp_path, capsys):
     assert vs.main([str(ok), "--n", "3"]) == 0
     assert vs.main([str(ruim)]) == 1
     assert "linha 2, coluna gc" in capsys.readouterr().out
+
+
+def test_timestamp_precisa_ser_data_e_hora_em_utc():
+    for ruim in ["2026-11-20", "2026-11-20T12:00:00", "2026-11-20T12:00:00-03:00"]:
+        d = df_valido()
+        d.loc[0, "timestamp"] = ruim
+        assert any(p.coluna == "timestamp" for p in vs.validar(d)), ruim
+    d = df_valido()
+    d.loc[0, "timestamp"] = "2026-11-20T12:00:00+00:00"
+    assert vs.validar(d) == []
+
+
+def test_rep_fora_do_intervalo_quando_n_e_informado():
+    d = df_valido(3)
+    d.loc[0, "rep"] = "9"
+    d.loc[0, "run_id"] = "novo-id"
+    assert any(p.regra == "intervalo" and p.linha == 2 for p in vs.validar(d, n=3))
+
+
+def test_arquivo_inexistente_ou_vazio_da_mensagem_e_codigo_2(tmp_path, capsys):
+    vazio = tmp_path / "vazio.csv"
+    vazio.write_text("")
+    assert vs.main([str(tmp_path / "nao_existe.csv")]) == 2
+    assert vs.main([str(vazio)]) == 2
+    saida = capsys.readouterr().out
+    assert "nao encontrado" in saida and "vazio" in saida

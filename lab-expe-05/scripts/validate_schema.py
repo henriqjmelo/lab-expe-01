@@ -71,12 +71,13 @@ def _num(v: str) -> float | None:
     return x if x == x and abs(x) != float("inf") else None
 
 
-def _data_iso(v: str) -> bool:
+def _data_iso_utc(v: str) -> bool:
+    """ISO 8601 completo (data e hora) em UTC, com Z ou +00:00, como pede o contrato."""
     try:
-        datetime.fromisoformat(v.strip().replace("Z", "+00:00"))
-        return True
+        d = datetime.fromisoformat(v.strip().replace("Z", "+00:00"))
     except ValueError:
         return False
+    return d.tzinfo is not None and d.utcoffset().total_seconds() == 0 and "T" in v
 
 
 def coletor_no_log(texto: str) -> str | None:
@@ -99,8 +100,8 @@ def _checar_linha(i: int, r: dict[str, str], ps: list[Problema]) -> None:
 
     if r["gc"].strip() and r["gc"].strip() not in COLETORES:
         erro("dominio", f"gc deve ser G1 ou ZGC, veio {r['gc']!r}", "gc")
-    if r["timestamp"].strip() and not _data_iso(r["timestamp"]):
-        erro("tipo", f"timestamp nao e ISO 8601: {r['timestamp']!r}", "timestamp")
+    if r["timestamp"].strip() and not _data_iso_utc(r["timestamp"]):
+        erro("tipo", f"timestamp deve ser ISO 8601 em UTC (ex.: 2026-11-20T12:00:00Z), veio {r['timestamp']!r}", "timestamp")
 
     for c in ("rep", "cpus", "heap_mb", "iterations"):
         if r[c].strip():
@@ -171,6 +172,10 @@ def validar(df: pd.DataFrame, n: int | None = None, base_dir: Path | None = None
         celulas[(r["gc"].strip(), r["heap_mult"].strip(), r["benchmark"].strip())].append((k + 2, r["rep"].strip()))
     for chave, itens in celulas.items():
         reps = [rep for _, rep in itens]
+        if n is not None:
+            for linha_csv, rep in itens:
+                if _int(rep) is not None and not 1 <= _int(rep) <= n:
+                    ps.append(Problema("erro", "intervalo", f"rep {rep} fora de 1..{n}", linha_csv, "rep"))
         for rep in {x for x in reps if reps.count(x) > 1}:
             ps.append(Problema("erro", "duplicata", f"rep {rep} repetido na celula {chave}", itens[0][0], "rep"))
         if n is not None and len(itens) != n:
@@ -229,7 +234,15 @@ def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-    ps = validar(ler_csv(args.csv), n=args.n, base_dir=args.base_dir)
+    try:
+        df = ler_csv(args.csv)
+    except FileNotFoundError:
+        print(f"[erro] arquivo nao encontrado: {args.csv}")
+        return 2
+    except pd.errors.EmptyDataError:
+        print(f"[erro] arquivo vazio, sem cabecalho: {args.csv}")
+        return 2
+    ps = validar(df, n=args.n, base_dir=args.base_dir)
     erros = [p for p in ps if p.gravidade == "erro"]
     for p in ps[: args.max]:
         print(p)

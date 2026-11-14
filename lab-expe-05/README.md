@@ -74,9 +74,10 @@ A definir nas issues S01-B1 (ambiente), S01-C2 (análise) e S03-B1 (`make all`).
 Validar um CSV de dados contra o contrato (S01-A4):
 
 ```bash
-python lab-expe-05/scripts/validate_schema.py data/pilot.csv            # esquema
-python lab-expe-05/scripts/validate_schema.py data/full.csv --n 30      # N linhas por célula
-python -m pytest lab-expe-05/tests -q                                   # testes do validador
+python lab-expe-05/scripts/validate_schema.py lab-expe-05/data/pilot.csv                       # esquema
+python lab-expe-05/scripts/validate_schema.py lab-expe-05/data/full.csv --n 30                 # N linhas por célula
+python lab-expe-05/scripts/validate_schema.py lab-expe-05/data/full.csv --base-dir lab-expe-05/data   # confere arquivos e o coletor no log de GC
+python -m pytest lab-expe-05/tests -q                                                          # testes do validador
 ```
 
 ---
