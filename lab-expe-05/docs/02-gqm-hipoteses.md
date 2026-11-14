@@ -22,7 +22,7 @@ Nota sobre o ZGC: no JDK 25 o ZGC existe **somente no modo geracional** (o modo 
 | **Q2.** A latência de cauda difere? | Latência p99 de requisição (`lat_p99_ms`), reportada pelo DaCapo | ms | Razão | Derivada (percentil da distribuição de latências) | **Confirmatória** |
 | **Q3.** As pausas de GC diferem? | Pausa máxima stop-the-world (`gc_pause_max_ms`), do log de GC | ms | Razão | Derivada (máximo sobre as pausas do log) | Exploratória |
 | **Q4.** O uso de CPU e de memória difere? | CPU total do processo (`cpu_s`, user + sys) e pico de RSS (`rss_peak_mb`) | s; MB | Razão | Direta | Exploratória |
-| **Q5.** A diferença entre os coletores depende do tamanho do heap? | Interação GC × heap sobre log(`exec_ms`) | adimensional | Razão (log) | Derivada | **Confirmatória** (RQ2) |
+| **Q5.** A diferença entre os coletores depende do tamanho do heap? | Interação GC × heap sobre log(`exec_ms`) | adimensional | Razão (variável original; o modelo usa o log) | Derivada (contraste de log = razão de razões ZGC/G1) | **Confirmatória** (RQ2) |
 
 O p99 só existe nos benchmarks que reportam latência (Q2 usa só esses). Nos demais, `lat_p99_ms` fica vazio, o que é dado e não erro.
 
@@ -34,7 +34,8 @@ Todas as métricas têm **zero absoluto** (0 ms de tempo, 0 MB de memória) e ra
 
 **RQ1 (Q1 e Q2).** Para cada par heap × benchmark, comparando G1 e ZGC:
 
-- H₀: o desempenho do G1 e do ZGC é igual (média igual quando os dados são aproximadamente normais; mesma distribuição quando se usa Mann-Whitney).
+- **Q1:** H₀: o `exec_ms` do G1 e o do ZGC são iguais. **Q2:** H₀: o `lat_p99_ms` do G1 e o do ZGC são iguais.
+- Com o teste t de Welch (dados aproximadamente normais), H₀ é de **médias iguais**; com Mann-Whitney, de **mesma distribuição** (ordenação estocástica igual). A escolha do teste está no plano de análise.
 - H₁: os coletores diferem. **Bicaudal**: o grupo não assume a direção antes de medir, embora se espere menor latência de cauda no ZGC.
 
 São **8 pares** para o tempo (2 heaps × 4 benchmarks) e **4 pares** para o p99 (2 heaps × 2 benchmarks com latência), ou seja, **12 testes confirmatórios**, com correção de Holm.
@@ -44,7 +45,7 @@ São **8 pares** para o tempo (2 heaps × 4 benchmarks) e **4 pares** para o p99
 - H₀: não há interação coletor × heap (a razão ZGC/G1 é a mesma nos dois tamanhos de heap).
 - H₁: a diferença entre os coletores muda com o tamanho do heap.
 
-**Nível de significância:** α = 0,05, definido antes de ver os dados completos. Q3 e Q4 são **exploratórias**: recebem correção própria e são sempre rotuladas assim, o que limita o número de testes confirmatórios e a inflação do erro tipo I. O plano de análise (`04-plano-analise.md`) detalha os testes.
+**Nível de significância:** α = 0,05, definido antes de ver os dados completos. É a **separação** entre confirmatórias e exploratórias que limita o número de testes confirmatórios (12) e a inflação do erro tipo I. Q3 e Q4 são exploratórias: recebem correção própria, definida no plano de análise (`04-plano-analise.md`), e são sempre rotuladas assim. O RQ2 é um modelo à parte (α = 0,05) e fica fora do Holm dos 12 testes.
 
 ## 4. Variáveis
 
@@ -54,7 +55,7 @@ São **8 pares** para o tempo (2 heaps × 4 benchmarks) e **4 pares** para o p99
 | **Fator** | Tamanho do heap | Razão | 2 níveis, múltiplos do heap mínimo de cada benchmark (definidos na S01-B2) |
 | **Fator** | Benchmark | Nominal | 4 benchmarks DaCapo (2 de latência, 2 de vazão) |
 | **Controladas** | Versão do JDK e imagem (tag e digest) | Nominal | JDK 25.0.x, uma imagem |
-| | Flags da JVM, exceto coletor e heap | Nominal | iguais nas duas condições (conferido por `diff` de `PrintFlagsFinal`) |
+| | Flags da JVM, exceto coletor e heap | Nominal | iguais nas duas condições; o `diff` de `PrintFlagsFinal` deve mostrar diferenças **apenas** nas flags do coletor e nas derivadas dele (ex.: nº de threads de GC) |
 | | `-Xms` = `-Xmx` | Razão | sem redimensionamento do heap |
 | | **Número de CPUs** e memória do contêiner | Razão | um valor só (ver validade externa) |
 | | Máquina, SO, versão do Docker, plano de energia | Nominal | uma máquina oficial de coleta |
@@ -72,11 +73,14 @@ Variável **não controlável** que a randomização em blocos distribui: temper
 
 ## 6. Armadilha de medição (Goodhart e Campbell)
 
+- **Lei de Goodhart:** quando uma medida vira meta, deixa de ser uma boa medida.
+- **Lei de Campbell:** quanto mais um indicador é usado para decidir, maior a pressão para distorcê-lo (e para ele distorcer o que mede).
+
 "Pausa de GC menor" é uma métrica fácil de otimizar e **não é o mesmo que latência percebida pelo usuário**. Um coletor pode ter pausas muito curtas e ainda assim piorar a latência de cauda (por exemplo, consumindo CPU que a aplicação precisaria). Por isso:
 
 1. A **latência de requisição (p99)** é a métrica primária de cauda; a pausa máxima é só exploratória.
 2. Nenhum resultado é reportado sozinho: vazão, CPU e memória aparecem junto, para não declarar vitória só pela métrica que o ZGC favorece.
-3. Heaps e benchmarks são fixados **antes** da coleta completa, para não ajustar o desenho ao resultado.
+3. Heaps e benchmarks são fixados **antes** da coleta completa. Isso protege contra flexibilidade analítica (ajustar o desenho ao resultado), um risco vizinho ao de Goodhart.
 
 O risco inverso também existe: medir só tempo de execução favoreceria o coletor de maior vazão. A combinação de métricas é a defesa contra os dois lados.
 
@@ -96,4 +100,4 @@ A matriz completa, com a escala e a estatística de cada análise, é a da issue
 
 - **"Por que a pausa de GC não é a métrica principal de latência?"** Porque pausa curta não garante latência de cauda baixa: o coletor concorrente do ZGC consome CPU que a aplicação disputa. O que o usuário sente é a latência da requisição, então o p99 é a métrica primária e a pausa é exploratória.
 - **"Por que o tempo é de razão e o que isso permite?"** Tem zero absoluto, então razões fazem sentido. Permite reportar o efeito como razão ZGC/G1 com intervalo de confiança.
-- **"Por que só duas métricas são confirmatórias?"** Para limitar o número de testes (12) e a inflação do erro tipo I. O resto é explorado, mas rotulado como tal.
+- **"Por que só duas métricas são confirmatórias?"** São três perguntas confirmatórias (Q1, Q2 e Q5), mas só duas métricas (`exec_ms` e `lat_p99_ms`; o Q5 usa `exec_ms`). Isso limita o número de testes (12) e a inflação do erro tipo I. O resto é explorado, mas rotulado como tal.
