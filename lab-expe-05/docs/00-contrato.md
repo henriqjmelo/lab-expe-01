@@ -52,7 +52,7 @@ Vale para `data/pilot.csv`, `data/full.csv`, `data/processed/clean.csv` e `data/
 | `rss_peak_mb` | decimal | pico de RSS |
 | `failed` | 0 ou 1 | 1 para OOM, falha de validação do benchmark ou erro de contêiner |
 | `failure_reason` | texto | vazio se `failed` = 0 |
-| `seed` | inteiro | semente da ordem embaralhada |
+| `seed` | inteiro | semente da ordem embaralhada do bloco (repete nas 16 linhas do mesmo bloco) |
 | `raw_file` | caminho | saída bruta em `data/raw/` |
 | `gc_log_file` | caminho | log de GC em `data/raw/` |
 
@@ -61,7 +61,7 @@ Vale para `data/pilot.csv`, `data/full.csv`, `data/processed/clean.csv` e `data/
 | Arquivo | Produz | Consome |
 | :--- | :--- | :--- |
 | `docs/00-contrato.md` | A (S01-A0) | todos |
-| `scripts/validate_schema.py` | A (S01-A4) | B (S02-B2), C |
+| `scripts/validate_schema.py` | A (S01-A4) | B (S01-B3 e S02-B2), C |
 | `data/sintetico.csv`, `scripts/gerar_sintetico.py` | C (S01-C2) | A, B (testes) |
 | `analysis/` e `analysis/run.py` | C (S01-C2) | C, A (dashboard), B (`make all`) |
 | `data/pilot.csv` | B (S01-B3) | C (S01-C3) |

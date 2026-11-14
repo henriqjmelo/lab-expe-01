@@ -63,7 +63,7 @@ lab-expe-05/
   env/         Dockerfile, compose.yaml, flags.diff
   scripts/     coleta, validação, dados sintéticos, impacto
   analysis/    pipeline de análise
-  data/        raw/, processed/, pilot.csv, full.csv
+  data/        raw/, processed/, pilot.csv, full.csv, sintetico.csv
   results/     tabelas/ e figures/
 ```
 
