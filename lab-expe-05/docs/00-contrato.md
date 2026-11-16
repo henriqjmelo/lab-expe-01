@@ -112,6 +112,6 @@ Revisão cruzada: **A é revisado por B, B por C, C por A.**
 | Máquina oficial de coleta | `[PREENCHER]` | S01-B1 |
 | 4 benchmarks e 2 níveis de heap | `[DECIDIR no piloto]` | S01-B2 |
 | Iterações internas | `[DECIDIR no piloto]` | S01-B3 / S01-C3 |
-| Menor efeito de interesse prático | `[PREENCHER com o grupo]` | S01-C1 |
+| Menor efeito de interesse prático | razão ZGC/G1 de **1,05** (`exec_ms`) e **1,10** (`lat_p99_ms`) — ver [04-plano-analise.md](04-plano-analise.md) §9 | S01-C1 |
 | Limiar de CV do plano B | 5 % `[AJUSTAR]` | S01-C3 |
 | Formato do documento | Relatório em Markdown (`docs/relatorio.md`) exportado para PDF, mais o dashboard e slides. Só muda se o grupo decidir antes do início da S03 | S03-B2 |

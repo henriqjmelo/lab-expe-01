@@ -24,6 +24,7 @@ Revisão cruzada: **A é revisado por B, B por C, C por A.**
 * Repositório: `https://github.com/henriqjmelo/lab-expe-01`
 * GitHub Projects (v2): `https://github.com/users/henriqjmelo/projects/1`
 * Contrato entre os papéis: [docs/00-contrato.md](docs/00-contrato.md)
+* Plano de análise pré-registrado: [docs/04-plano-analise.md](docs/04-plano-analise.md)
 
 ---
 
