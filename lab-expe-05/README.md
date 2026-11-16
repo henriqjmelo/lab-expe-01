@@ -62,16 +62,38 @@ lab-expe-05/
   docs/        contrato, critérios, GQM, categorias, plano de análise, ameaças, relatório
   env/         Dockerfile, compose.yaml, flags.diff
   scripts/     coleta, validação, dados sintéticos, impacto
-  analysis/    pipeline de análise
+  analysis/    pipeline de análise: run.py (comando único), io_dados, descritiva,
+               testes (árvore de decisão), interacao (RQ2), poder, graficos
   data/        raw/, processed/, pilot.csv, full.csv, sintetico.csv
   results/     tabelas/ e figures/
 ```
 
 ## Como executar
 
-A definir nas issues S01-B1 (ambiente), S01-C2 (análise) e S03-B1 (`make all`).
+Ambiente de coleta: a definir na S01-B1. Pacote reproduzível (`make all`): S03-B1.
 
-Validar um CSV de dados contra o contrato (S01-A4):
+### Análise (S01-C2)
+
+```bash
+cd lab-expe-05
+python -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+
+./.venv/bin/python scripts/gerar_sintetico.py                      # data/sintetico.csv
+./.venv/bin/python analysis/run.py --entrada data/sintetico.csv    # tabelas e figuras
+./.venv/bin/python -m pytest tests -q                              # testes
+```
+
+Quando o dado real chegar, **só o `--entrada` muda**:
+
+```bash
+./.venv/bin/python analysis/run.py --entrada data/pilot.csv --n 5
+./.venv/bin/python analysis/run.py --entrada data/processed/clean.csv --n 30
+```
+
+Saídas nos caminhos do contrato: `results/tabelas/{descritiva,testes,exploratorias,interacao,poder}.csv`
+e `results/figures/*.png`. O que está versionado hoje vem do **sintético**, não de coleta real.
+
+### Validar um CSV contra o contrato (S01-A4)
 
 ```bash
 python lab-expe-05/scripts/validate_schema.py lab-expe-05/data/pilot.csv                       # esquema
