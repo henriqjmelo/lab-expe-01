@@ -1,0 +1,8 @@
+# Lab05 - pipeline de analise (S01-C2)
+# python -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+numpy>=1.26
+scipy>=1.11
+pandas>=2.1
+matplotlib>=3.8
+statsmodels>=0.14
+pytest>=8.0
