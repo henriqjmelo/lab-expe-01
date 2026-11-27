@@ -1,0 +1,6 @@
+# PENDENTE — comparação não executada.
+# Em 2026-11-26, o Docker CLI não conseguiu acessar o daemon local (operation not permitted).
+# Não há saída de PrintFlagsFinal do digest Temurin fixado; nenhum diff é inferido do Java do host.
+# Depois de habilitar o Docker Desktop e confirmar o heap do piloto, executar:
+#   bash env/capture-flags.sh
+# Revisar cada diferença de PrintFlagsFinal e documentar as alterações esperadas além de coletor/heap.

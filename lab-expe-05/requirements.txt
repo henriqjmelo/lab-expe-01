@@ -1,0 +1,14 @@
+# Python 3.14; stack numérico espelha os pins já usados pelo Lab04.
+# statsmodels 0.15.0 tem wheel CPython 3.14 macOS arm64 e Linux aarch64.
+numpy==2.5.4
+scipy==1.18.1
+pandas==3.1.1
+matplotlib==3.11.2
+statsmodels==0.15.0
+patsy==1.0.3
+formulaic==1.2.2
+interface-meta==2.0.1
+narwhals==2.28.0
+typing-extensions==4.16.0
+packaging==26.3
+pytest==9.2.0

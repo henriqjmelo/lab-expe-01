@@ -1,0 +1,28 @@
+{
+  "suite": {
+    "name": "DaCapo 23.11-MR2-Chopin",
+    "jar_glob": "dacapo*.jar",
+    "workload_size": "default",
+    "iterations": 5,
+    "latency_metric": "simple p99",
+    "cooldown_seconds": 60
+  },
+  "benchmarks": [
+    {"name": "cassandra", "role": "latency", "reference_min_heap_mb": 174, "min_heap_mb": null},
+    {"name": "spring", "role": "latency", "reference_min_heap_mb": 55, "min_heap_mb": null},
+    {"name": "biojava", "role": "batch_candidate", "reference_min_heap_mb": 93, "min_heap_mb": null},
+    {"name": "pmd", "role": "batch_candidate", "reference_min_heap_mb": 191, "min_heap_mb": null}
+  ],
+  "reserves": [
+    {"name": "jme", "role": "frame_latency", "min_heap_mb": null},
+    {"name": "h2o", "role": "batch_ml", "min_heap_mb": null}
+  ],
+  "heap_multipliers": [2.0, 4.0],
+  "blocks": {"pilot": 5, "full": 30},
+  "container": {
+    "cpus": 4,
+    "memory_limit": "6g",
+    "platform": "linux/arm64/v8"
+  },
+  "status": "candidate_only_no_target_runtime_validation"
+}

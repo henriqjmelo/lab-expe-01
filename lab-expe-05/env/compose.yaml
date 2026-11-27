@@ -1,0 +1,25 @@
+name: lab05
+
+services:
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TEMURIN_IMAGE: ${TEMURIN_IMAGE:-eclipse-temurin:25-jdk-noble@sha256:4ddc1a8bdaf283421df5487411aff10b797ccf1e06a339041005114c8f489b5c}
+    image: lab05-temurin25:25.0.5.1-noble
+    platform: ${LAB05_PLATFORM:-linux/arm64/v8}
+    cpus: ${LAB05_CPUS:-4.0}
+    mem_limit: ${LAB05_MEM_LIMIT:-6g}
+    init: true
+    network_mode: none
+    working_dir: /workspace
+    volumes:
+      - ../data:/workspace/data
+      - ../scripts:/workspace/scripts:ro
+      - ./artifacts:/workspace/artifacts:ro
+    environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      TZ: UTC
+    entrypoint: ["/bin/bash", "/workspace/scripts/container-run.sh"]
