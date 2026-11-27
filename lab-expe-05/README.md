@@ -59,26 +59,48 @@ As interfaces entre os papéis estão escritas em [docs/00-contrato.md](docs/00-
 
 ```text
 lab-expe-05/
-  docs/        contrato, critérios, GQM, categorias, plano de análise, ameaças, relatório
+  requirements.txt dependências fixadas para validação e análise
+  Makefile     testes, preflight, coleta explícita, validação e fluxo final
+  docs/        contrato, critérios, GQM, categorias, análise, ameaças, relatório
   env/         Dockerfile, compose.yaml, flags.diff
-  scripts/     coleta, validação, dados sintéticos, impacto
-  analysis/    pipeline de análise
+  scripts/     coleta, limpeza e validação
+  slides/      roteiro cronometrado e origem dos slides do bloco B
+  analysis/    pipeline do papel C (ainda não integrado nesta branch)
   data/        raw/, processed/, pilot.csv, full.csv, sintetico.csv
   results/     tabelas/ e figures/
 ```
 
 ## Como executar
 
-A definir nas issues S01-B1 (ambiente), S01-C2 (análise) e S03-B1 (`make all`).
-
-Validar um CSV de dados contra o contrato (S01-A4):
+Configure um ambiente Python separado com os pins de `requirements.txt` (stack numérica reaproveitada do Lab04; statsmodels 0.15.0 tem wheel oficial CPython 3.14 ARM64):
 
 ```bash
-python lab-expe-05/scripts/validate_schema.py lab-expe-05/data/pilot.csv                       # esquema
-python lab-expe-05/scripts/validate_schema.py lab-expe-05/data/full.csv --n 30                 # N linhas por célula
-python lab-expe-05/scripts/validate_schema.py lab-expe-05/data/full.csv --base-dir lab-expe-05/data   # confere arquivos e o coletor no log de GC
-python -m pytest lab-expe-05/tests -q                                                          # testes do validador
+cd lab-expe-05
+python3.14 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+make test
+make config-check                 # somente docker compose config; sem build/run
+make plan-pilot                   # plano seguro, sem --execute
 ```
+
+Quando houver coleta real, valide e derive a entrada analítica. Falhas permanecem nos CSVs originais; o cleaner exclui falhas apenas do derivado e recusa o desenho não balanceado por padrão:
+
+```bash
+make validate CSV=data/pilot.csv N=5
+make validate CSV=data/full.csv N=30
+python scripts/clean_data.py data/full.csv --n 30 --base-dir data/raw --output data/processed/clean.csv
+```
+
+`make pilot` e `make full` passam `--execute` deliberadamente. Só os use após aprovar a máquina/VM Docker, obter o JAR oficial e conferir o checksum publicado, medir/aprovar `min_heap_mb`, construir e inspecionar a imagem, gerar/revisar `env/flags.diff` e confirmar a seleção, iterações e definição de p99 com o grupo. Hoje o JAR não foi baixado, os heaps continuam `null`, o daemon Docker não está acessível e as flags não foram medidas; o preflight deve bloquear a coleta.
+
+`make all` nunca coleta: testa, valida a configuração, verifica/limpa `full.csv` e chama `analysis/run.py`. Esse CSV, o `clean.csv` e o pipeline de C ainda não existem nesta branch, então o alvo permanece bloqueado até a coleta real e a integração de C. Fixtures de teste não são resultados.
+
+O teste Compose estático e os testes Python não validam imagem, JDK, JAR, heaps ou execução real do DaCapo. Consulte [env/README.md](env/README.md), [docs/05-benchmarks.md](docs/05-benchmarks.md), [docs/06-diario-coleta.md](docs/06-diario-coleta.md), [docs/10-mapa-labs.md](docs/10-mapa-labs.md) e [docs/11-revisao-cruzada.md](docs/11-revisao-cruzada.md).
+
+## Apresentação
+
+O bloco B (ambiente, coleta, reuso dos Labs e ameaças, 3 min) tem roteiro cronometrado em [slides/bloco-b.md](slides/bloco-b.md) e deck de cinco páginas no Slides. O roteiro aponta, página por página, o arquivo de origem de cada número. O ensaio com cronômetro e a rodada de perguntas cruzadas estão planejados em [docs/12-ensaio.md](docs/12-ensaio.md), com o banco em [docs/13-banco-perguntas.md](docs/13-banco-perguntas.md).
 
 ---
 
